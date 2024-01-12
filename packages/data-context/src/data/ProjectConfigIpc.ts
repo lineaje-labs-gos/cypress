@@ -3,13 +3,12 @@ import { CypressError, getError } from '@packages/errors'
 import type { FullConfig, TestingType } from '@packages/types'
 import { ChildProcess, fork, ForkOptions, spawn } from 'child_process'
 import EventEmitter from 'events'
-import fs from 'fs-extra'
 import path from 'path'
 import inspector from 'inspector'
 import debugLib from 'debug'
+import { getTsconfig } from 'get-tsconfig'
 import { autoBindDebug, hasTypeScriptInstalled, toPosix } from '../util'
 import _ from 'lodash'
-import { pathToFileURL } from 'url'
 import os from 'os'
 import semver from 'semver'
 import type { OTLPTraceExporterCloud } from '@packages/telemetry'
@@ -17,11 +16,11 @@ import { telemetry, encodeTelemetryContext } from '@packages/telemetry'
 
 const pkg = require('@packages/root')
 const debug = debugLib(`cypress:lifecycle:ProjectConfigIpc`)
+const debugVerbose = debugLib(`cypress-verbose:lifecycle:ProjectConfigIpc`)
 
 const CHILD_PROCESS_FILE_PATH = require.resolve('@packages/server/lib/plugins/child/require_async_child')
 
-const tsNodeEsm = pathToFileURL(require.resolve('ts-node/esm/transpile-only')).href
-const tsNode = toPosix(require.resolve('@packages/server/lib/plugins/child/register_ts_node'))
+const tsx = toPosix(require.resolve('tsx'))
 
 export type IpcHandler = (ipc: ProjectConfigIpc) => void
 
@@ -250,10 +249,11 @@ export class ProjectConfigIpc extends EventEmitter {
 
   private forkConfigProcess () {
     const configProcessArgs = ['--projectRoot', this.projectRoot, '--file', this.configFilePath]
-    // allow the use of ts-node in subprocesses tests by removing the env constant from it
+    // allow the use of tsx in subprocesses tests by removing the env constant from it
     // without this line, packages/ts/register.js never registers the ts-node module for config and
     // run_plugins can't use the config module.
-    const env = _.omit(process.env, 'CYPRESS_INTERNAL_E2E_TESTING_SELF')
+    // we also do not want telemetry enabled within our cy-in-cy tests as it isn't configured to handled it
+    const env = _.omit(process.env, 'CYPRESS_INTERNAL_E2E_TESTING_SELF', 'CYPRESS_INTERNAL_ENABLE_TELEMETRY')
 
     env.NODE_OPTIONS = process.env.ORIGINAL_NODE_OPTIONS || ''
 
@@ -273,80 +273,76 @@ export class ProjectConfigIpc extends EventEmitter {
 
     debug('fork child process %o', { CHILD_PROCESS_FILE_PATH, configProcessArgs, childOptions: _.omit(childOptions, 'env') })
 
-    let isProjectUsingESModules = false
-
-    try {
-      // TODO: convert this to async FS methods
-      // eslint-disable-next-line no-restricted-syntax
-      const pkgJson = fs.readJsonSync(path.join(this.projectRoot, 'package.json'))
-
-      isProjectUsingESModules = pkgJson.type === 'module'
-    } catch (e) {
-      // project does not have `package.json` or it was not found
-      // reasonable to assume not using es modules
-    }
-
     if (!childOptions.env) {
       childOptions.env = {}
     }
 
-    // If they've got TypeScript installed, we can use
-    // ts-node for CommonJS
-    // ts-node/esm for ESM
-    if (hasTypeScriptInstalled(this.projectRoot)) {
+    // use for 20.6.0 and above
+    let tsxLoader = `--import ${tsx}`
+
+    // @see https://tsx.is/dev-api/node-cli#node-js-cli
+    if (this.nodeVersion && semver.lte(this.nodeVersion, '20.5.1')) {
+      debug(`detected node version ${this.nodeVersion}. Using deprecated "--loader" flag.`)
+      tsxLoader = `--loader ${tsx}`
+    }
+
+    // in nodejs 22.7.0, the --experimental-detect-module option is now enabled by default.
+    // We need to disable it with the --no-experimental-detect-module flag.
+    // @see https://github.com/cypress-io/cypress/issues/30084
+    if (this.nodeVersion && semver.gte(this.nodeVersion, '22.7.0')) {
+      debug(`detected node version ${this.nodeVersion}, adding --no-experimental-detect-module option to child_process NODE_OPTIONS.`)
+      tsxLoader = `${tsxLoader} --no-experimental-detect-module`
+    }
+
+    // in nodejs 22.12.0, the --experimental-require-module option is now enabled by default.
+    // We need to disable it with the --no-experimental-require-module flag.
+    // @see https://github.com/cypress-io/cypress/issues/30715
+    if (this.nodeVersion && semver.gte(this.nodeVersion, '22.12.0')) {
+      debug(`detected node version ${this.nodeVersion}, adding --no-experimental-require-module option to child_process NODE_OPTIONS.`)
+      tsxLoader = `${tsxLoader} --no-experimental-require-module`
+    }
+
+    // If they've got TypeScript installed, we can use tsx for CommonJS and ESM.
+    // @see https://tsx.is/dev-api/node-cli#node-js-cli
+    const hasTs = hasTypeScriptInstalled(this.projectRoot)
+
+    if (hasTs) {
       debug('found typescript in %s', this.projectRoot)
-      if (isProjectUsingESModules) {
-        debug(`using --experimental-specifier-resolution=node with --loader ${tsNodeEsm}`)
-        // Use the ts-node/esm loader so they can use TypeScript with `"type": "module".
-        // The loader API is experimental and will change.
-        // The same can be said for the other alternative, esbuild, so this is the
-        // best option that leverages the existing modules we bundle in the binary.
-        // @see ts-node esm loader https://typestrong.org/ts-node/docs/usage/#node-flags-and-other-tools
-        // @see Node.js Loader API https://nodejs.org/api/esm.html#customizing-esm-specifier-resolution-algorithm
-        let tsNodeEsmLoader = `--experimental-specifier-resolution=node --loader ${tsNodeEsm}`
 
-        // in nodejs 22.7.0, the --experimental-detect-module option is now enabled by default.
-        // We need to disable it with the --no-experimental-detect-module flag.
-        // @see https://github.com/cypress-io/cypress/issues/30084
-        if (this.nodeVersion && semver.gte(this.nodeVersion, '22.7.0')) {
-          debug(`detected node version ${this.nodeVersion}, adding --no-experimental-detect-module option to child_process NODE_OPTIONS.`)
-          tsNodeEsmLoader = `${tsNodeEsmLoader} --no-experimental-detect-module`
-        }
+      // start with an env variable? What would this look like if we offered this as a configuration option?
+      // the relative tsconfig path is relative to whatever the project root is, NOT the cypress configuration file.
+      // check cypress directory or the relative tsconfig path to look up tsconfig
+      // if this fails, check the root
 
-        // in nodejs 22.12.0, the --experimental-require-module option is now enabled by default.
-        // We need to disable it with the --no-experimental-require-module flag.
-        // @see https://github.com/cypress-io/cypress/issues/30715
-        if (this.nodeVersion && semver.gte(this.nodeVersion, '22.12.0')) {
-          debug(`detected node version ${this.nodeVersion}, adding --no-experimental-require-module option to child_process NODE_OPTIONS.`)
-          tsNodeEsmLoader = `${tsNodeEsmLoader} --no-experimental-require-module`
-        }
+      let tsconfigSubDirectoryIfExists = process.env.CYPRESS_RELATIVE_TSCONFIG_PATH || 'cypress'
 
-        if (childOptions.env.NODE_OPTIONS) {
-          childOptions.env.NODE_OPTIONS += ` ${tsNodeEsmLoader}`
-        } else {
-          childOptions.env.NODE_OPTIONS = tsNodeEsmLoader
-        }
-      } else {
-        // Not using ES Modules (via "type": "module"),
-        // so we just register the standard ts-node module
-        // to handle TypeScript that is compiled to CommonJS.
-        // We do NOT use the `--loader` flag because we have some additional
-        // custom logic for ts-node when used with CommonJS that needs to be evaluated
-        // so we need to load and evaluate the hook first using the `--require` module API.
-        const tsNodeLoader = `--require "${tsNode}"`
+      let tsconfigRootPath: string = path.join(this.projectRoot, tsconfigSubDirectoryIfExists)
 
-        debug(`using cjs with --require ${tsNode}`)
+      // do we have a tsconfig in CYPRESS_RELATIVE_TSCONFIG_PATH or the default cypress directory?
+      let tsConfigIfExists = getTsconfig(tsconfigRootPath)
 
-        if (childOptions.env.NODE_OPTIONS) {
-          childOptions.env.NODE_OPTIONS += ` ${tsNodeLoader}`
-        } else {
-          childOptions.env.NODE_OPTIONS = tsNodeLoader
-        }
+      if (!tsConfigIfExists) {
+        debug(`tsconfig.json not found at ${tsconfigRootPath}. Checking the project root...`)
+
+        tsConfigIfExists = getTsconfig(this.projectRoot)
       }
+
+      if (tsConfigIfExists) {
+        debug(`tsconfig.json found at ${tsConfigIfExists.path}`)
+        childOptions.env.TSX_TSCONFIG_PATH = tsConfigIfExists.path
+
+        debugVerbose(`tsconfig.json parsed as follows: %o`, tsConfigIfExists.config)
+      } else {
+        debug(`No tsconfig.json found! Attempting to parse file without tsconfig.json.`)
+      }
+    }
+
+    debug(`using generic ${tsxLoader} for esm and cjs ${hasTs ? 'with typescript' : ''}.`)
+
+    if (childOptions.env.NODE_OPTIONS) {
+      childOptions.env.NODE_OPTIONS += ` ${tsxLoader}`
     } else {
-      // Just use Node's built-in ESM support.
-      // TODO: Consider using userland `esbuild` with Node's --loader API to handle ESM.
-      debug(`no typescript found, just use regular Node.js`)
+      childOptions.env.NODE_OPTIONS = tsxLoader
     }
 
     const telemetryCtx = encodeTelemetryContext({ context: telemetry.getActiveContextObject(), version: pkg.version })

@@ -38,6 +38,8 @@ describe('ProjectConfigIpc', () => {
     // some of these node versions may not exist, but we want to verify
     // the experimental flags are correctly disabled for future versions
     const NODE_VERSIONS = ['18.20.4', '20.17.0', '22.7.0', '22.11.4', '22.12.0', '22.15.0']
+
+    const lastVersionWithDeprecatedLoaderOption = '20.5.1'
     const experimentalDetectModuleIntroduced = '22.7.0'
     const experimentalRequireModuleIntroduced = '22.12.0'
 
@@ -57,14 +59,16 @@ describe('ProjectConfigIpc', () => {
 
     context('typescript', () => {
       [...NODE_VERSIONS].forEach((nodeVersion) => {
-        context(`node v${nodeVersion}`, () => {
-          context('ESM', () => {
-            it('passes the correct experimental flags if ESM is being used with typescript', async () => {
-              // @ts-expect-error
-              const projectPath = await scaffoldProject('config-cjs-and-esm/config-with-ts-module')
+        const MOCK_NODE_PATH = `/Users/foo/.nvm/versions/node/v${nodeVersion}/bin/node`
+        const MOCK_NODE_VERSION = nodeVersion
 
-              const MOCK_NODE_PATH = `/Users/foo/.nvm/versions/node/v${nodeVersion}/bin/node`
-              const MOCK_NODE_VERSION = nodeVersion
+        context(`node v${nodeVersion}`, () => {
+          const PROJECTS = ['config-cjs-and-esm/config-with-ts-module', 'config-cjs-and-esm/config-with-module-resolution-bundler', 'config-cjs-and-esm/config-with-js-module', 'config-cjs-and-esm/config-with-cjs']
+
+          PROJECTS.forEach((project) => {
+            it(`${project}: tsx generic loader (esm/commonjs/typescript)`, async () => {
+              // @ts-expect-error
+              const projectPath = await scaffoldProject(project)
 
               projectConfigIpc = new ProjectConfigIpc(
                 MOCK_NODE_PATH,
@@ -76,11 +80,22 @@ describe('ProjectConfigIpc', () => {
                 () => {},
               )
 
-              expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
-                env: {
-                  NODE_OPTIONS: sinon.match('--experimental-specifier-resolution=node --loader'),
-                },
-              }))
+              // make sure that we use tsx for every file, regardless of typescript, esm, or commonjs
+              if (semver.lte(nodeVersion, lastVersionWithDeprecatedLoaderOption)) {
+                // For node 20.5.1 and down, we need use the --loader flag
+                expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
+                  env: {
+                    NODE_OPTIONS: sinon.match(/--loader .*cypress\/node_modules\/tsx\/dist\/loader.mjs/),
+                  },
+                }))
+              } else {
+                // For node 20.6.0 and up, we need use the --import flag
+                expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
+                  env: {
+                    NODE_OPTIONS: sinon.match(/--import .*cypress\/node_modules\/tsx\/dist\/loader.mjs/),
+                  },
+                }))
+              }
 
               if (semver.gte(nodeVersion, experimentalDetectModuleIntroduced)) {
                 expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
@@ -97,33 +112,68 @@ describe('ProjectConfigIpc', () => {
                   },
                 }))
               }
+
+              if (project.includes('config-with-ts-module') || project.includes('config-with-module-resolution-bundler')) {
+                // these projects have typescript installed and have a tsconfig, so the TSX_TSCONFIG_PATH should be set to the project path
+                expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
+                  env: {
+                    TSX_TSCONFIG_PATH: sinon.match(`/cy-projects/${project}/tsconfig.json`),
+                  },
+                }))
+              } else {
+                // non typescript projects that do NOT have a tsconfig, so the TSX_TSCONFIG_PATH should be undefined
+                expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
+                  env: {
+                    TSX_TSCONFIG_PATH: undefined,
+                  },
+                }))
+              }
             })
           })
 
-          context('CommonJS', () => {
-            it('uses the ts_node commonjs loader if CommonJS is being used with typescript', async () => {
-              // @ts-expect-error
-              const projectPath = await scaffoldProject('config-cjs-and-esm/config-with-module-resolution-bundler')
+          it('can source tsconfig from cypress sub directory', async () => {
+            // @ts-expect-error
+            const projectPath = await scaffoldProject('config-cjs-and-esm/config-inside-cypress-directory')
 
-              const MOCK_NODE_PATH = `/Users/foo/.nvm/versions/node/v${nodeVersion}/bin/node`
-              const MOCK_NODE_VERSION = nodeVersion
+            projectConfigIpc = new ProjectConfigIpc(
+              MOCK_NODE_PATH,
+              MOCK_NODE_VERSION,
+              projectPath,
+              'cypress.config.js',
+              false,
+              (error) => {},
+              () => {},
+            )
 
-              projectConfigIpc = new ProjectConfigIpc(
-                MOCK_NODE_PATH,
-                MOCK_NODE_VERSION,
-                projectPath,
-                'cypress.config.js',
-                false,
-                (error) => {},
-                () => {},
-              )
+            expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
+              env: {
+                TSX_TSCONFIG_PATH: sinon.match(`/cy-projects/config-cjs-and-esm/config-inside-cypress-directory/cypress/tsconfig.json`),
+              },
+            }))
+          })
 
-              expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
-                env: {
-                  NODE_OPTIONS: sinon.match('--require'),
-                },
-              }))
-            })
+          it('can source tsconfig from custom sub directory', async () => {
+            process.env.CYPRESS_RELATIVE_TSCONFIG_PATH = 'custom-test-directory'
+            // @ts-expect-error
+            const projectPath = await scaffoldProject('config-cjs-and-esm/config-inside-cypress-directory')
+
+            projectConfigIpc = new ProjectConfigIpc(
+              MOCK_NODE_PATH,
+              MOCK_NODE_VERSION,
+              projectPath,
+              'cypress.config.js',
+              false,
+              (error) => {},
+              () => {},
+            )
+
+            expect(forkSpy).to.have.been.calledWith(sinon.match.string, sinon.match.array, sinon.match({
+              env: {
+                TSX_TSCONFIG_PATH: sinon.match(`/cy-projects/config-cjs-and-esm/config-inside-cypress-directory/custom-test-directory/tsconfig.json`),
+              },
+            }))
+
+            delete process.env.CYPRESS_RELATIVE_TSCONFIG_PATH
           })
         })
       })

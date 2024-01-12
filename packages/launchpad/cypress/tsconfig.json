@@ -1,0 +1,5 @@
+{
+  "extends":"../tsconfig.json",
+  /** NOTE: only needed to run data-context package in system tests */
+  "include": ["../../../packages/data-context/src/**/*.ts"],
+}
