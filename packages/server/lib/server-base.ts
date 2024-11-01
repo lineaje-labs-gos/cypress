@@ -247,6 +247,7 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
 
       this._server = this._createHttpServer(app)
 
+      debug('inject document domain?', injectDocumentDomain)
       this._originPolicy = injectDocumentDomain ? 'same-super-domain-origin' : 'same-origin'
 
       const onError = (err) => {

@@ -1104,6 +1104,72 @@ describe('Server', () => {
       })
     })
 
+    describe('http with injectDocumentDomain enabled', () => {
+      const superDomain = 'cypress.io'
+      const secondSuperDomain = 'google.com'
+      const origin = `http://www.${superDomain}`
+      const sameSuperdomainOrigin = `http://docs.${superDomain}`
+      const differentSuperdomainOrigin = `http://www.${secondSuperDomain}`
+
+      const statusCode = 200
+      const contentText = 'content'
+      const path = '/'
+
+      beforeEach(async function () {
+        await this.setup(origin, {
+          projectRoot: '/foo/bar/',
+          config: {
+            port: 2000,
+            supportFile: false,
+
+            injectDocumentDomain: true,
+
+          },
+        })
+
+        ;[origin, sameSuperdomainOrigin, differentSuperdomainOrigin].forEach((originToMock) => {
+          nock(originToMock).get(path).reply(statusCode, `<html>${contentText}</html>`, {
+            'Content-Type': 'text/html',
+          })
+        })
+      })
+
+      describe('when navigating to a different subdomain of the same superdomain without cy.origin', function () {
+        it('injects document.domain', async function () {
+          const url = `${sameSuperdomainOrigin}${path}`
+
+          await this.server._onResolveUrl(url, {}, this.automationRequest)
+          const res = await this.rp(url)
+
+          expect(res.body).to.include(`document.domain = \'${superDomain}\'`)
+        })
+      })
+
+      describe('when navigating to a different superdomain with cy.origin', function () {
+        it('injects document.domain', async function () {
+          const url = `${differentSuperdomainOrigin}${path}`
+
+          this.server.remoteStates.set(differentSuperdomainOrigin, {}, false)
+          await this.server._onResolveUrl(url, {}, this.automationRequest)
+          const res = await this.rp(url)
+
+          expect(res.body).to.include(`document.domain = \'${secondSuperDomain}\'`)
+        })
+      })
+
+      describe('when navigating to the same origin', function () {
+        it('injects document.domain', async function () {
+          const url = `${origin}${path}`
+
+          this.server.remoteStates.set(differentSuperdomainOrigin)
+          await this.server._onResolveUrl(url, {}, this.automationRequest)
+          const res = await this.rp(url)
+
+          expect(res.body).to.include(`document.domain = \'${superDomain}\'`)
+        })
+      })
+    })
+
     describe('both', () => {
       beforeEach(function () {
         Fixtures.scaffold('no-server')
