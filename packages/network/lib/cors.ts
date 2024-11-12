@@ -93,7 +93,7 @@ export function domainPropsToHostname ({ domain, subdomain, tld }: Record<string
 export function urlMatchesPolicyProps ({ policy, frameUrl, topProps }: {
   policy: Policy
   frameUrl: string
-  topProps: ParsedHostWithProtocolAndHost
+  topProps: ParsedHostWithProtocolAndHost | null
 }): boolean {
   if (!policy || !frameUrl || !topProps) {
     return false
@@ -187,10 +187,6 @@ export const policyFromConfig = (config: { injectDocumentDomain: boolean }): Pol
     'same-origin'
 }
 
-export const policyFromDomainInjectionConfig = (injectDocumentDomain: boolean) => {
-  return injectDocumentDomain ? 'same-super-domain-origin' : 'same-origin'
-}
-
 /**
  * @param url - The url to check for injection
  * @param opts - an options object containing the skipDomainInjectionForDomains config. Default is undefined.
@@ -209,16 +205,6 @@ export const shouldInjectDocumentDomain = (url: string, opts?: {
 
   return true
 }
-
-/**
- * Checks the supplied url's against the determined policy.
- * The policy is same-super-domain-origin unless the domain is in the list of strict same origin domains,
- * in which case the policy is 'same-origin'
- * @param frameUrl - The url you are testing the policy for.
- * @param topUrl - The url you are testing the policy in context of.
- * @param opts - an options object containing the skipDomainInjectionForDomains config. Default is undefined.
- * @returns boolean, true if matching, false if not.
- */
 
 /**
  * Checks the supplied url and props against the determined policy.

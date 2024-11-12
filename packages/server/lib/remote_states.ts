@@ -1,6 +1,7 @@
 import { cors, uri } from '@packages/network'
 import Debug from 'debug'
 import _ from 'lodash'
+import type { ParsedHostWithProtocolAndHost } from '@packages/network/lib/types'
 
 export const DEFAULT_DOMAIN_NAME = 'localhost'
 
@@ -8,7 +9,7 @@ const fullyQualifiedRe = /^https?:\/\//
 
 const debug = Debug('cypress:server:remote-states')
 
-interface RemoteState {
+export interface RemoteState {
   auth?: {
     username: string
     password: string
@@ -17,7 +18,7 @@ interface RemoteState {
   strategy: 'file' | 'http'
   origin: string
   fileServer: string | null
-  props: Record<string, any> | null
+  props: ParsedHostWithProtocolAndHost | null
 }
 
 interface RemoteStatesConfig {
@@ -114,8 +115,8 @@ export class RemoteStates {
     this.currentOriginKey = this.primaryOriginKey
   }
 
-  current (): Cypress.RemoteState {
-    return this.get(this.currentOriginKey) as Cypress.RemoteState
+  current (): RemoteState {
+    return this.get(this.currentOriginKey) as RemoteState
   }
 
   private _stateFromUrl (url: string): RemoteState {
@@ -141,7 +142,7 @@ export class RemoteStates {
     }
   }
 
-  set (urlOrState: string | Cypress.RemoteState, options: Pick<RemoteState, 'auth'> = { }, isPrimaryOrigin: boolean = true): RemoteState | undefined {
+  set (urlOrState: string | RemoteState, options: Pick<RemoteState, 'auth'> = { }, isPrimaryOrigin: boolean = true): RemoteState | undefined {
     const state: RemoteState = _.isString(urlOrState) ?
       {
         ...this._stateFromUrl(urlOrState),

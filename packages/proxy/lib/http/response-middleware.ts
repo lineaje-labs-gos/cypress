@@ -9,6 +9,7 @@ import { InterceptResponse } from '@packages/net-stubbing'
 import { concatStream, cors, httpUtils } from '@packages/network'
 import type { Policy } from '@packages/network/lib/cors'
 import { toughCookieToAutomationCookie } from '@packages/server/lib/util/cookies'
+import type { RemoteState } from '@packages/server/lib/remote_states'
 import { telemetry } from '@packages/telemetry'
 import { hasServiceWorkerHeader, isVerboseTelemetry as isVerbose } from '.'
 import { CookiesHelper } from './util/cookies'
@@ -65,7 +66,7 @@ function getNodeCharsetFromResponse (headers: IncomingHttpHeaders, body: Buffer,
   return 'latin1'
 }
 
-function reqMatchesPolicyBasedOnDomain (req: CypressIncomingRequest, remoteState, policy: Policy) {
+function reqMatchesPolicyBasedOnDomain (req: CypressIncomingRequest, remoteState: RemoteState, policy: Policy) {
   if (remoteState.strategy === 'http') {
     return cors.urlMatchesPolicyProps({ policy, frameUrl: req.proxiedUrl, topProps: remoteState.props })
   }
