@@ -29,6 +29,7 @@ export default defineConfig({
   'e2e': {
     experimentalRunAllSpecs: true,
     experimentalStudio: true,
+    injectDocumentDomain: true,
     baseUrl: 'http://localhost:5555',
     supportFile: 'cypress/e2e/support/e2eSupport.ts',
     async setupNodeEvents (on, config) {
