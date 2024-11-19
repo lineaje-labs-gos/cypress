@@ -940,7 +940,7 @@ describe('network stubbing', { retries: 15 }, function () {
     it('can load transfer-encoding: chunked redirects', function () {
       cy.intercept('*')
       const originOne = 'http://foobar.com:3500'
-      const originTwo = cy.config('injectDocumentDomain') ? 'http://localhost:3501' : 'http://foobar.com:3501'
+      const originTwo = Cypress.config('injectDocumentDomain') ? 'http://localhost:3501' : 'http://foobar.com:3501'
 
       const url4 = `${originTwo}/fixtures/generic.html`
       const url3 = `${originTwo}/redirect?href=${encodeURIComponent(url4)}`
@@ -950,7 +950,7 @@ describe('network stubbing', { retries: 15 }, function () {
       cy.visit(`${originOne}/fixtures/empty.html`)
 
       cy.visit(url1).as('redirect')
-      if (cy.config('injectDocumentDomain')) {
+      if (Cypress.config('injectDocumentDomain')) {
         cy.location('href').should('eq', url4)
       } else {
         cy.origin('http://foobar.com:3501', { args: [url4] }, ([url4]) => {
