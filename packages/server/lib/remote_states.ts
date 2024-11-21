@@ -2,6 +2,7 @@ import { cors, uri } from '@packages/network'
 import Debug from 'debug'
 import _ from 'lodash'
 import type { ParsedHostWithProtocolAndHost } from '@packages/network/lib/types'
+import type { DocumentDomainInjection } from '@packages/network'
 
 export const DEFAULT_DOMAIN_NAME = 'localhost'
 
@@ -21,9 +22,9 @@ export interface RemoteState {
   props: ParsedHostWithProtocolAndHost | null
 }
 
-interface RemoteStatesConfig {
-  serverPort: number
-  fileServerPort?: number
+interface RemoteStatesServerPorts {
+  server: number
+  fileServer?: number
 }
 
 /**
@@ -66,21 +67,17 @@ export class RemoteStates {
   private remoteStates: Map<string, RemoteState> = new Map()
   private primaryOriginKey: string = ''
   private currentOriginKey: string = ''
-  private _config?: RemoteStatesConfig
-  private _configure: () => RemoteStatesConfig
-
-  private _determineOriginKey: (url: string) => string
+  private serverPorts?: RemoteStatesServerPorts
 
   constructor (
-    configure: () => { serverPort: number, fileServerPort?: number },
-    originKeyStrategy: (url: string) => string,
+    private configure: () => RemoteStatesServerPorts,
+    private documentDomainInjection: DocumentDomainInjection,
   ) {
-    this._configure = configure
-    this._determineOriginKey = originKeyStrategy
   }
 
   get (url: string) {
-    const state = this.remoteStates.get(this._determineOriginKey(url))
+    debug('get (origin key)', this.documentDomainInjection.getOriginKey(url), this.remoteStates)
+    const state = this.remoteStates.get(this.documentDomainInjection.getOriginKey(url))
 
     debug('getting remote state: %o for: %s', state, url)
 
@@ -102,7 +99,7 @@ export class RemoteStates {
   }
 
   isPrimarySuperDomainOrigin (url: string): boolean {
-    return this.primaryOriginKey === this._determineOriginKey(url)
+    return this.primaryOriginKey === this.documentDomainInjection.getOriginKey(url)
   }
 
   reset () {
@@ -125,9 +122,9 @@ export class RemoteStates {
 
     if ((url === '<root>') || !fullyQualifiedRe.test(url)) {
       return {
-        origin: `http://${DEFAULT_DOMAIN_NAME}:${this.config.serverPort}`,
+        origin: `http://${DEFAULT_DOMAIN_NAME}:${this.ports.server}`,
         strategy: 'file',
-        fileServer: _.compact([`http://${DEFAULT_DOMAIN_NAME}`, this.config.fileServerPort]).join(':'),
+        fileServer: _.compact([`http://${DEFAULT_DOMAIN_NAME}`, this.ports.fileServer]).join(':'),
         domainName: DEFAULT_DOMAIN_NAME,
         props: null,
       }
@@ -150,33 +147,31 @@ export class RemoteStates {
       } :
       urlOrState
 
-    const remoteOrigin = this._determineOriginKey(state.origin)
-
-    this.currentOriginKey = remoteOrigin
+    this.currentOriginKey = this.documentDomainInjection.getOriginKey(state.origin)
 
     if (isPrimaryOrigin) {
       // convert map to array
       const stateArray = Array.from(this.remoteStates.entries())
 
       // set the primary remote state and convert back to map
-      stateArray[0] = [remoteOrigin, state]
+      stateArray[0] = [this.currentOriginKey, state]
       this.remoteStates = new Map(stateArray)
 
-      this.primaryOriginKey = remoteOrigin
+      this.primaryOriginKey = this.currentOriginKey
     } else {
-      this.remoteStates.set(remoteOrigin, state)
+      this.remoteStates.set(this.currentOriginKey, state)
     }
 
-    debug('setting remote state %o for %s', state, remoteOrigin)
+    debug('setting remote state %o for %s', state, this.currentOriginKey)
 
-    return this.get(remoteOrigin)
+    return this.get(this.currentOriginKey)
   }
 
-  private get config () {
-    if (!this._config) {
-      this._config = this._configure()
+  private get ports () {
+    if (!this.serverPorts) {
+      this.serverPorts = this.configure()
     }
 
-    return this._config
+    return this.serverPorts
   }
 }

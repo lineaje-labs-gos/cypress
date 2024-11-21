@@ -14,7 +14,7 @@ import url from 'url'
 import la from 'lazy-ass'
 import httpsProxy from '@packages/https-proxy'
 import { getRoutesForRequest, netStubbingState, NetStubbingState } from '@packages/net-stubbing'
-import { agent, clientCertificates, cors, httpUtils, uri, concatStream } from '@packages/network'
+import { agent, clientCertificates, cors, httpUtils, uri, concatStream, DocumentDomainInjection } from '@packages/network'
 import type { Policy } from '@packages/network/lib/cors'
 import { NetworkProxy, BrowserPreRequest } from '@packages/proxy'
 import type { SocketCt } from './socket-ct'
@@ -161,6 +161,7 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
   private _urlResolver: Bluebird<Record<string, any>> | null = null
   private testingType?: TestingType
   private _config: Cfg
+  private _documentDomainInjection: DocumentDomainInjection
 
   constructor (config: Cfg) {
     this.isListening = false
@@ -171,17 +172,19 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
     this._middleware = null
     this._baseUrl = null
     this._fileServer = null
+
+    this._documentDomainInjection = new DocumentDomainInjection(config)
+    // TODO: maybe dont need to keep this around anymore
     this._config = config
 
-    const configRemoteStates = () => {
+    const remoteStatePorts = () => {
       return {
-        serverPort: this._port(),
-        fileServerPort: this._fileServer?.port(),
+        server: this._port(),
+        fileServer: this._fileServer?.port(),
       }
     }
-    const originKeyStrategy = config.injectDocumentDomain ? cors.getSuperDomainOrigin : (url) => new URL(url).origin
 
-    this._remoteStates = new RemoteStates(configRemoteStates, originKeyStrategy)
+    this._remoteStates = new RemoteStates(remoteStatePorts, this._documentDomainInjection)
 
     this.resourceTypeAndCredentialManager = resourceTypeAndCredentialManager
   }

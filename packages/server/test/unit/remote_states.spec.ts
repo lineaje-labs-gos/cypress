@@ -3,7 +3,8 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import chaiSubset from 'chai-subset'
 import sinonChai from '@cypress/sinon-chai'
-import { cors } from '@packages/network'
+import Sinon from 'sinon'
+import { DocumentDomainInjection } from '@packages/network'
 
 import { RemoteStates, DEFAULT_DOMAIN_NAME } from '../../lib/remote_states'
 
@@ -12,24 +13,36 @@ chai.use(chaiSubset)
 chai.use(sinonChai)
 
 describe('remote states', () => {
-  const serverPort = 3030
-  const fileServerPort = 3030
-  const originKeyStrategy = (url) => new URL(url).origin
+  const serverPorts = {
+    server: 3030,
+    fileServer: 3030,
+  }
 
-  const remoteStateConfig = () => {
-    return { serverPort, fileServerPort }
+  const remoteStatesServerPorts = () => {
+    return serverPorts
   }
 
   let remoteStates: RemoteStates
+  let documentDomainInjection: Sinon.SinonStubbedInstance<DocumentDomainInjection>
 
   beforeEach(() => {
-    remoteStates = new RemoteStates(remoteStateConfig, originKeyStrategy)
+    documentDomainInjection = Sinon.createStubInstance(DocumentDomainInjection)
+
+    // While the behavior of this class is partially determined by DocumentDomainInjection,
+    // it's not necessary to test multiple permutations of its getOriginKey - as long as it's
+    // returning an appropriate origin key, this class will behave as expected.
+    documentDomainInjection.getOriginKey.callsFake((url) => {
+      return new URL(url).origin
+    })
+
+    remoteStates = new RemoteStates(remoteStatesServerPorts, documentDomainInjection)
     // set the initial state
     remoteStates.set('http://localhost:3500')
   })
 
   context('#get', () => {
-    it('returns the remote state by for requested origin policy', function () {
+    it('returns the remote state for an origin when a matching origin key is returned from DocumentDomainInjection', function () {
+      documentDomainInjection.getOriginKey.returns('http://localhost:3500')
       const state = remoteStates.get('http://localhost:3500/foobar')
 
       expect(state).to.deep.equal({
@@ -300,10 +313,10 @@ describe('remote states', () => {
 
       expect(state).to.deep.equal({
         auth: undefined,
-        origin: `http://${DEFAULT_DOMAIN_NAME}:${serverPort}`,
+        origin: `http://${DEFAULT_DOMAIN_NAME}:${serverPorts.server}`,
         strategy: 'file',
         domainName: DEFAULT_DOMAIN_NAME,
-        fileServer: `http://${DEFAULT_DOMAIN_NAME}:${fileServerPort}`,
+        fileServer: `http://${DEFAULT_DOMAIN_NAME}:${serverPorts.fileServer}`,
         props: null,
       })
     })
@@ -313,10 +326,10 @@ describe('remote states', () => {
 
       expect(state).to.deep.equal({
         auth: undefined,
-        origin: `http://${DEFAULT_DOMAIN_NAME}:${serverPort}`,
+        origin: `http://${DEFAULT_DOMAIN_NAME}:${serverPorts.server}`,
         strategy: 'file',
         domainName: DEFAULT_DOMAIN_NAME,
-        fileServer: `http://${DEFAULT_DOMAIN_NAME}:${fileServerPort}`,
+        fileServer: `http://${DEFAULT_DOMAIN_NAME}:${serverPorts.fileServer}`,
         props: null,
       })
     })
@@ -342,60 +355,6 @@ describe('remote states', () => {
       const actualState = remoteStates.get('http://www.foobar.com')
 
       expect(actualState).to.deep.equal(state)
-    })
-
-    describe('with a superdomain origin key strategy', () => {
-      beforeEach(() => {
-        remoteStates = new RemoteStates(remoteStateConfig, cors.getSuperDomainOrigin)
-      })
-
-      it('sets the origin of the superdomain-keyed state to the superdomain of the incoming state', function () {
-        remoteStates.set('https://staging.google.com/foo/bar')
-
-        let state = remoteStates.get('https://google.com')
-
-        expect(state).to.deep.equal({
-          auth: undefined,
-          origin: 'https://staging.google.com',
-          strategy: 'http',
-          domainName: 'google.com',
-          fileServer: null,
-          props: {
-            port: '443',
-            domain: 'google',
-            tld: 'com',
-            subdomain: 'staging',
-            protocol: 'https:',
-          },
-        })
-
-        remoteStates.set('https://prod.google.com/foo/bar')
-
-        state = remoteStates.get('https://google.com')
-
-        expect(state).to.deep.equal({
-          auth: undefined,
-          origin: 'https://prod.google.com',
-          strategy: 'http',
-          domainName: 'google.com',
-          fileServer: null,
-          props: {
-            port: '443',
-            domain: 'google',
-            tld: 'com',
-            subdomain: 'prod',
-            protocol: 'https:',
-          },
-        })
-      })
-    })
-
-    // default for this spec
-    describe('without a superdomain origin key strategy', () => {
-      it('does not set a state keyed to the superdomain origin of the incomign state', function () {
-        remoteStates.set('https://staging.google.com/foo/bar')
-        expect(remoteStates.get('https://google.com')).to.be.undefined
-      })
     })
   })
 })
