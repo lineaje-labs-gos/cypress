@@ -27,11 +27,11 @@ module.exports = {
     debug('all files to send %o', _.map(allFilesToSend, 'relative'))
 
     const injection = new DocumentDomainInjection(config)
-    const { domainName } = remoteStates.getPrimary()
 
-    const superDomain = injection.shouldSetDomainForUrl(domainName) ?
-      injection.getHostname(domainName) :
-      undefined
+    debug('primary remote state', remoteStates.getPrimary())
+    const { origin } = remoteStates.getPrimary()
+
+    const superDomain = injection.shouldSetDomainForUrl(origin) ? injection.getHostname(origin) : ''
 
     const privilegedChannel = await privilegedCommandsManager.getPrivilegedChannel({
       browserFamily: req.query.browserFamily,
@@ -39,7 +39,7 @@ module.exports = {
       namespace: config.namespace,
       scripts: allFilesToSend,
       url: req.proxiedUrl,
-      documentDomainContext: injection.shouldSetDomainForUrl(domainName),
+      documentDomainContext: injection.shouldSetDomainForUrl(origin),
     })
 
     const iframeOptions = {
