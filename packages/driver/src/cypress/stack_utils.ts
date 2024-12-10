@@ -109,18 +109,15 @@ const getInvocationDetails = (specWindow, config) => {
     // note: specWindow.Cypress can be undefined or null
     // if the user quickly reloads the tests multiple times
 
-    // firefox throws a different stack than chromium
-    // which includes stackframes from cypress_runner.js.
+    // firefox and chromium include stackframes from cypress_runner.js.
     // So we drop the lines until we get to the spec stackframe (includes __cypress/tests)
-    if (specWindow.Cypress && (
-      specWindow.Cypress.isBrowser('firefox') || specWindow.Cypress.isBrowser('chrome')
-    )) {
+    if (specWindow.Cypress) {
       stack = stackWithLinesDroppedFromMarker(stack, '__cypress/tests', true)
     }
 
-    const details: InvocationDetails = getSourceDetailsForFirstLine(stack, config('projectRoot')) || {};
+    const details: InvocationDetails = getSourceDetailsForFirstLine(stack, config('projectRoot')) || {}
 
-    (details as any).stack = stack
+    ;(details as any).stack = stack
 
     return details as (InvocationDetails & { stack: any })
   }
@@ -410,8 +407,9 @@ const reconstructStack = (parsedStack) => {
 const getSourceStack = (stack, projectRoot?) => {
   if (!_.isString(stack)) return {}
 
+  const withDroppedInternal = stackWithLinesDroppedFromMarker(stack, '__cypress/tests', true)
   const getSourceDetailsWithStackUtil = _.partial(getSourceDetailsForLine, projectRoot)
-  const parsed = _.map(stack.split('\n'), getSourceDetailsWithStackUtil)
+  const parsed = _.map(withDroppedInternal.split('\n'), getSourceDetailsWithStackUtil)
 
   return {
     parsed,
