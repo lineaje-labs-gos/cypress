@@ -8,20 +8,22 @@ import { HttpBuffer, HttpBuffers } from '../../../lib/http/util/buffers'
 import { RemoteStates } from '@packages/server/lib/remote_states'
 import { CookieJar } from '@packages/server/lib/util/cookies'
 import { HttpMiddlewareThis } from '../../../lib/http'
+import { DocumentDomainInjection } from '@packages/network'
 
 describe('http/request-middleware', () => {
   const serverPort = 3030
   const fileServerPort = 3030
-  const originKeyStrategy = (url) => new URL(url).origin
 
   const remoteStateConfig = () => {
-    return { serverPort, fileServerPort }
+    return { server: serverPort, fileServer: fileServerPort }
   }
 
   let remoteStates: RemoteStates
+  let documentDomainInjection
 
   beforeEach(() => {
-    remoteStates = new RemoteStates(remoteStateConfig, originKeyStrategy)
+    documentDomainInjection = new DocumentDomainInjection({ injectDocumentDomain: false, testingType: 'e2e' })
+    remoteStates = new RemoteStates(remoteStateConfig, documentDomainInjection)
   })
 
   it('exports the members in the correct order', () => {

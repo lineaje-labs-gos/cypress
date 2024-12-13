@@ -9,20 +9,22 @@ import { Readable } from 'stream'
 import * as rewriter from '../../../lib/http/util/rewriter'
 import { nonceDirectives, problematicCspDirectives, unsupportedCSPDirectives } from '../../../lib/http/util/csp-header'
 import * as serviceWorkerInjector from '../../../lib/http/util/service-worker-injector'
+import { DocumentDomainInjection } from '@packages/network'
 
 describe('http/response-middleware', function () {
   const serverPort = 3030
   const fileServerPort = 3030
-  const originKeyStrategy = (url) => new URL(url).origin
 
   const remoteStateConfig = () => {
-    return { serverPort, fileServerPort }
+    return { server: serverPort, fileServer: fileServerPort }
   }
 
   let remoteStates: RemoteStates
+  let documentDomainInjection: DocumentDomainInjection
 
   beforeEach(() => {
-    remoteStates = new RemoteStates(remoteStateConfig, originKeyStrategy)
+    documentDomainInjection = new DocumentDomainInjection({ injectDocumentDomain: false, testingType: 'e2e' })
+    remoteStates = new RemoteStates(remoteStateConfig, documentDomainInjection)
   })
 
   it('exports the members in the correct order', function () {
