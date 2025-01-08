@@ -2,15 +2,15 @@ import { watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { addCrossOriginIframe, getAutIframeModel, getEventManager, UnifiedRunnerAPI } from '.'
 import { useAutStore, useSpecStore } from '../store'
-import { useStudioStore } from '../store/studio-store'
 import { empty, getReporterElement, getRunnerElement } from './utils'
 
 export function useEventManager () {
   const eventManager = getEventManager()
 
   const autStore = useAutStore()
+
   const specStore = useSpecStore()
-  const studioStore = useStudioStore()
+
   const router = useRouter()
 
   function runSpec (isRerun: boolean = false) {
@@ -19,6 +19,7 @@ export function useEventManager () {
     }
 
     autStore.setScriptError(null)
+
     UnifiedRunnerAPI.executeSpec(specStore.activeSpec, isRerun)
   }
 
@@ -41,22 +42,8 @@ export function useEventManager () {
       getAutIframeModel().showVisitFailure(payload)
     })
 
-    eventManager.on('page:loading', (isLoading) => {
-      if (isLoading) {
-        return
-      }
-
-      getAutIframeModel().reattachStudio()
-    })
-
     eventManager.on('visit:blank', ({ testIsolation }) => {
       getAutIframeModel().visitBlankPage(testIsolation)
-    })
-
-    eventManager.on('run:end', () => {
-      if (studioStore.isLoading) {
-        getAutIframeModel().startStudio()
-      }
     })
 
     eventManager.on('expect:origin', addCrossOriginIframe)
@@ -68,6 +55,15 @@ export function useEventManager () {
 
       // Delete runId from query which will remove the test filter and trigger a rerun
       router.replace({ ...currentRoute, query })
+    })
+
+    eventManager.on('studio:init:after', ({
+      testId,
+    }) => {
+      // Get file query parameter from current url
+      const fileFromCurrentUrl = router.currentRoute.value.query.file
+
+      router.push({ path: '/specs/studiorunner', query: { file: fileFromCurrentUrl, testId } })
     })
   }
 

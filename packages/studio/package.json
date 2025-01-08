@@ -1,0 +1,9 @@
+{
+  "name": "@packages/studio",
+  "version": "0.0.0-development",
+  "private": true,
+  "browser": "src/main.ts",
+  "devDependencies": {
+    "react": "17.0.2"
+  }
+}

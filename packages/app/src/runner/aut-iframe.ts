@@ -4,7 +4,6 @@ import { logger } from './logger'
 import _ from 'lodash'
 /* eslint-disable no-duplicate-imports */
 import type { DebouncedFunc } from 'lodash'
-import { useStudioStore } from '../store/studio-store'
 import { getElementDimensions, setOffset } from './dimensions'
 import { getOrCreateHelperDom, getSelectorHighlightStyles, getZIndex, INT32_MAX } from './dom'
 import highlightMounter from './selector-playground/highlight-mounter'
@@ -486,28 +485,6 @@ export class AutIframe {
         Yielded: Cypress.dom.getElements($el),
       },
     })
-  }
-
-  startStudio () {
-    const studioStore = useStudioStore()
-
-    if (studioStore.isLoading) {
-      studioStore.start(this._body()?.[0])
-    }
-  }
-
-  reattachStudio () {
-    const studioStore = useStudioStore()
-
-    if (studioStore.isActive) {
-      const body = this._body()?.[0]
-
-      if (!body) {
-        throw Error(`Cannot reattach Studio without the HTMLBodyElement for the app`)
-      }
-
-      studioStore.attachListeners(body)
-    }
   }
 
   private _scrollIntoView (win: Window, el: HTMLElement) {

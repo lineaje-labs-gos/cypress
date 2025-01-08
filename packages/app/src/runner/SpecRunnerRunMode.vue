@@ -85,6 +85,7 @@ import { useEventManager } from './useEventManager'
 import SpecRunnerHeaderRunMode from './SpecRunnerHeaderRunMode.vue'
 import AutomationDisconnected from './automation/AutomationDisconnected.vue'
 import AutomationMissing from './automation/AutomationMissing.vue'
+import { useRouter } from 'vue-router'
 
 const eventManager = getEventManager()
 
@@ -102,11 +103,13 @@ const {
   handleResizeEnd,
 } = useResizablePanels()
 
+const router = useRouter()
+const testId = router.currentRoute.value.query.testId as string | undefined
 const {
   initializeRunnerLifecycleEvents,
   startSpecWatcher,
   cleanupRunner,
-} = useEventManager()
+} = useEventManager(testId)
 
 const hideCommandLog = runnerUiStore.hideCommandLog
 const hideRunnerUi = runnerUiStore.hideRunnerUi

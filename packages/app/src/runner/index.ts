@@ -93,6 +93,7 @@ export function getAutIframeModel (): AutIframe {
  */
 function createIframeModel () {
   const autIframe = getAutIframeModel()
+  const autStore = useAutStore()
   // IFrame Model to manage snapshots, etc.
   const iframeModel = new IframeModel(
     autIframe.detachDom,
@@ -100,9 +101,7 @@ function createIframeModel () {
     autIframe.highlightEl,
     autIframe.doesAUTMatchTopSuperDomainOrigin,
     getEventManager(),
-    {
-      selectorPlaygroundModel: getEventManager().selectorPlaygroundModel,
-    },
+    autStore,
   )
 
   iframeModel.listen()
@@ -292,7 +291,7 @@ function setSpecForDriver (spec: SpecFile) {
  * a Spec IFrame to load the spec's source code, and
  * initialize Cypress on the AUT.
  */
-function runSpecE2E (config, spec: SpecFile) {
+function runSpecE2E (config, spec: SpecFile, testId?: string) {
   const $runnerRoot = getRunnerElement()
 
   // clear AUT, if there is one.

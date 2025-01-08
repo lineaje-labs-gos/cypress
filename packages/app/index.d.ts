@@ -63,5 +63,8 @@ declare global {
         stop: () => void
       }
     }
+    Studio: {
+      mountStudio: (element: Element, options: any) => void
+    }
   }
 }

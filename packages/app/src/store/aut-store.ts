@@ -18,6 +18,21 @@ interface AutStoreState {
   specRunnerHeaderHeight: number
 }
 
+export interface AutStore extends AutStoreState {
+  setHighlightUrl (highlightUrl: boolean): void
+  updateUrl (url?: string): void
+  updateDimensions (viewportWidth: number, viewportHeight: number): void
+  setViewportUpdatedCallback (cb: () => void): void
+  setIsLoadingUrl (isLoadingUrl: boolean): void
+  setIsRunning (isRunning: boolean): void
+  setIsLoading (isLoading: boolean): void
+  resetUrl (): void
+  setScriptError (err: ScriptError): void
+  setScale (scale: number): void
+  setSpecRunnerHeaderHeight (height: number): void
+  viewportDimensions: { height: number, width: number }
+}
+
 export const useAutStore = defineStore({
   id: 'aut-store',
   state: (): AutStoreState => {

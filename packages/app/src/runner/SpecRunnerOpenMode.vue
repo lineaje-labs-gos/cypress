@@ -130,6 +130,7 @@ import { runnerConstants } from './runner-constants'
 import StudioInstructionsModal from './studio/StudioInstructionsModal.vue'
 import StudioSaveModal from './studio/StudioSaveModal.vue'
 import { useStudioStore } from '../store/studio-store'
+import { useRouter } from 'vue-router'
 
 const {
   preferredMinimumPanelWidth,
@@ -186,6 +187,7 @@ const props = defineProps<{
 
 const eventManager = getEventManager()
 
+const router = useRouter()
 const autStore = useAutStore()
 const screenshotStore = useScreenshotStore()
 const runnerUiStore = useRunnerUiStore()
@@ -195,11 +197,12 @@ const {
   handleResizeEnd,
 } = useResizablePanels()
 
+const testId = router.currentRoute.value.query.testId as string | undefined
 const {
   initializeRunnerLifecycleEvents,
   startSpecWatcher,
   cleanupRunner,
-} = useEventManager()
+} = useEventManager(testId)
 
 const studioStore = useStudioStore()
 
@@ -286,6 +289,7 @@ function openFile () {
     },
   })
 }
+
 onMounted(() => {
   const eventManager = getEventManager()
 

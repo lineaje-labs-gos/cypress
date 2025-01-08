@@ -16,22 +16,33 @@ mutation TestsForRun ($spec: String!) {
 `
 
 const initialized = ref(false)
+const tearingDown = ref(false)
 
-export function useUnifiedRunner () {
+export function useUnifiedRunner (monitorTearDownOnly: boolean = false) {
   let prevQuery: LocationQuery
 
-  onMounted(async () => {
+  const initialize = async () => {
     await UnifiedRunnerAPI.initialize()
     initialized.value = true
+  }
+
+  onMounted(async () => {
+    if (!monitorTearDownOnly) {
+      await initialize()
+    }
   })
 
-  onBeforeUnmount(() => {
-    UnifiedRunnerAPI.teardown()
+  onBeforeUnmount(async () => {
+    tearingDown.value = true
+    await UnifiedRunnerAPI.teardown()
     initialized.value = false
+    tearingDown.value = false
   })
 
   return {
     initialized: readonly(initialized),
+    initialize,
+    tearingDown: readonly(tearingDown),
     watchSpecs: (specs: Ref<ReadonlyArray<SpecFile>>) => {
       const specStore = useSpecStore()
       const route = useRoute()

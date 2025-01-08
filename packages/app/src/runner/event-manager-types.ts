@@ -20,6 +20,8 @@ export type LocalBusEventMap = {
   'after:screenshot': undefined
   'open:file': FileDetails
   'testFilter:cloudDebug:dismiss': undefined
+  'studio:initialize': { runState, config }
+  'studio:init:after': { testId?: string, suiteId?: string }
 }
 
 export interface StudioSavePayload {
@@ -50,6 +52,10 @@ export type LocalBusEmitsMap = {
 
   // Test filter events
   'testFilter:cloudDebug:dismiss': undefined
+
+  // Studio Events
+  'studio:init:after': { testId?: string, suiteId?: string }
+  'studio:initialize': { runState, config }
 }
 
 export type SocketToDriverMap = {

@@ -1,5 +1,5 @@
 import { useSnapshotStore } from './snapshot-store'
-import { useAutStore } from '../store'
+import { AutStore } from '../store'
 import type { EventManager } from './event-manager'
 import { defaultMessages } from '@cy/i18n'
 import { useStudioStore } from '../store/studio-store'
@@ -37,9 +37,7 @@ export class IframeModel {
     private highlightEl: ({ body }: any, opts: any) => void,
     private isAUTSameOrigin: () => boolean,
     private eventManager: EventManager,
-    private studio: {
-      selectorPlaygroundModel: any
-    },
+    private autStore: AutStore,
   ) {
     this._reset()
   }
@@ -59,10 +57,8 @@ export class IframeModel {
       return this._updateViewport({ viewportHeight, viewportWidth })
     })
 
-    const autStore = useAutStore()
-
     this.eventManager.on('url:changed', (url: string) => {
-      autStore.updateUrl(url)
+      this.autStore.updateUrl(url)
     })
 
     this.eventManager.on('page:loading', this._updateLoadingUrl)
@@ -75,47 +71,38 @@ export class IframeModel {
   }
 
   _beforeRun = () => {
-    const autStore = useAutStore()
-
-    autStore.setIsLoading(false)
-    autStore.setIsRunning(true)
-    autStore.resetUrl()
+    this.autStore.setIsLoading(false)
+    this.autStore.setIsRunning(true)
+    this.autStore.resetUrl()
 
     this._reset()
   }
 
   _afterRun = () => {
-    const autStore = useAutStore()
-
-    autStore.setIsRunning(false)
+    this.autStore.setIsRunning(false)
   }
 
   _updateViewport = ({ viewportWidth, viewportHeight }, cb?: () => void) => {
-    const autStore = useAutStore()
-
-    autStore.updateDimensions(viewportWidth, viewportHeight)
+    this.autStore.updateDimensions(viewportWidth, viewportHeight)
 
     if (cb) {
-      autStore.setViewportUpdatedCallback(cb)
+      this.autStore.setViewportUpdatedCallback(cb)
     }
   }
 
   _updateLoadingUrl = (isLoadingUrl: boolean) => {
-    const autStore = useAutStore()
-
-    autStore.setIsLoadingUrl(isLoadingUrl)
+    this.autStore.setIsLoadingUrl(isLoadingUrl)
   }
 
   setSnapshots = (snapshotProps: AutSnapshot) => {
     const snapshotStore = useSnapshotStore()
-    const autStore = useAutStore()
     const studioStore = useStudioStore()
 
     if (snapshotStore.isSnapshotPinned) {
       return
     }
 
-    if (autStore.isRunning) {
+    if (this.autStore.isRunning) {
       return snapshotStore.setTestsRunningError()
     }
 
@@ -132,7 +119,7 @@ export class IframeModel {
       return
     }
 
-    autStore.setHighlightUrl(false)
+    this.autStore.setHighlightUrl(false)
 
     if (!this.originalState) {
       this._storeOriginalState()
@@ -141,7 +128,7 @@ export class IframeModel {
     this.detachedId = snapshotProps.id
 
     this._updateViewport(snapshotProps)
-    autStore.updateUrl(snapshotProps.url)
+    this.autStore.updateUrl(snapshotProps.url)
 
     clearInterval(this.intervalId)
 
@@ -181,13 +168,12 @@ export class IframeModel {
 
   _clearSnapshots = () => {
     const snapshotStore = useSnapshotStore()
-    const autStore = useAutStore()
 
     if (snapshotStore.isSnapshotPinned) return
 
     clearInterval(this.intervalId)
 
-    autStore.setHighlightUrl(false)
+    this.autStore.setHighlightUrl(false)
 
     if (!this.originalState || !this.originalState.body) {
       return snapshotStore.clearMessage()
@@ -208,7 +194,7 @@ export class IframeModel {
       if (previousDetachedId !== this.detachedId) return
 
       this._updateViewport(this.originalState)
-      autStore.updateUrl(this.originalState.url)
+      this.autStore.updateUrl(this.originalState.url)
       this.restoreDom(this.originalState.snapshot)
       snapshotStore.clearMessage()
 
@@ -248,8 +234,6 @@ export class IframeModel {
   }
 
   _storeOriginalState () {
-    const autStore = useAutStore()
-
     if (!this.isAUTSameOrigin()) {
       const Cypress = this.eventManager.getCypress()
 
@@ -258,7 +242,7 @@ export class IframeModel {
        * In this case, the final snapshot request from the primary is sent out to the cross-origin spec bridges.
        * The spec bridge that matches the origin policy will take a snapshot and send it back to the primary for the runner to store in originalState.
        */
-      Cypress.primaryOriginCommunicator.toAllSpecBridges('generate:final:snapshot', autStore.url || '')
+      Cypress.primaryOriginCommunicator.toAllSpecBridges('generate:final:snapshot', this.autStore.url || '')
       Cypress.primaryOriginCommunicator.once('snapshot:final:generated', (finalSnapshot) => {
         // todo(lachlan): UNIFY-1318 - find correct default, if they are even needed, for required fields ($el, coords...)
         // @ts-ignore
@@ -267,11 +251,11 @@ export class IframeModel {
           htmlAttrs: finalSnapshot.htmlAttrs,
           snapshot: finalSnapshot,
           snapshots: [],
-          url: autStore.url || '',
+          url: this.autStore.url || '',
           // TODO: use same attr for both runner and runner-ct states.
           // these refer to the same thing - the viewport dimensions.
-          viewportWidth: autStore.viewportWidth,
-          viewportHeight: autStore.viewportHeight,
+          viewportWidth: this.autStore.viewportWidth,
+          viewportHeight: this.autStore.viewportHeight,
         }
       })
 
@@ -291,11 +275,11 @@ export class IframeModel {
       htmlAttrs,
       snapshot: finalSnapshot,
       snapshots: [],
-      url: autStore.url || '',
+      url: this.autStore.url || '',
       // TODO: UNIFY-1318 - use same attr for both runner and runner-ct states.
       // these refer to the same thing - the viewport dimensions.
-      viewportWidth: autStore.viewportWidth,
-      viewportHeight: autStore.viewportHeight,
+      viewportWidth: this.autStore.viewportWidth,
+      viewportHeight: this.autStore.viewportHeight,
     }
   }
 
