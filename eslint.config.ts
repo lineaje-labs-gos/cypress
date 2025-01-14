@@ -36,6 +36,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       '@typescript-eslint/no-this-alias': 'off',
       '@typescript-eslint/triple-slash-reference': 'off',
       'no-global-assign': 'off',
+      'no-unsafe-finally': 'off',
     },
   },
 
@@ -49,6 +50,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'mocha/no-identical-title': 'off', // warn
       'mocha/consistent-spacing-between-blocks': 'off',
       'mocha/no-global-tests': 'off',
+      'mocha/no-sibling-hooks': 'off',
     }
   },
 
@@ -73,7 +75,8 @@ export default ts.config(
       'cli/**/*',
       '**/__snapshots__/**/*',
       '.nx/**/*',
-      '.releaserc.js'
+      '.releaserc.js',
+      'dist/**'
     ]
   },
   {
