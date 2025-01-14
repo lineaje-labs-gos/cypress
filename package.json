@@ -1,8 +1,53 @@
 {
   "name": "cypress",
   "version": "13.17.0",
-  "description": "Cypress is a next generation front end testing tool built for the modern web",
   "private": true,
+  "description": "Cypress is a next generation front end testing tool built for the modern web",
+  "keywords": [
+    "automation",
+    "browser",
+    "cypress",
+    "cypress.io",
+    "e2e",
+    "end-to-end",
+    "integration",
+    "component",
+    "mocks",
+    "runner",
+    "spies",
+    "stubs",
+    "test",
+    "testing"
+  ],
+  "homepage": "https://cypress.io",
+  "bugs": {
+    "url": "https://github.com/cypress-io/cypress/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cypress-io/cypress.git"
+  },
+  "license": "MIT",
+  "workspaces": {
+    "packages": [
+      "cli",
+      "packages/*",
+      "npm/*",
+      "tooling/*",
+      "system-tests",
+      "scripts"
+    ],
+    "nohoist": [
+      "**/@wdio/*",
+      "**/webpack-preprocessor/babel-loader",
+      "**/webpack-preprocessor/**/merge-source-map",
+      "**/webpack-preprocessor/**/patch-package",
+      "**/webpack-batteries-included-preprocessor/ts-loader",
+      "**/jest",
+      "**/jest*",
+      "**/expect"
+    ]
+  },
   "scripts": {
     "binary-build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 node ./scripts/binary.js build",
     "binary-deploy": "node ./scripts/binary.js deploy",
@@ -63,12 +108,30 @@
     "test-scripts-watch": "yarn test-scripts --watch --watch-extensions 'ts,js'",
     "test-system": "yarn workspace @tooling/system-tests test",
     "pretest-unit": "yarn ensure-deps",
-    "test-unit": "lerna exec yarn test-unit --ignore={@packages/{driver,root,static,web-config,net-stubbing,rewriter},@cypress/{webpack-dev-server,eslint-plugin-dev}}",
+    "test-unit": "lerna exec yarn test-unit --ignore={@packages/{driver,root,static,web-config,net-stubbing,rewriter},@cypress/{webpack-dev-server}}",
     "pretest-watch": "yarn ensure-deps",
     "test-watch": "lerna exec yarn test-watch --ignore=@packages/{driver,root,static,web-config}",
     "type-check": "yarn lerna exec yarn type-check --scope=@tooling/system-tests && node scripts/type_check",
     "verify:mocha:results": "node ./scripts/verify-mocha-results",
     "watch": "yarn gulp watch"
+  },
+  "lint-staged": {
+    "*.coffee": "yarn stop-only --folder",
+    "*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix"
+  },
+  "resolutions": {
+    "**/@types/cheerio": "0.22.21",
+    "**/@types/enzyme": "3.10.5",
+    "**/@wdio/logger": "9.0.0",
+    "**/jquery": "3.7.1",
+    "**/pretty-format": "26.4.0",
+    "**/sharp": "0.29.3",
+    "**/socket.io-parser": "4.0.5",
+    "**/ua-parser-js": "0.7.33",
+    "browserify-sign": "4.2.2",
+    "devtools-protocol": "0.0.1346313",
+    "sharp": "0.29.3",
+    "vue-template-compiler": "2.6.12"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "3.485.0",
@@ -76,6 +139,7 @@
     "@babel/eslint-parser": "7.25.1",
     "@cypress/request": "^3.0.6",
     "@cypress/request-promise": "^5.0.0",
+    "@eslint/js": "^9.18.0",
     "@electron/fuses": "1.8.0",
     "@electron/notarize": "^2.5.0",
     "@fellow/eslint-plugin-coffee": "0.4.13",
@@ -144,20 +208,15 @@
     "electron": "33.2.1",
     "electron-builder": "^25.1.8",
     "enzyme-adapter-react-16": "1.12.1",
-    "eslint": "^8.56.0",
-    "eslint-plugin-cypress": "3.5.0",
-    "eslint-plugin-graphql": "4.0.0",
-    "eslint-plugin-import": "2.25.4",
-    "eslint-plugin-json-format": "2.0.1",
-    "eslint-plugin-mocha": "8.2.0",
-    "eslint-plugin-react": "7.22.0",
-    "eslint-plugin-react-hooks": "4.2.0",
-    "eslint-plugin-vue": "7.18.0",
+    "eslint": "^9.18.0",
+    "eslint-plugin-cypress": "^4.1.0",
+    "eslint-plugin-mocha": "^10.5.0",
     "execa": "4.0.0",
     "filesize": "10.1.1",
     "fs-extra": "9.1.0",
     "getenv": "^1.0.0",
     "glob": "7.1.6",
+    "globals": "^15.14.0",
     "graphql": "^15.5.1",
     "graphql-executor": "0.0.23",
     "gulp": "4.0.2",
@@ -170,6 +229,7 @@
     "husky": "7.0.2",
     "inquirer": "8.2.4",
     "inquirer-confirm": "2.0.3",
+    "jiti": "^2.4.2",
     "lazy-ass": "1.6.0",
     "lerna": "8.1.8",
     "lint-staged": "11.1.2",
@@ -209,6 +269,7 @@
     "tree-kill": "1.2.2",
     "ts-node": "^10.9.2",
     "typescript": "5.3.3",
+    "typescript-eslint": "^8.20.0",
     "yarn-deduplicate": "3.1.0"
   },
   "engines": {
@@ -216,67 +277,5 @@
     "yarn": ">=1.22.22"
   },
   "productName": "Cypress",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cypress-io/cypress.git"
-  },
-  "homepage": "https://cypress.io",
-  "bugs": {
-    "url": "https://github.com/cypress-io/cypress/issues"
-  },
-  "keywords": [
-    "automation",
-    "browser",
-    "cypress",
-    "cypress.io",
-    "e2e",
-    "end-to-end",
-    "integration",
-    "component",
-    "mocks",
-    "runner",
-    "spies",
-    "stubs",
-    "test",
-    "testing"
-  ],
-  "workspaces": {
-    "packages": [
-      "cli",
-      "packages/*",
-      "npm/*",
-      "tooling/*",
-      "system-tests",
-      "scripts"
-    ],
-    "nohoist": [
-      "**/@wdio/*",
-      "**/webpack-preprocessor/babel-loader",
-      "**/webpack-preprocessor/**/merge-source-map",
-      "**/webpack-preprocessor/**/patch-package",
-      "**/webpack-batteries-included-preprocessor/ts-loader",
-      "**/jest",
-      "**/jest*",
-      "**/expect"
-    ]
-  },
-  "lint-staged": {
-    "*.coffee": "yarn stop-only --folder",
-    "*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix"
-  },
-  "resolutions": {
-    "**/@types/cheerio": "0.22.21",
-    "**/@types/enzyme": "3.10.5",
-    "**/@wdio/logger": "9.0.0",
-    "**/jquery": "3.7.1",
-    "**/pretty-format": "26.4.0",
-    "**/sharp": "0.29.3",
-    "**/socket.io-parser": "4.0.5",
-    "**/ua-parser-js": "0.7.33",
-    "browserify-sign": "4.2.2",
-    "devtools-protocol": "0.0.1346313",
-    "sharp": "0.29.3",
-    "vue-template-compiler": "2.6.12"
-  }
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
