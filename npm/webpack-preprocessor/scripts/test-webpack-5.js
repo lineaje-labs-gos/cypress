@@ -20,6 +20,7 @@ const main = async () => {
   const install = () => execa('yarn', ['install', '--ignore-scripts'], { stdio: 'inherit' })
 
   const resetPkg = async () => {
+    // eslint-disable-next-line no-restricted-syntax
     fs.writeFileSync(pkgJsonPath, originalPkg, 'utf8')
     await install()
   }
@@ -41,6 +42,7 @@ const main = async () => {
   delete pkg.devDependencies['webpack']
   // eslint-disable-next-line no-console
   console.log('[@cypress/webpack-preprocessor]: updating package.json...')
+  // eslint-disable-next-line no-restricted-syntax
   fs.writeFileSync(pkgJsonPath, JSON.stringify(pkg, null, 2))
 
   // eslint-disable-next-line no-console

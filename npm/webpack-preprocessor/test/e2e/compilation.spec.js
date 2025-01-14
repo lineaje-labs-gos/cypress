@@ -52,6 +52,7 @@ describe('webpack preprocessor - e2e', () => {
     file = createFile()
 
     return preprocessor(options)(file).then((outputPath) => {
+      // eslint-disable-next-line no-restricted-syntax
       snapshot(fs.readFileSync(outputPath).toString())
     })
   })
