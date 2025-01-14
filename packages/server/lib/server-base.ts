@@ -28,7 +28,7 @@ import { createInitialWorkers } from '@packages/rewriter'
 import type { Cfg } from './project-base'
 import type { Browser } from '@packages/server/lib/browsers/types'
 import { InitializeRoutes, createCommonRoutes } from './routes'
-import type { FoundSpec, ProtocolManagerShape, TestingType } from '@packages/types'
+import type { FoundSpec, ProtocolManagerShape, TestingType, AppStudioShape } from '@packages/types'
 import type { Server as WebSocketServer } from 'ws'
 import { RemoteStates, RemoteState } from './remote_states'
 import { cookieJar, SerializableAutomationCookie } from './util/cookies'
@@ -138,6 +138,7 @@ export interface OpenServerOptions {
   getCurrentBrowser: () => Browser
   getSpec: () => FoundSpec | null
   shouldCorrelatePreRequests: () => boolean
+  appStudio: AppStudioShape
 }
 
 export class ServerBase<TSocket extends SocketE2E | SocketCt> {
@@ -328,6 +329,7 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
     shouldCorrelatePreRequests,
     testingType,
     SocketCtor,
+    appStudio,
   }: OpenServerOptions) {
     debug('server open')
     this.testingType = testingType
@@ -370,6 +372,7 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
       onError,
       getSpec,
       testingType,
+      appStudio,
     }
 
     this.getCurrentBrowser = getCurrentBrowser

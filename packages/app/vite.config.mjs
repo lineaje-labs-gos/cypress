@@ -4,8 +4,15 @@ import Pages from 'vite-plugin-pages'
 import Copy from 'rollup-plugin-copy'
 import Legacy from '@vitejs/plugin-legacy'
 import { resolve } from 'path'
+import { federation } from '@module-federation/vite'
 
 export default makeConfig({
+  // Necessary for module federation. Good for chrome >= 89
+  esbuild: {
+    supported: {
+      'top-level-await': true,
+    },
+  },
   optimizeDeps: {
     include: [
       'javascript-time-ago',
@@ -22,6 +29,21 @@ export default makeConfig({
     ],
   },
 }, {
+  pluginsToListFirst: [
+    federation({
+      name: 'host',
+      remotes: {
+        'app-studio': {
+          type: 'module',
+          name: 'app-studio',
+          entryGlobalName: 'app-studio',
+          entry: '/__cypress-studio/app-studio.js',
+          shareScope: 'default',
+        },
+      },
+      filename: 'app-studio.js',
+    }),
+  ],
   plugins: [
     Layouts(),
     Pages({ extensions: ['vue'] }),

@@ -25,6 +25,8 @@ import type ProtocolManager from './cloud/protocol'
 import { ServerBase } from './server-base'
 import type Protocol from 'devtools-protocol'
 import type { ServiceWorkerClientEvent } from '@packages/proxy/lib/http/util/service-worker-manager'
+import cloudApi from './cloud/api'
+import * as enc from './cloud/encryption'
 
 export interface Cfg extends ReceivedCypressOptions {
   projectId?: string
@@ -153,6 +155,13 @@ export class ProjectBase extends EE {
 
     this._server = new ServerBase(cfg)
 
+    const appStudio = await this.ctx.appStudio.getAppStudio({
+      retryWithBackoff: cloudApi.retryWithBackoff,
+      requestPromise: cloudApi.rp,
+      publicKeyVersion: cloudApi.publicKeyVersion,
+      enc,
+    })
+
     const [port, warning] = await this._server.open(cfg, {
       getCurrentBrowser: () => this.browser,
       getSpec: () => this.spec,
@@ -161,6 +170,7 @@ export class ProjectBase extends EE {
       shouldCorrelatePreRequests: this.shouldCorrelatePreRequests,
       testingType: this.testingType,
       SocketCtor: this.testingType === 'e2e' ? SocketE2E : SocketCt,
+      appStudio,
     })
 
     this.ctx.actions.servers.setAppServerPort(port)

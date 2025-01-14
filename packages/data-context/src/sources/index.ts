@@ -1,6 +1,7 @@
 /* eslint-disable padding-line-between-statements */
 // created by autobarrel, do not modify directly
 
+export * from './AppStudioDataSource'
 export * from './BrowserDataSource'
 export * from './CloudDataSource'
 export * from './EnvDataSource'
@@ -18,4 +19,5 @@ export * from './RemoteRequestDataSource'
 export * from './UtilDataSource'
 export * from './VersionsDataSource'
 export * from './WizardDataSource'
+export * from './app-studio/'
 export * from './migration/'

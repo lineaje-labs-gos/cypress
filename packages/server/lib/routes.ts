@@ -9,7 +9,7 @@ import type { Cfg } from './project-base'
 import xhrs from './controllers/xhrs'
 import { runner } from './controllers/runner'
 import { iframesController } from './controllers/iframes'
-import type { FoundSpec } from '@packages/types'
+import type { FoundSpec, AppStudioShape } from '@packages/types'
 import { getCtx } from '@packages/data-context'
 import { graphQLHTTP } from '@packages/graphql/src/makeGraphQLServer'
 import type { RemoteStates } from './remote_states'
@@ -34,6 +34,7 @@ export interface InitializeRoutes {
   remoteStates: RemoteStates
   onError: (...args: unknown[]) => any
   testingType: Cypress.TestingType
+  appStudio: AppStudioShape
 }
 
 export const createCommonRoutes = ({
@@ -44,6 +45,7 @@ export const createCommonRoutes = ({
   remoteStates,
   nodeProxy,
   onError,
+  appStudio,
 }: InitializeRoutes) => {
   const router = Router()
   const { clientRoute, namespace } = config
@@ -103,6 +105,8 @@ export const createCommonRoutes = ({
 
     next()
   })
+
+  appStudio.initializeRoutes(router)
 
   router.get(`/${config.namespace}/tests`, (req, res, next) => {
     // slice out the cache buster

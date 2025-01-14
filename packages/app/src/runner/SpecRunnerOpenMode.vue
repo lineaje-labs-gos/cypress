@@ -1,3 +1,4 @@
+/// <reference path="../studio" />
 <template>
   <StudioInstructionsModal
     :open="studioStore.instructionModalIsOpen"
@@ -130,6 +131,7 @@ import { runnerConstants } from './runner-constants'
 import StudioInstructionsModal from './studio/StudioInstructionsModal.vue'
 import StudioSaveModal from './studio/StudioSaveModal.vue'
 import { useStudioStore } from '../store/studio-store'
+import Studio from 'app-studio'
 
 const {
   preferredMinimumPanelWidth,
@@ -287,6 +289,8 @@ function openFile () {
   })
 }
 onMounted(() => {
+  import('app-studio').then((Studio) => Studio.helloWorld())
+
   const eventManager = getEventManager()
 
   // these events use GraphQL
@@ -311,6 +315,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   cleanupRunner()
 })
+
+Studio.helloWorld()
 
 </script>
 

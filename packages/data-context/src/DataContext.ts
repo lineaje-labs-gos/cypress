@@ -32,6 +32,7 @@ import {
   ErrorDataSource,
   GraphQLDataSource,
   RemoteRequestDataSource,
+  AppStudioDataSource,
 } from './sources'
 import { cached } from './util/cached'
 import type { GraphQLSchema, OperationTypeNode, DocumentNode } from 'graphql'
@@ -176,6 +177,11 @@ export class DataContext {
   @cached
   get relevantRunSpecs () {
     return new RelevantRunSpecsDataSource(this)
+  }
+
+  @cached
+  get appStudio () {
+    return new AppStudioDataSource(this)
   }
 
   @cached

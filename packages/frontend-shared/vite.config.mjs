@@ -29,6 +29,7 @@ const alias = {
 
 const makePlugins = (plugins) => {
   return ([
+    ...(plugins?.pluginsToListFirst || []),
     vue(),
     vueJsx(), // Used mostly for testing in *.(t|j)sx files.
     vueI18n({
@@ -116,7 +117,6 @@ export const makeConfig = (config = {}, plugins = {}) => {
     css: {
       preprocessorOptions: {
         scss: {
-          // @ts-expect-error
           additionalData: `@use "file:///${path.resolve(__dirname, '../reporter/src/lib/variables.scss').replaceAll('\\', '/')}" as *;\n`,
         },
       },
