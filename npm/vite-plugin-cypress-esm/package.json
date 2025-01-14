@@ -8,7 +8,7 @@
     "check-ts": "tsc --noEmit",
     "cypress:open": "node ../../scripts/cypress open --project . --component",
     "cypress:run": "node ../../scripts/cypress run --project . --component",
-    "lint": "eslint --ext .js,.ts,.json, .",
+    "lint": "eslint .",
     "test": "npm run cypress:run",
     "watch": "tsc -w"
   },

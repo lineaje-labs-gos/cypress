@@ -52,6 +52,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'mocha/consistent-spacing-between-blocks': 'off',
       'mocha/no-global-tests': 'off',
       'mocha/no-sibling-hooks': 'off',
+      'mocha/no-skipped-tests': 'off',
     }
   },
 
