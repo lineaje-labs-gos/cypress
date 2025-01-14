@@ -9,7 +9,6 @@ const config = {
   output: {
     globals: {
       vue: 'Vue',
-      vue: 'Vue',
       '@vue/compiler-dom': 'VueCompilerDOM',
       '@vue/server-renderer': 'VueServerRenderer'
     },

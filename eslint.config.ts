@@ -4,6 +4,7 @@ import cy from 'eslint-plugin-cypress/flat'
 import mocha from 'eslint-plugin-mocha'
 import globals from 'globals'
 import path from 'path'
+import vue from 'eslint-plugin-vue'
 
 /**
  * baseConfig should be imported by other packages that define their own eslint.config.ts
@@ -17,26 +18,34 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
   ...ts.configs.recommended,
   cy.configs.recommended,
   mocha.configs.flat.recommended,
+  ...vue.configs['flat/recommended'],
   {
     // rules that are gold standard, but have many violations
     // these are off while developing eslint, but will be set to warn
     rules: {
+      'no-useless-escape': 'off',
+      'prefer-const': 'off',
+      'prefer-rest-params': 'off',
+      'no-prototype-builtins': 'off',
+      'no-global-assign': 'off',
+      'no-unsafe-finally': 'off',
+
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
-      'no-useless-escape': 'off',
       '@typescript-eslint/no-unsafe-function-type': 'off',
-      'prefer-const': 'off',
-      'prefer-rest-params': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-namespace': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      'no-prototype-builtins': 'off',
       '@typescript-eslint/no-this-alias': 'off',
       '@typescript-eslint/triple-slash-reference': 'off',
-      'no-global-assign': 'off',
-      'no-unsafe-finally': 'off',
-      '@typescript-eslint/no-empty-object-type': 'off'
+      '@typescript-eslint/no-empty-object-type': 'off',
+
+      'vue/multi-word-component-names': 'off',
+      'vue/html-closing-bracket-spacing': 'off',
+
+      'cypress/no-unnecessary-waiting': 'off',
+      'cypress/unsafe-to-chain-command': 'off',
     },
   },
 
@@ -70,6 +79,13 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
         require: 'readonly',
         module: 'readonly',
       }
+    }
+  },
+
+  {
+    files: ['webpack.config.js'],
+    languageOptions: {
+      globals: globals.node
     }
   }
 ]
