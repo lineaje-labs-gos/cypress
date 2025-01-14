@@ -46,10 +46,33 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     },
   },
 
-  // overrides for basic recommended rules
+  // overrides for basic recommended rules, and custom rules
   {
     rules: {
       'no-console': 'error',
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'process',
+          property: 'geteuid',
+          message: 'process.geteuid() will throw on Windows. Do not use it unless you catch any potential errors.',
+        },
+        {
+          object: 'os',
+          property: 'userInfo',
+          message: 'os.userInfo() will throw when there is not an `/etc/passwd` entry for the current user (like when running with --user 12345 in Docker). Do not use it unless you catch any potential errors.',
+        },
+      ],
+      'no-restricted-syntax': [
+        // esquery tool: https://estools.github.io/esquery/
+        'error',
+        {
+          // match sync FS methods except for `existsSync`
+          // examples: fse.readFileSync, fs.readFileSync, this.ctx.fs.readFileSync...
+          selector: `MemberExpression[object.name='fs'][property.name=/^[A-z]+Sync$/]:not(MemberExpression[property.name='existsSync']), MemberExpression[property.name=/^[A-z]+Sync$/]:not(MemberExpression[property.name='existsSync']):has(MemberExpression[property.name='fs'])`,
+          message: 'Synchronous fs calls should not be used in Cypress. Use an async API instead.',
+        },
+      ],
     },
   },
 
