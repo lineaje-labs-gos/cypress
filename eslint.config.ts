@@ -42,6 +42,14 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       '@stylistic/new-parens': 'off',
       '@stylistic/indent-binary-ops': 'off',
       '@stylistic/template-curly-spacing': 'off',
+      '@stylistic/no-mixed-operators': 'off',
+    },
+  },
+
+  // overrides for basic recommended rules
+  {
+    rules: {
+      'no-console': 'error',
     },
   },
 
@@ -49,7 +57,6 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     // rules that are gold standard, but have many violations
     // these are off while developing eslint, but will be set to warn
     rules: {
-      'no-console': 'error',
       'no-useless-escape': 'off',
       'prefer-const': 'off',
       'prefer-rest-params': 'off',

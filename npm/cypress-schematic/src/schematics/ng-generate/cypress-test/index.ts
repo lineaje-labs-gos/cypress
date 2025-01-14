@@ -56,7 +56,7 @@ export default function (options: Schema): Rule {
     if (options.path === undefined) {
       options.path = testType === 'component' ? `${project.sourceRoot}/${project.prefix}` : `${project.root}/cypress/e2e`
     }
-
+    // eslint-disable-next-line no-console
     console.log(`Creating new ${testType} spec named: ${options.name}`)
 
     const templatePath = testType === 'component' ? '../files/ct/__path__' : '../files/e2e/__path__'
