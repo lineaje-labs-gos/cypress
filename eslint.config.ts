@@ -5,6 +5,7 @@ import mocha from 'eslint-plugin-mocha'
 import globals from 'globals'
 import path from 'path'
 import vue from 'eslint-plugin-vue'
+import stylistic from '@stylistic/eslint-plugin'
 
 /**
  * baseConfig should be imported by other packages that define their own eslint.config.ts
@@ -14,11 +15,36 @@ import vue from 'eslint-plugin-vue'
  */
 
 export const baseConfig: InfiniteDepthConfigWithExtends[] = [
-  js.configs.recommended, 
+  js.configs.recommended,
   ...ts.configs.recommended,
   cy.configs.recommended,
   mocha.configs.flat.recommended,
   ...vue.configs['flat/recommended'],
+  stylistic.configs.customize({
+    'braceStyle': '1tbs',
+    'arrowParens': true,
+  }),
+
+  // overrides for stylistic rules
+  {
+    rules: {
+      '@stylistic/space-before-function-paren': ['error', 'always'],
+      '@stylistic/comma-dangle': ['error', 'always-multiline'],
+      '@stylistic/multiline-ternary': 'off',
+      // the following rules are very inconsistent across the codebase.
+      // enabling them, even with customized options, may result in large diffs.
+      '@stylistic/indent': 'off', // ['warn', 2, { MemberExpression: 0 }],
+      '@stylistic/operator-linebreak': 'off',
+      '@stylistic/max-statements-per-line': 'off',
+      '@stylistic/quote-props': 'off',
+      '@stylistic/spaced-comment': 'off',
+      '@stylistic/no-extra-parens': 'off',
+      '@stylistic/new-parens': 'off',
+      '@stylistic/indent-binary-ops': 'off',
+      '@stylistic/template-curly-spacing': 'off',
+    },
+  },
+
   {
     // rules that are gold standard, but have many violations
     // these are off while developing eslint, but will be set to warn
@@ -66,7 +92,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'mocha/no-skipped-tests': 'off',
       'mocha/no-exports': 'off',
       'mocha/no-async-describe': 'off',
-    }
+    },
   },
 
   // common file patterns to ignore
@@ -74,27 +100,26 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     ignores: [
       '.releaserc.js',
       'dist/**/*',
-    ]
+    ],
   },
 
-  // globals necessary for mixed js/ts 
+  // globals necessary for mixed js/ts
   {
     languageOptions: {
       globals: {
         require: 'readonly',
         module: 'readonly',
-      }
-    }
+      },
+    },
   },
 
   {
     files: ['webpack.config.js'],
     languageOptions: {
-      globals: globals.node
-    }
-  }
+      globals: globals.node,
+    },
+  },
 ]
-
 
 export default ts.config(
   ...baseConfig,
@@ -108,19 +133,19 @@ export default ts.config(
       '**/__snapshots__/**/*',
       '.nx/**/*',
       '.releaserc.js',
-      'dist/**'
-    ]
+      'dist/**',
+    ],
   },
   {
     files: ['**/*.{ts,js}'],
     languageOptions: {
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: path.join(__dirname, './ts')
+        tsconfigRootDir: path.join(__dirname, './ts'),
       },
       globals: {
-        ...globals.node,  
-      }
-    }
-  }
+        ...globals.node,
+      },
+    },
+  },
 )

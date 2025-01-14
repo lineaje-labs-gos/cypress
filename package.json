@@ -270,7 +270,9 @@
     "ts-node": "^10.9.2",
     "typescript": "5.3.3",
     "typescript-eslint": "^8.20.0",
-    "yarn-deduplicate": "3.1.0"
+    "yarn-deduplicate": "3.1.0",
+    "@stylistic/eslint-plugin": "^2.13.0",
+    "eslint-plugin-vue": "^9.32.0"
   },
   "engines": {
     "node": ">=20.18.1",
