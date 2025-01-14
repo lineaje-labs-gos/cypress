@@ -23,7 +23,7 @@ const getViteDevServerConfig = (projectRoot: string) => {
     framework: 'react',
   } as unknown as ViteDevServerConfig
 }
-const MAJOR_VERSIONS: ({version: 4, vite: any } | {version: 5, vite: any } | {version: 6, vite: any })[] = [
+const MAJOR_VERSIONS: ({ version: 4, vite: any } | { version: 5, vite: any } | { version: 6, vite: any })[] = [
   {
     version: 4,
     vite: vite4,

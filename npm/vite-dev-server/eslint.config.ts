@@ -6,8 +6,8 @@ export default [
   {
     languageOptions: {
       globals: {
-        process: 'readonly'
-      }
-    }
-  }
+        process: 'readonly',
+      },
+    },
+  },
 ]
