@@ -25,6 +25,16 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     'arrowParens': true,
   }),
 
+  // set up ts parser
+  {
+    files: ['**/*.{ts,js,jsx,vue}'],
+    languageOptions: {
+      parserOptions: {
+        parser: ts.parser,
+      },
+    },
+  },
+
   // overrides for stylistic rules
   {
     rules: {
@@ -43,6 +53,16 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       '@stylistic/indent-binary-ops': 'off',
       '@stylistic/template-curly-spacing': 'off',
       '@stylistic/no-mixed-operators': 'off',
+      '@stylistic/jsx-tag-spacing': 'off',
+      '@stylistic/jsx-function-call-newline': 'off',
+      '@stylistic/jsx-wrap-multilines': 'off',
+      '@stylistic/jsx-closing-tag-location': 'off',
+      '@stylistic/jsx-first-prop-new-line': 'off',
+      '@stylistic/jsx-closing-bracket-location': 'off',
+      '@stylistic/jsx-one-expression-per-line': 'off',
+      '@stylistic/jsx-max-props-per-line': 'off',
+      '@stylistic/jsx-curly-brace-presence': 'off',
+      '@stylistic/jsx-quotes': 'off',
     },
   },
 
@@ -87,6 +107,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'no-global-assign': 'off',
       'no-unsafe-finally': 'off',
       'no-async-promise-executor': 'off',
+      'no-unsafe-optional-chaining': 'off',
 
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-require-imports': 'off',
@@ -102,10 +123,15 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
 
       'vue/multi-word-component-names': 'off',
       'vue/html-closing-bracket-spacing': 'off',
+      'vue/no-dupe-keys': 'off',
+      'vue/v-on-event-hyphenation': 'off',
+      'vue/attribute-hyphenation': 'off',
+      'vue/no-useless-template-attributes': 'off',
 
       'cypress/no-unnecessary-waiting': 'off',
       'cypress/unsafe-to-chain-command': 'off',
       'cypress/no-async-tests': 'off',
+      'cypress/no-assigning-return-values': 'warn',
     },
   },
 

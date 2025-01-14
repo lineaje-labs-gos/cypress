@@ -54,6 +54,7 @@ describe('Spec List - Last updated with git info', () => {
     .trigger('mouseleave')
 
     cy.withCtx((ctx) => {
+      // eslint-disable-next-line no-restricted-syntax
       ctx.fs.appendFileSync(
         ctx.path.join(ctx.currentProject!, 'cypress', 'e2e', 'dom-container.spec.js'),
         '// modifying the spec.',
@@ -74,6 +75,7 @@ describe('Spec List - Last updated with git info', () => {
     .trigger('mouseleave')
 
     cy.withCtx((ctx) => {
+      // eslint-disable-next-line no-restricted-syntax
       ctx.fs.appendFileSync(
         ctx.path.join(ctx.currentProject!, 'cypress', 'e2e', 'foo.spec.js'),
         '// modifying the spec.',

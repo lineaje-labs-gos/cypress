@@ -18,6 +18,7 @@ describe('run-all-specs', () => {
       return cy.findByTestId('run-all-specs-for-all').click()
     }
 
+    // eslint-disable cypress/no-assigning-return-values
     const command = cy.get('[data-cy=spec-item-directory]').contains(platformDir)
 
     return command.realHover().then(() => {

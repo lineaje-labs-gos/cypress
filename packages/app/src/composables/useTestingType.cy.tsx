@@ -5,7 +5,7 @@ import type { FunctionalComponent } from 'vue'
 describe('useTestingType', () => {
   type ComposableWrapperProps<R> = { useComposable: () => R, callback: (result: R) => void }
 
-  const ComposableWrapper: FunctionalComponent<ComposableWrapperProps<unknown>> = <R, >({ useComposable, callback }: ComposableWrapperProps<R>) => {
+  const ComposableWrapper: FunctionalComponent<ComposableWrapperProps<unknown>> = <R = unknown>({ useComposable, callback }: ComposableWrapperProps<R>) => {
     const result = useComposable()
 
     callback(result)

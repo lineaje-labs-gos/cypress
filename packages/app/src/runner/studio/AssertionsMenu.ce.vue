@@ -52,6 +52,7 @@ import { nextTick, onMounted, Ref, ref, StyleValue } from 'vue'
 import type { PossibleAssertions, AddAssertion, AssertionArgs } from './types'
 
 const props = defineProps <{
+  // eslint-disable-next-line no-undef
   jqueryElement: JQuery<HTMLElement>
   possibleAssertions: PossibleAssertions
   addAssertion: AddAssertion

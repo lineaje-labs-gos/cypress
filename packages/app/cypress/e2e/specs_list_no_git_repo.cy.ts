@@ -13,6 +13,7 @@ describe('Spec List - Last updated with no git info', () => {
     .should('not.exist')
 
     cy.withCtx((ctx) => {
+      // eslint-disable-next-line no-restricted-syntax
       ctx.fs.appendFileSync(
         ctx.path.join(ctx.currentProject!, 'cypress', 'e2e', 'blank-contents.spec.js'),
         '// touching the spec.',

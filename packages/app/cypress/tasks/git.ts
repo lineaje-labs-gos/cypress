@@ -14,6 +14,7 @@ export async function initGitRepoForTestProject (projectPath: string) {
   }
 
   const e2eFolder = path.join(projectPath, 'cypress', 'e2e')
+  // eslint-disable-next-line no-restricted-syntax
   const allSpecs = fs.readdirSync(e2eFolder)
 
   await git.init()
@@ -25,7 +26,9 @@ export async function initGitRepoForTestProject (projectPath: string) {
   const fooSpec = path.join(e2eFolder, 'foo.spec.js')
   const blankContentsSpec = path.join(e2eFolder, 'blank-contents.spec.js')
 
+  // eslint-disable-next-line no-restricted-syntax
   fs.createFileSync(fooSpec)
+  // eslint-disable-next-line no-restricted-syntax
   fs.writeFileSync(blankContentsSpec, 'it(\'modifies the file\', () => {})')
 
   return null

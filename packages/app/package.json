@@ -14,7 +14,7 @@
     "cypress:run:e2e": "yarn cypress:run-cypress-in-cypress node ../../scripts/cypress run --project .",
     "cypress:run:e2e:update:snapshots": "CYPRESS_SNAPSHOT_UPDATE=1 yarn cypress:run-cypress-in-cypress node ../../scripts/cypress run --project . --spec **/*mochaEvents* --browser chrome",
     "dev": "yarn cypress:run-cypress-in-cypress gulp dev --project .",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
+    "lint": "eslint .",
     "start": "echo \"run 'yarn dev' or 'yarn watch' from the root\" && exit 1",
     "test": "echo 'ok'",
     "watch": "echo \"run 'yarn dev' or 'yarn watch' from the root\" && exit 1"

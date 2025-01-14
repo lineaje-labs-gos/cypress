@@ -4,7 +4,7 @@ import { useToggle } from '@vueuse/core'
 import type { FoundSpec } from '@packages/types/src'
 import { getRunnerConfigFromWindow } from '../../runner/get-runner-config-from-window'
 
-export type RawNode <T> = {
+export type RawNode<T> = {
   id: string
   name: string
   children: RawNode<T>[]
@@ -62,7 +62,7 @@ export function buildSpecTree<T extends FoundSpec> (specs: FoundSpec[], root: Sp
 //   - components
 //     - index.ts
 // tree (given that src/comp is not collapsed)
-function getHighlightIndexes <T extends FoundSpec> (node: SpecTreeNode<T>) {
+function getHighlightIndexes<T extends FoundSpec> (node: SpecTreeNode<T>) {
   if (!(node.data as any)?.fuzzyIndexes) {
     return []
   }
@@ -135,7 +135,7 @@ function collapseEmptyChildren<T extends FoundSpec> (node: SpecTreeNode<T>) {
   return
 }
 
-export type UseCollapsibleTreeNode <T extends RawNode<T>> = {
+export type UseCollapsibleTreeNode<T extends RawNode<T>> = {
   // control open/close state
   hidden: ComputedRef<boolean>
   expanded: Ref<boolean>
@@ -146,7 +146,7 @@ export type UseCollapsibleTreeNode <T extends RawNode<T>> = {
 
   parent?: UseCollapsibleTreeNode<T>
   children: UseCollapsibleTreeNode<T>[]
-} & { [K in keyof T]: T[K]}
+} & { [K in keyof T]: T[K] }
 
 export interface UseCollapsibleTreeOptions {
   expandInitially?: boolean
@@ -246,7 +246,7 @@ function sortTree<T extends RawNode<T>> (tree: T) {
   }
 }
 
-export function useCollapsibleTree <T extends RawNode<T>> (tree: T, options: UseCollapsibleTreeOptions = {}) {
+export function useCollapsibleTree<T extends RawNode<T>> (tree: T, options: UseCollapsibleTreeOptions = {}) {
   options.expandInitially = options.expandInitially ?? true
   sortTree(tree)
   const collapsibleTree = buildTree<T>(tree, options)

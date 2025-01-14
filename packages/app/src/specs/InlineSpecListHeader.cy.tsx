@@ -4,7 +4,7 @@ import { defaultMessages } from '@cy/i18n'
 import { defineStore } from 'pinia'
 
 describe('InlineSpecListHeader', () => {
-  const mountWithProps = (props: {resultCount?: number, isRunAllSpecsAllowed?: boolean} = {}) => {
+  const mountWithProps = (props: { resultCount?: number, isRunAllSpecsAllowed?: boolean } = {}) => {
     const specFilterModel = ref('')
 
     const propsWithDefaults = {

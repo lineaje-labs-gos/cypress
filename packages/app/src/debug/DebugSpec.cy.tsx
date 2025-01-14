@@ -8,7 +8,7 @@ const resultCounts = (min: number, max: number) => {
   }
 }
 
-const multipleGroups: {[groupId: string]: any} = {
+const multipleGroups: { [groupId: string]: any } = {
   '123': {
     os: {
       name: 'Linux',
@@ -35,7 +35,7 @@ const multipleGroups: {[groupId: string]: any} = {
   },
 }
 
-const singleGroup: {[groupId: string]: any} = {
+const singleGroup: { [groupId: string]: any } = {
   '123': {
     os: {
       name: 'Linux',
@@ -50,7 +50,7 @@ const singleGroup: {[groupId: string]: any} = {
   },
 }
 
-const testResultMultipleGroups: {[thumbprint: string]: TestResults[]} = {
+const testResultMultipleGroups: { [thumbprint: string]: TestResults[] } = {
   'abcd': [
     {
       id: '676df87878',
@@ -123,7 +123,7 @@ const testResultMultipleGroups: {[thumbprint: string]: TestResults[]} = {
   ],
 }
 
-const testResultSingleGroup: {[thumbprint: string]: TestResults[]} = {
+const testResultSingleGroup: { [thumbprint: string]: TestResults[] } = {
   'abcd': [
     {
       id: '676df87878',
@@ -270,7 +270,7 @@ describe('<DebugSpec/> responsive UI', () => {
       },
     }
 
-    const testResult: {[thumbprint: string]: TestResults[]} = {
+    const testResult: { [thumbprint: string]: TestResults[] } = {
       'abcd': [
         {
           id: '676df87878',
@@ -378,7 +378,7 @@ describe('testing groupings', () => {
       },
     }
 
-    const repeatedValueGroups: {[groupId: string]: any} = {
+    const repeatedValueGroups: { [groupId: string]: any } = {
       '456': {
         os: {
           name: 'Apple',
@@ -405,7 +405,7 @@ describe('testing groupings', () => {
       },
     }
 
-    const tests: {[thumbprint: string]: TestResults[]} = {
+    const tests: { [thumbprint: string]: TestResults[] } = {
       'abcd': [
         {
           id: '676df87878',
