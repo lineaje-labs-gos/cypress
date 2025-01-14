@@ -11,7 +11,7 @@ export const LazyComponent: React.FC<LazyComponentProps> = () => {
   return (
     <div>
       Loading a dog:
-      <React.Suspense fallback={'loading...'}>
+      <React.Suspense fallback="loading...">
         <LazyDog />
       </React.Suspense>
     </div>

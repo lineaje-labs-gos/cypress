@@ -9,11 +9,11 @@ export default [
     files: ['src/createMount.ts'],
     rules: {
       'cypress/no-unnecessary-waiting': 'warn',
-    }
+    },
   },
   {
     rules: {
       'react/prop-types': 'warn',
-    }
-  }
+    },
+  },
 ]
