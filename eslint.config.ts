@@ -41,6 +41,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       '@typescript-eslint/no-this-alias': 'off',
       '@typescript-eslint/triple-slash-reference': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-wrapper-object-types': 'off',
 
       'vue/multi-word-component-names': 'off',
       'vue/html-closing-bracket-spacing': 'off',
@@ -63,6 +64,8 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'mocha/no-global-tests': 'off',
       'mocha/no-sibling-hooks': 'off',
       'mocha/no-skipped-tests': 'off',
+      'mocha/no-exports': 'off',
+      'mocha/no-async-describe': 'off',
     }
   },
 
