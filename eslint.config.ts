@@ -34,6 +34,8 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       '@typescript-eslint/no-explicit-any': 'off',
       'no-prototype-builtins': 'off',
       '@typescript-eslint/no-this-alias': 'off',
+      '@typescript-eslint/triple-slash-reference': 'off',
+      'no-global-assign': 'off',
     },
   },
 
@@ -46,6 +48,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'mocha/no-top-level-hooks': 'off', //warn
       'mocha/no-identical-title': 'off', // warn
       'mocha/consistent-spacing-between-blocks': 'off',
+      'mocha/no-global-tests': 'off',
     }
   },
 
