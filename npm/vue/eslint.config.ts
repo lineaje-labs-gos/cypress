@@ -8,8 +8,8 @@ export default [
     files: ['**/*.vue'],
     languageOptions: {
       parserOptions: {
-        parser: ts.parser
-      }
-    }
-  }
+        parser: ts.parser,
+      },
+    },
+  },
 ]

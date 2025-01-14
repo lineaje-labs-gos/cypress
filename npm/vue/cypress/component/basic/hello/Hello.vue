@@ -24,6 +24,7 @@ export default {
 
   computed: {
     error () {
+      // eslint-disable-next-line no-console
       console.log(this.username)
 
       return this.username.trim().length < 7

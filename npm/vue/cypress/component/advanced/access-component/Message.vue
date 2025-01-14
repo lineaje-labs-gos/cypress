@@ -29,6 +29,7 @@ export default {
   emits: ['message-clicked'],
   methods: {
     handleClick () {
+      // eslint-disable-next-line no-console
       console.log('lalala')
       this.$emit('message-clicked', this.message)
     },

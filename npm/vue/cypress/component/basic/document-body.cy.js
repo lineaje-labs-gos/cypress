@@ -5,7 +5,9 @@ describe('document.body', () => {
   it('is set correctly', () => {
     mount({
       mounted () {
+        // eslint-disable-next-line no-console
         console.log('mounted!')
+        // eslint-disable-next-line no-console
         console.log('document.body', document.body)
         document.body.innerText = 'Mounted!'
       },
