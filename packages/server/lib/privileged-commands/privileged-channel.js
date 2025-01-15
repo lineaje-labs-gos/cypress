@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 /* global window */
 (({ browserFamily, isSpecBridge, key, namespace, scripts, url, win = window, documentDomainContext }) => {
   /**

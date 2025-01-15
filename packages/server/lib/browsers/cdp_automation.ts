@@ -378,7 +378,6 @@ export class CdpAutomation implements CDPClient {
     })
   }
 
-  // eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
   private _updateFrameTree = (client: CriClient, eventName) => async () => {
     debugVerbose(`update frame tree for ${eventName}`)
 

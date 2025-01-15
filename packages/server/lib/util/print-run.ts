@@ -608,13 +608,11 @@ export const logUploadManifest = (artifacts: IArtifact[], protocolCaptureMeta: {
     [ArtifactKinds.PROTOCOL]: 'Test Replay',
   }
 
-  // eslint-disable-next-line no-console
   console.log('')
   terminal.header('Uploading Cloud Artifacts', {
     color: ['blue'],
   })
 
-  // eslint-disable-next-line no-console
   console.log('')
 
   const video = artifacts.find(({ reportKey }) => reportKey === ArtifactKinds.VIDEO)
@@ -686,14 +684,12 @@ export const logUploadResults = (results: ArtifactUploadResult[], protocolFatalE
     [ArtifactKinds.PROTOCOL]: 'Test Replay',
   }
 
-  // eslint-disable-next-line no-console
   console.log('')
 
   terminal.header('Uploaded Cloud Artifacts', {
     color: ['blue'],
   })
 
-  // eslint-disable-next-line no-console
   console.log('')
 
   results.forEach(({ key, ...report }, i, { length }) => {

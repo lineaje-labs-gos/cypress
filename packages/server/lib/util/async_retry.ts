@@ -4,9 +4,9 @@ type RetryOptions = {
   shouldRetry?: (err?: Error) => boolean
 }
 
-export function asyncRetry <
+export function asyncRetry<
   TArgs extends any[],
-  TResult extends any,
+  TResult,
 > (fn: (...args: TArgs) => Promise<TResult>, options: RetryOptions) {
   return async (...args: TArgs): Promise<TResult> => {
     let attempt = 0

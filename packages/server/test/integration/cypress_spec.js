@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// eslint-disable-next-line no-redeclare
 /*global globalThis*/
 require('../spec_helper')
 const _ = require('lodash')

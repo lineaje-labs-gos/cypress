@@ -40,9 +40,8 @@ describe('lib/util/suppress_warnings', function () {
 
     suppress()
 
-    // eslint-disable-next-line no-buffer-constructor
     new Buffer(0)
-    // eslint-disable-next-line no-buffer-constructor
+
     new Buffer('asdf')
 
     expect(emitWarning).not.to.be.called
