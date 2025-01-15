@@ -1,6 +1,6 @@
 import AU from 'ansi_up'
 import os from 'os'
-/* eslint-disable no-console */
+
 import chalk from 'chalk'
 import _ from 'lodash'
 import path from 'path'
@@ -155,7 +155,7 @@ export const AllCypressErrors = {
   CLOUD_CANCEL_SKIPPED_SPEC: () => {
     return errTemplate`${fmt.off(`\n  `)}This spec and its tests were skipped because the run has been canceled.`
   },
-  CLOUD_API_RESPONSE_FAILED_RETRYING: (arg1: {tries: number, delayMs: number, response: Error}) => {
+  CLOUD_API_RESPONSE_FAILED_RETRYING: (arg1: { tries: number, delayMs: number, response: Error }) => {
     const time = pluralize('time', arg1.tries)
     const delay = humanTime.long(arg1.delayMs, false)
 
@@ -167,9 +167,8 @@ export const AllCypressErrors = {
         We will retry ${fmt.off(arg1.tries)} more ${fmt.off(time)} in ${fmt.off(delay)}...
         `
     /* Because of fmt.listFlags() and fmt.listItems() */
-    /* eslint-disable indent */
   },
-  CLOUD_CANNOT_PROCEED_IN_PARALLEL: (arg1: {flags: any, response: Error}) => {
+  CLOUD_CANNOT_PROCEED_IN_PARALLEL: (arg1: { flags: any, response: Error }) => {
     return errTemplate`\
         We encountered an unexpected error communicating with our servers.
 
@@ -182,7 +181,7 @@ export const AllCypressErrors = {
       ciBuildId: '--ciBuildId',
     })}`
   },
-  CLOUD_CANNOT_PROCEED_IN_SERIAL: (arg1: {flags: any, response: Error}) => {
+  CLOUD_CANNOT_PROCEED_IN_SERIAL: (arg1: { flags: any, response: Error }) => {
     return errTemplate`\
         We encountered an unexpected error communicating with our servers.
 
@@ -195,7 +194,7 @@ export const AllCypressErrors = {
       ciBuildId: '--ciBuildId',
     })}`
   },
-  CLOUD_UNKNOWN_INVALID_REQUEST: (arg1: {flags: any, response: Error}) => {
+  CLOUD_UNKNOWN_INVALID_REQUEST: (arg1: { flags: any, response: Error }) => {
     return errTemplate`\
         We encountered an unexpected error communicating with our servers.
 
@@ -210,7 +209,7 @@ export const AllCypressErrors = {
       ciBuildId: '--ciBuildId',
     })}`
   },
-  CLOUD_UNKNOWN_CREATE_RUN_WARNING: (arg1: {props?: any, message: string}) => {
+  CLOUD_UNKNOWN_CREATE_RUN_WARNING: (arg1: { props?: any, message: string }) => {
     if (!Object.keys(arg1.props).length) {
       return errTemplate`\
           Warning from Cypress Cloud: ${fmt.highlight(arg1.message)}
@@ -223,7 +222,7 @@ export const AllCypressErrors = {
         Details:
         ${fmt.meta(arg1.props)}`
   },
-  CLOUD_STALE_RUN: (arg1: {runUrl: string, [key: string]: any}) => {
+  CLOUD_STALE_RUN: (arg1: { runUrl: string, [key: string]: any }) => {
     return errTemplate`\
         You are attempting to pass the ${fmt.flag(`--parallel`)} flag to a run that was completed over 24 hours ago.
 
@@ -240,7 +239,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/stale-run`
   },
-  CLOUD_ALREADY_COMPLETE: (props: {runUrl: string}) => {
+  CLOUD_ALREADY_COMPLETE: (props: { runUrl: string }) => {
     return errTemplate`\
         The run you are attempting to access is already complete and will not accept new groups.
 
@@ -257,7 +256,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/already-complete`
   },
-  CLOUD_PARALLEL_REQUIRED: (arg1: {runUrl: string}) => {
+  CLOUD_PARALLEL_REQUIRED: (arg1: { runUrl: string }) => {
     return errTemplate`\
         You did not pass the ${fmt.flag(`--parallel`)} flag, but this run's group was originally created with the --parallel flag.
 
@@ -274,7 +273,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/parallel-required`
   },
-  CLOUD_PARALLEL_DISALLOWED: (arg1: {runUrl: string}) => {
+  CLOUD_PARALLEL_DISALLOWED: (arg1: { runUrl: string }) => {
     return errTemplate`\
         You passed the ${fmt.flag(`--parallel`)} flag, but this run group was originally created without the --parallel flag.
 
@@ -290,7 +289,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/parallel-disallowed`
   },
-  CLOUD_PARALLEL_GROUP_PARAMS_MISMATCH: (arg1: {runUrl: string, parameters: any, payload: any }) => {
+  CLOUD_PARALLEL_GROUP_PARAMS_MISMATCH: (arg1: { runUrl: string, parameters: any, payload: any }) => {
     let params: any = arg1.parameters
 
     if (arg1.payload?.differentParams) {
@@ -344,7 +343,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/parallel-group-params-mismatch`
   },
-  CLOUD_RUN_GROUP_NAME_NOT_UNIQUE: (arg1: {runUrl: string, ciBuildId?: string | null}) => {
+  CLOUD_RUN_GROUP_NAME_NOT_UNIQUE: (arg1: { runUrl: string, ciBuildId?: string | null }) => {
     return errTemplate`\
         You passed the ${fmt.flag(`--group`)} flag, but this group name has already been used for this run.
 
@@ -362,7 +361,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/run-group-name-not-unique`
   },
-  CLOUD_AUTO_CANCEL_NOT_AVAILABLE_IN_PLAN: (arg1: {link: string}) => {
+  CLOUD_AUTO_CANCEL_NOT_AVAILABLE_IN_PLAN: (arg1: { link: string }) => {
     return errTemplate`\
       ${fmt.highlightSecondary(`Auto Cancellation`)} is not included under your current billing plan.
 
@@ -370,7 +369,7 @@ export const AllCypressErrors = {
 
       ${fmt.off(arg1.link)}`
   },
-  CLOUD_AUTO_CANCEL_MISMATCH: (arg1: {runUrl: string}) => {
+  CLOUD_AUTO_CANCEL_MISMATCH: (arg1: { runUrl: string }) => {
     return errTemplate`\
         You passed the ${fmt.flag(`--auto-cancel-after-failures`)} flag, but this run originally started with a different value for the ${fmt.flag(`--auto-cancel-after-failures`)} flag.
 
@@ -442,7 +441,6 @@ export const AllCypressErrors = {
         The --ci-build-id flag is used to either group or parallelize multiple runs together.
 
         https://on.cypress.io/incorrect-ci-build-id-usage`
-    /* eslint-enable indent */
   },
   RECORD_KEY_MISSING: () => {
     return errTemplate`\
@@ -491,7 +489,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/recording-project-runs`
   },
-  CLOUD_INVALID_RUN_REQUEST: (arg1: {message: string, errors: string[], object: object}) => {
+  CLOUD_INVALID_RUN_REQUEST: (arg1: { message: string, errors: string[], object: object }) => {
     return errTemplate`\
         Recording this run failed. The request was invalid.
 
@@ -629,7 +627,7 @@ export const AllCypressErrors = {
         return AllCypressErrors.CLOUD_PROTOCOL_UPLOAD_NETWORK_FAILURE(firstError as Error & { url: string })
       }
 
-      return AllCypressErrors.CLOUD_PROTOCOL_UPLOAD_HTTP_FAILURE(error.errors[0] as Error & { url: string, status: number, statusText: string, responseBody: string})
+      return AllCypressErrors.CLOUD_PROTOCOL_UPLOAD_HTTP_FAILURE(error.errors[0] as Error & { url: string, status: number, statusText: string, responseBody: string })
     }
 
     let systemErr = error.errors.find((err) => {
@@ -934,7 +932,7 @@ export const AllCypressErrors = {
 
       Instead the value was: ${fmt.stringify(value)}`
   },
-  RENAMED_CONFIG_OPTION: (arg1: {name: string, newName: string}) => {
+  RENAMED_CONFIG_OPTION: (arg1: { name: string, newName: string }) => {
     return errTemplate`\
         The ${fmt.highlight(arg1.name)} configuration option you have supplied has been renamed.
 
@@ -955,7 +953,7 @@ export const AllCypressErrors = {
         This server has been configured as your ${fmt.highlight(`baseUrl`)}, and tests will likely fail if it is not running.`
   },
   // TODO: test this
-  CANNOT_CONNECT_BASE_URL_RETRYING: (arg1: {attempt: number, baseUrl: string, remaining: number, delay: number}) => {
+  CANNOT_CONNECT_BASE_URL_RETRYING: (arg1: { attempt: number, baseUrl: string, remaining: number, delay: number }) => {
     switch (arg1.attempt) {
       case 1:
         return errTemplate`\
@@ -973,7 +971,7 @@ export const AllCypressErrors = {
     }
   },
   // TODO: test this
-  INVALID_REPORTER_NAME: (arg1: {name: string, paths: string[], error: Error}) => {
+  INVALID_REPORTER_NAME: (arg1: { name: string, paths: string[], error: Error }) => {
     return errTemplate`\
         Error loading the reporter: ${fmt.highlight(arg1.name)}
 
@@ -1019,7 +1017,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/installing-cypress`
   },
-  FREE_PLAN_EXCEEDS_MONTHLY_PRIVATE_TESTS: (arg1: {link: string, usedTestsMessage: string, limit: number}) => {
+  FREE_PLAN_EXCEEDS_MONTHLY_PRIVATE_TESTS: (arg1: { link: string, usedTestsMessage: string, limit: number }) => {
     return errTemplate`\
         You've exceeded the limit of private test results under your free plan this month. ${getUsedTestsMessage(arg1.limit, arg1.usedTestsMessage)}
 
@@ -1027,7 +1025,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  FREE_PLAN_IN_GRACE_PERIOD_EXCEEDS_MONTHLY_PRIVATE_TESTS: (arg1: {link: string, usedTestsMessage: string, gracePeriodMessage: string, limit: number}) => {
+  FREE_PLAN_IN_GRACE_PERIOD_EXCEEDS_MONTHLY_PRIVATE_TESTS: (arg1: { link: string, usedTestsMessage: string, gracePeriodMessage: string, limit: number }) => {
     return errTemplate`\
         You've exceeded the limit of private test results under your free plan this month. ${getUsedTestsMessage(arg1.limit, arg1.usedTestsMessage)}
 
@@ -1035,7 +1033,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  PAID_PLAN_EXCEEDS_MONTHLY_PRIVATE_TESTS: (arg1: {link: string, usedTestsMessage: string, limit: number}) => {
+  PAID_PLAN_EXCEEDS_MONTHLY_PRIVATE_TESTS: (arg1: { link: string, usedTestsMessage: string, limit: number }) => {
     return errTemplate`\
         You've exceeded the limit of private test results under your current billing plan this month. ${getUsedTestsMessage(arg1.limit, arg1.usedTestsMessage)}
 
@@ -1043,7 +1041,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  FREE_PLAN_EXCEEDS_MONTHLY_TESTS: (arg1: {link: string, usedTestsMessage: string, limit: number}) => {
+  FREE_PLAN_EXCEEDS_MONTHLY_TESTS: (arg1: { link: string, usedTestsMessage: string, limit: number }) => {
     return errTemplate`\
         You've exceeded the limit of test results under your free plan this month. ${getUsedTestsMessage(arg1.limit, arg1.usedTestsMessage)}
 
@@ -1051,7 +1049,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  FREE_PLAN_IN_GRACE_PERIOD_EXCEEDS_MONTHLY_TESTS: (arg1: {link: string, usedTestsMessage: string, gracePeriodMessage: string, limit: number}) => {
+  FREE_PLAN_IN_GRACE_PERIOD_EXCEEDS_MONTHLY_TESTS: (arg1: { link: string, usedTestsMessage: string, gracePeriodMessage: string, limit: number }) => {
     return errTemplate`\
         You've exceeded the limit of test results under your free plan this month. ${getUsedTestsMessage(arg1.limit, arg1.usedTestsMessage)}
 
@@ -1061,7 +1059,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  PLAN_EXCEEDS_MONTHLY_TESTS: (arg1: {link: string, planType: string, usedTestsMessage: string, limit: number}) => {
+  PLAN_EXCEEDS_MONTHLY_TESTS: (arg1: { link: string, planType: string, usedTestsMessage: string, limit: number }) => {
     return errTemplate`\
         You've exceeded the limit of test results under your ${fmt.highlight(arg1.planType)} billing plan this month. ${getUsedTestsMessage(arg1.limit, arg1.usedTestsMessage)}
 
@@ -1069,7 +1067,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  FREE_PLAN_IN_GRACE_PERIOD_PARALLEL_FEATURE: (arg1: {link: string, gracePeriodMessage: string}) => {
+  FREE_PLAN_IN_GRACE_PERIOD_PARALLEL_FEATURE: (arg1: { link: string, gracePeriodMessage: string }) => {
     return errTemplate`\
         ${fmt.highlightSecondary(`Parallelization`)} is not included under your free plan.
 
@@ -1077,7 +1075,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  PARALLEL_FEATURE_NOT_AVAILABLE_IN_PLAN: (arg1: {link: string}) => {
+  PARALLEL_FEATURE_NOT_AVAILABLE_IN_PLAN: (arg1: { link: string }) => {
     return errTemplate`\
         ${fmt.highlightSecondary(`Parallelization`)} is not included under your current billing plan.
 
@@ -1085,7 +1083,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  PLAN_IN_GRACE_PERIOD_RUN_GROUPING_FEATURE_USED: (arg1: {link: string, gracePeriodMessage: string}) => {
+  PLAN_IN_GRACE_PERIOD_RUN_GROUPING_FEATURE_USED: (arg1: { link: string, gracePeriodMessage: string }) => {
     return errTemplate`\
         ${fmt.highlightSecondary(`Grouping`)} is not included under your free plan.
 
@@ -1093,7 +1091,7 @@ export const AllCypressErrors = {
 
         ${fmt.off(arg1.link)}`
   },
-  RUN_GROUPING_FEATURE_NOT_AVAILABLE_IN_PLAN: (arg1: {link: string}) => {
+  RUN_GROUPING_FEATURE_NOT_AVAILABLE_IN_PLAN: (arg1: { link: string }) => {
     return errTemplate`\
         ${fmt.highlightSecondary(`Grouping`)} is not included under your current billing plan.
 
@@ -1140,7 +1138,7 @@ export const AllCypressErrors = {
 
         CYPRESS_INTERNAL_ENV is reserved for internal use and cannot be modified.`
   },
-  CDP_VERSION_TOO_OLD: (minimumVersion: string, currentVersion: {major: number, minor: string | number}) => {
+  CDP_VERSION_TOO_OLD: (minimumVersion: string, currentVersion: { major: number, minor: string | number }) => {
     const phrase = currentVersion.major !== 0
       ? fmt.highlight(`${currentVersion.major}.${currentVersion.minor}`)
       : fmt.off('an older version')
@@ -1249,7 +1247,7 @@ export const AllCypressErrors = {
   },
   // TODO: verify configFile is absolute path
   // TODO: make this relative path, not absolute
-  EXPERIMENTAL_COMPONENT_TESTING_REMOVED: (arg1: {configFile: string}) => {
+  EXPERIMENTAL_COMPONENT_TESTING_REMOVED: (arg1: { configFile: string }) => {
     return errTemplate`\
         The ${fmt.highlight('experimentalComponentTesting')} configuration option was removed in ${fmt.cypressVersion(`7.0.0`)}.
 
@@ -1879,7 +1877,6 @@ export const AllCypressErrors = {
   },
 } as const
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _typeCheck: Record<keyof AllCypressErrorObj, (...args: any[]) => ErrTemplateResult> = AllCypressErrors
 
 type AllCypressErrorObj = typeof AllCypressErrors
@@ -1966,7 +1963,7 @@ interface GenericError extends Error {
   [key: string]: any
 }
 
-export const cloneErr = function (err: CypressError | GenericError, options: {html?: boolean} = {}) {
+export const cloneErr = function (err: CypressError | GenericError, options: { html?: boolean } = {}) {
   _.defaults(options, {
     html: false,
   })
