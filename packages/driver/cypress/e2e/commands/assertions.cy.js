@@ -1189,6 +1189,7 @@ describe('src/cy/commands/assertions', () => {
   describe('message formatting', () => {
     const expectMarkdown = (test, message, done) => {
       cy.then(() => {
+        // eslint-disable-next-line mocha/no-empty-description
         test()
       })
 
@@ -1325,7 +1326,7 @@ describe('src/cy/commands/assertions', () => {
     describe('#contain', () => {
       it('can find input type submit by value', function () {
         // $input creates an HTML element to be tested.
-        // eslint-disable-next-line no-unused-vars
+
         const $input = cy.$$('<input type=\'submit\' value=\'click me\' />').appendTo(this.$body)
 
         cy.get('input[type=submit]').should('contain', 'click me')

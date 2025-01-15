@@ -1248,7 +1248,6 @@ export default {
       return foundTest
     }
 
-    // eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
     const onSpecError = (handlerType: HandlerType) => (event) => {
       let { originalErr, err } = $errUtils.errorFromUncaughtEvent(handlerType, event)
 

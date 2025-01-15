@@ -15,7 +15,6 @@ const getRemoteLocationFromCrossOriginWindow = (autWindow: Window): Promise<Loca
   })
 }
 
-// eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
 export const create = (state: StateFunc) => ({
   getRemoteLocation (key?: string | undefined, win?: Window) {
     try {

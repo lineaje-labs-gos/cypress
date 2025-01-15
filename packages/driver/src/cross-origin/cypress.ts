@@ -149,7 +149,6 @@ const setup = (cypressConfig: Cypress.Config, env: Cypress.ObjectLike) => {
   cy.onBeforeAppWindowLoad = onBeforeAppWindowLoad(Cypress, cy)
 }
 
-// eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
 const onBeforeAppWindowLoad = (Cypress: Cypress.Cypress, cy: $Cy) => (autWindow: Window) => {
   autWindow.Cypress = Cypress
 

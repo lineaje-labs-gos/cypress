@@ -1,4 +1,3 @@
-/* eslint-disable prefer-rest-params */
 import _ from 'lodash'
 import Promise from 'bluebird'
 import debugFn from 'debug'
@@ -81,7 +80,6 @@ const setTopOnError = function (Cypress, cy: $Cy) {
     return
   }
 
-  // eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
   const onTopError = (handlerType) => (event) => {
     const { originalErr, err, promise } = $errUtils.errorFromUncaughtEvent(handlerType, event) as ErrorFromProjectRejectionEvent
 
@@ -151,6 +149,7 @@ export class $Cy extends EventEmitter2 implements ITimeouts, IStability, IAssert
     keyboard: Keyboard
     mouse: Mouse
   }
+
   queue: CommandQueue
 
   timeout: ITimeouts['timeout']
@@ -1088,7 +1087,6 @@ export class $Cy extends EventEmitter2 implements ITimeouts, IStability, IAssert
     const cy = this
 
     bindToListeners(contentWindow, {
-      // eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
       onError: (handlerType) => (event) => {
         const { originalErr, err, promise } = $errUtils.errorFromUncaughtEvent(handlerType, event) as ErrorFromProjectRejectionEvent
 

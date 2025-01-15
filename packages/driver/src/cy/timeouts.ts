@@ -2,7 +2,6 @@ import _ from 'lodash'
 import $errUtils from '../cypress/error_utils'
 import type { StateFunc } from '../cypress/state'
 
-// eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
 export const create = (state: StateFunc) => ({
   timeout (ms?: number, delta: boolean = false) {
     const runnable = state('runnable')

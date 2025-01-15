@@ -16,7 +16,6 @@ export const aliasDisplayName = (name) => {
   return name.replace(aliasDisplayRe, '')
 }
 
-// eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
 export const create = (cy: $Cy) => ({
   addAlias (ctx, aliasObj) {
     const { alias } = aliasObj

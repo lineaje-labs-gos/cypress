@@ -49,7 +49,6 @@ const simulateFocusEvent = (el, win) => {
   return el.dispatchEvent(focusinEvt)
 }
 
-// eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
 export const create = (state: StateFunc) => ({
   documentHasFocus () {
     // hardcode document has focus as true

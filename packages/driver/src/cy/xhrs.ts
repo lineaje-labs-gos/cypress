@@ -23,7 +23,6 @@ const xhrNotWaitedOnByIndex = (state: StateFunc, alias: string, index: number, p
   }
 }
 
-// eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
 export const create = (state: StateFunc) => ({
   getIndexedXhrByAlias (alias: string, index: number) {
     let prop

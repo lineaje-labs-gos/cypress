@@ -13,7 +13,7 @@ type BoundEvent<K extends keyof WindowEventMap> = [
   win: Window,
   event: keyof WindowEventMap,
   fn: BoundEventHandler<K>,
-  capture?: boolean
+  capture?: boolean,
 ]
 
 let events: BoundEvent<any>[] = []

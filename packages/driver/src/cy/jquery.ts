@@ -8,7 +8,6 @@ const remoteJQueryisNotSameAsGlobal = (remoteJQuery) => {
   return remoteJQuery && (remoteJQuery !== $)
 }
 
-// eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
 export const create = (state: StateFunc) => ({
   $$ (selector, context?) {
     if (context == null) {

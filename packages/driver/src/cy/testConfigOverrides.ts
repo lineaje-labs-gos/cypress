@@ -12,7 +12,7 @@ type ResolvedTestConfigOverride = {
    * The list of test config overrides and the invocation details used to add helpful
    * error messaging to consumers if a test override fails validation.
    */
-  testConfigList: Array<TestConfig|ResolvedTestConfigOverride>
+  testConfigList: Array<TestConfig | ResolvedTestConfigOverride>
   /**
    * The test config overrides that will apply to the test if it passes validation.
    */
@@ -33,11 +33,11 @@ type TestConfig = {
   invocationDetails: {
     stack: Object
   }
-};
+}
 
 type ConfigOverrides = {
   env: Object | undefined
-};
+}
 
 function setConfig (testConfig: ResolvedTestConfigOverride, config, localConfigOverrides: ConfigOverrides = { env: undefined }) {
   const { testConfigList = [] } = testConfig
