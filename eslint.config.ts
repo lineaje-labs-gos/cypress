@@ -31,6 +31,10 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     languageOptions: {
       parserOptions: {
         parser: ts.parser,
+        projectService: true,
+      },
+      globals: {
+        ...globals.node,
       },
     },
   },
@@ -149,6 +153,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'no-unsafe-finally': 'off',
       'no-async-promise-executor': 'off',
       'no-unsafe-optional-chaining': 'off',
+      'prefer-spread': 'warn',
 
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-require-imports': 'off',
@@ -173,7 +178,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'cypress/no-unnecessary-waiting': 'off',
       'cypress/unsafe-to-chain-command': 'off',
       'cypress/no-async-tests': 'off',
-      'cypress/no-assigning-return-values': 'warn',
+      'cypress/no-assigning-return-values': 'off',
     },
   },
 
@@ -181,16 +186,18 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
   {
     rules: {
       'mocha/no-mocha-arrows': 'off',
-      'mocha/no-setup-in-describe': 'off', //warn
-      'mocha/max-top-level-suites': 'off', // warn
-      'mocha/no-top-level-hooks': 'off', //warn
-      'mocha/no-identical-title': 'off', // warn
+      'mocha/no-setup-in-describe': 'off',
+      'mocha/max-top-level-suites': 'off',
+      'mocha/no-top-level-hooks': 'off',
+      'mocha/no-identical-title': 'off',
       'mocha/consistent-spacing-between-blocks': 'off',
       'mocha/no-global-tests': 'off',
       'mocha/no-sibling-hooks': 'off',
       'mocha/no-skipped-tests': 'off',
       'mocha/no-exports': 'off',
       'mocha/no-async-describe': 'off',
+      'mocha/no-return-and-callback': 'off',
+      'mocha/no-pending-tests': 'off',
     },
   },
 
@@ -239,10 +246,6 @@ export default ts.config(
   {
     files: ['**/*.{ts,js}'],
     languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: path.join(__dirname, './ts'),
-      },
       globals: {
         ...globals.node,
       },
