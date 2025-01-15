@@ -232,6 +232,7 @@ export class PackherdModuleLoader {
     definitionHits: number
     misses: number
   }
+
   private readonly getModuleKey: GetModuleKey
   private readonly moduleExports: Record<string, Module>
   private readonly moduleDefinitions: Record<string, ModuleDefinition>
