@@ -7,6 +7,7 @@ import globals from 'globals'
 import path from 'path'
 import vue from 'eslint-plugin-vue'
 import stylistic from '@stylistic/eslint-plugin'
+import * as graphql from '@graphql-eslint/eslint-plugin'
 
 /**
  * baseConfig should be imported by other packages that define their own eslint.config.ts
@@ -39,6 +40,12 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
         },
       },
     },
+  },
+
+  // graphql parser
+  {
+    files: ['*.graphql'],
+    ...graphql.flatConfigs['operations-recommended'],
   },
 
   // common node files

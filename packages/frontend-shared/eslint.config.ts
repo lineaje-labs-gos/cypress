@@ -1,5 +1,6 @@
 import { baseConfig } from '../../eslint.config'
 import globals from 'globals'
+import * as graphql from '@graphql-eslint/eslint-plugin'
 
 export default [
   ...baseConfig,
@@ -22,4 +23,8 @@ export default [
       },
     },
   },
+  {
+    files: ['**/*.vue', '**/*.jsx'],
+    
+  }
 ]
