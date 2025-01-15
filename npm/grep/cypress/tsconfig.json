@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "types": ["cypress"]
+    "types": ["cypress"],
+    "allowJs": true,
   },
-  "include": ["e2e/**/*.ts"]
+  "include": ["**/*"]
 }
