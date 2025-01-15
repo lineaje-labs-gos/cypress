@@ -226,7 +226,7 @@ export class DataEmitterActions extends DataEmitterEvents {
    *                                                               the particular event. When the `listenerCount` is zero, then there are no
    *                                                               longer any subscribers for that event
    */
-  subscribeTo <T> (evt: keyof DataEmitterEvents, opts?: {sendInitial: boolean, initialValue?: T, filter?: (val: any) => boolean, onUnsubscribe?: (listenerCount: number) => void }): AsyncGenerator<T> {
+  subscribeTo <T> (evt: keyof DataEmitterEvents, opts?: { sendInitial: boolean, initialValue?: T, filter?: (val: any) => boolean, onUnsubscribe?: (listenerCount: number) => void }): AsyncGenerator<T> {
     const { sendInitial = true } = opts ?? {}
     let hasSentInitial = false
     let dfd: pDefer.DeferredPromise<any> | undefined
@@ -279,7 +279,7 @@ export class DataEmitterActions extends DataEmitterEvents {
       throw: async (error: Error) => {
         throw error
       },
-      return: async (): Promise<{ done: true, value: T | undefined}> => {
+      return: async (): Promise<{ done: true, value: T | undefined }> => {
         this.pub.off(evt, subscribed)
 
         if (opts?.onUnsubscribe) {

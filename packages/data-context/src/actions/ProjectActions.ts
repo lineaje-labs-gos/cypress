@@ -47,7 +47,7 @@ export interface ProjectApiShape {
   makeProjectSavedState(projectRoot: string): void
   getDevServer (): {
     updateSpecs(specs: SpecWithRelativeRoot[]): void
-    start(options: {specs: Cypress.Spec[], config: FullConfig}): Promise<{port: number}>
+    start(options: { specs: Cypress.Spec[], config: FullConfig }): Promise<{ port: number }>
     close(): void
     emitter: EventEmitter
   }
@@ -490,7 +490,7 @@ export class ProjectActions {
     }
   }
 
-  async runSpec ({ specPath }: { specPath: string}) {
+  async runSpec ({ specPath }: { specPath: string }) {
     const waitForBrowserToOpen = async () => {
       const browserStatusSubscription = this.ctx.emitter.subscribeTo('browserStatusChange', { sendInitial: false })
 

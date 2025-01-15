@@ -1,4 +1,3 @@
-/* eslint-disable no-dupe-class-members */
 import type { ChildProcess } from 'child_process'
 import EventEmitter from 'events'
 import type { CypressError } from '@packages/errors'
@@ -16,7 +15,7 @@ export class LegacyPluginsIpc extends EventEmitter {
     })
   }
 
-  send(event: 'loadLegacyPlugins', legacyConfig: LegacyCypressConfigJson): boolean
+  send (event: 'loadLegacyPlugins', legacyConfig: LegacyCypressConfigJson): boolean
   send (event: string, ...args: any[]) {
     if (this.childProcess.killed || !this.childProcess.connected) {
       return false
@@ -25,10 +24,10 @@ export class LegacyPluginsIpc extends EventEmitter {
     return this.childProcess.send({ event, args })
   }
 
-  on(event: 'ready', listener: () => void): this
-  on(event: 'loadLegacyPlugins:error', listener: (error: CypressError) => void): this
-  on(event: 'childProcess:unhandledError', listener: (legacyConfig: LegacyCypressConfigJson) => void): this
-  on(event: 'loadLegacyPlugins:reply', listener: (legacyConfig: LegacyCypressConfigJson) => void): this
+  on (event: 'ready', listener: () => void): this
+  on (event: 'loadLegacyPlugins:error', listener: (error: CypressError) => void): this
+  on (event: 'childProcess:unhandledError', listener: (legacyConfig: LegacyCypressConfigJson) => void): this
+  on (event: 'loadLegacyPlugins:reply', listener: (legacyConfig: LegacyCypressConfigJson) => void): this
   on (evt: string, listener: (...args: any[]) => void) {
     return super.on(evt, listener)
   }

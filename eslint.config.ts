@@ -71,7 +71,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     rules: {
       'no-console': 'error',
       'no-restricted-properties': [
-        'error',
+        'warn',
         {
           object: 'process',
           property: 'geteuid',
@@ -85,12 +85,53 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       ],
       'no-restricted-syntax': [
         // esquery tool: https://estools.github.io/esquery/
-        'error',
+        'warn',
         {
           // match sync FS methods except for `existsSync`
           // examples: fse.readFileSync, fs.readFileSync, this.ctx.fs.readFileSync...
           selector: `MemberExpression[object.name='fs'][property.name=/^[A-z]+Sync$/]:not(MemberExpression[property.name='existsSync']), MemberExpression[property.name=/^[A-z]+Sync$/]:not(MemberExpression[property.name='existsSync']):has(MemberExpression[property.name='fs'])`,
           message: 'Synchronous fs calls should not be used in Cypress. Use an async API instead.',
+        },
+      ],
+      'padding-line-between-statements': [
+        'error',
+        {
+          'blankLine': 'always',
+          'prev': '*',
+          'next': 'return',
+        },
+        {
+          'blankLine': 'always',
+          'prev': [
+            'const',
+            'let',
+            'var',
+            'if',
+            'while',
+            'export',
+            'cjs-export',
+            'import',
+            'cjs-import',
+            'multiline-expression',
+          ],
+          'next': '*',
+        },
+        {
+          'blankLine': 'any',
+          'prev': [
+            'const',
+            'let',
+            'var',
+            'import',
+            'cjs-import',
+          ],
+          'next': [
+            'const',
+            'let',
+            'var',
+            'import',
+            'cjs-import',
+          ],
         },
       ],
     },
@@ -120,6 +161,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       '@typescript-eslint/triple-slash-reference': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-wrapper-object-types': 'off',
+      '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
 
       'vue/multi-word-component-names': 'off',
       'vue/html-closing-bracket-spacing': 'off',
@@ -157,6 +199,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     ignores: [
       '.releaserc.js',
       'dist/**/*',
+      '**/__snapshots__/*',
     ],
   },
 

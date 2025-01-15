@@ -27,7 +27,6 @@ export const cached = <T>(
     throw new Error('@cached target must be configurable')
   } else {
     descriptor.get = function () {
-      // eslint-disable-next-line
       const value = originalMethod.apply(this, arguments as any)
       const newDescriptor: PropertyDescriptor = {
         configurable: false,

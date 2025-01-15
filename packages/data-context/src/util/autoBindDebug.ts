@@ -11,7 +11,7 @@ const debugLibCache: Record<string, debugLib.Debugger> = {}
  * to the constructor of the class for which you want to enable logging, you can then
  * set DEBUG=cypress-trace:<ClassName> to utilize the logging
  */
-export function autoBindDebug <T extends object> (obj: T): T {
+export function autoBindDebug<T extends object> (obj: T): T {
   const ns = `trace-cypress:${obj.constructor.name}`
   const debug = debugLibCache[ns] = debugLibCache[ns] || debugLib(ns)
 

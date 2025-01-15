@@ -1,4 +1,3 @@
-/* eslint-disable no-dupe-class-members */
 import path from 'path'
 import debugLib from 'debug'
 import { fork } from 'child_process'

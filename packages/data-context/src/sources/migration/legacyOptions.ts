@@ -290,7 +290,7 @@ const runtimeOptions: Array<RuntimeConfigOption> = [
   },
 ]
 
-export const legacyOptions: Array<ResolvedConfigOption|RuntimeConfigOption> = [
+export const legacyOptions: Array<ResolvedConfigOption | RuntimeConfigOption> = [
   ...resolvedOptions,
   ...runtimeOptions,
 ]

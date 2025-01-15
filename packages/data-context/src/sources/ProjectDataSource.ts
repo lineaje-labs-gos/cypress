@@ -149,7 +149,7 @@ export function getPathFromSpecPattern ({
 { specPattern: string
   testingType: TestingType
   fileExtensionToUse?: FileExtension
-  name?: string}) {
+  name?: string }) {
   function replaceWildCard (s: string, fallback: string) {
     return s.replace(/\*/g, fallback)
   }

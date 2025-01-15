@@ -44,7 +44,7 @@ export class RelevantRunsDataSource {
   #pollingInterval: number = 30
   #cached: RelevantRun = RUNS_EMPTY_RETURN
 
-  #runsPoller?: Poller<'relevantRunChange', RelevantRun, { name: RelevantRunLocationEnum}>
+  #runsPoller?: Poller<'relevantRunChange', RelevantRun, { name: RelevantRunLocationEnum }>
 
   constructor (private ctx: DataContext) {}
 

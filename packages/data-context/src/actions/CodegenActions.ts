@@ -15,7 +15,7 @@ export interface ReactComponentDescriptor {
 export class CodegenActions {
   constructor (private ctx: DataContext) {}
 
-  async getReactComponentsFromFile (filePath: string, reactDocgen?: typeof import('react-docgen')): Promise<{components: ReactComponentDescriptor[], errored?: boolean }> {
+  async getReactComponentsFromFile (filePath: string, reactDocgen?: typeof import('react-docgen')): Promise<{ components: ReactComponentDescriptor[], errored?: boolean }> {
     try {
       // this dance to get react-docgen is for now because react-docgen is a module and our typescript settings are set up to transpile to commonjs
       // which will require the module, which will fail because it's an es module. This is a temporary workaround.

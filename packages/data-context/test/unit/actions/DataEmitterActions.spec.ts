@@ -20,7 +20,6 @@ describe('DataEmitterActions', () => {
       let completed = false
 
       const testIterator = async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for await (const _value of subscription) {
           items += 1
         }
@@ -56,7 +55,6 @@ describe('DataEmitterActions', () => {
       let completed = false
 
       const testIterator = async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for await (const _value of subscription) {
           items += 1
         }
@@ -87,7 +85,6 @@ describe('DataEmitterActions', () => {
       let completed = false
 
       const testIterator = async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for await (const _value of subscription) {
           items += 1
         }
@@ -115,7 +112,6 @@ describe('DataEmitterActions', () => {
       }
 
       const testIterator = async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for await (const _value of subscription) {
           returnVal.items += 1
         }

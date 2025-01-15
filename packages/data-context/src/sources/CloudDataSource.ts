@@ -38,7 +38,6 @@ const REMOTE_SCHEMA_URLS = {
   production: 'https://cloud.cypress.io',
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type StartsWith<T, Prefix extends string> = T extends `${Prefix}${infer _U}` ? T : never
 type CloudQueryField = StartsWith<keyof NexusGen['fieldTypes']['Query'], 'cloud'>
 
@@ -121,10 +120,10 @@ export class CloudDataSource {
           ...urqlCacheKeys,
           updates: {
             Mutation: {
-              _cloudCacheInvalidate: (parent, { args }: {args: Parameters<Cache['invalidate']>}, cache, info) => {
+              _cloudCacheInvalidate: (parent, { args }: { args: Parameters<Cache['invalidate']> }, cache, info) => {
                 cache.invalidate(...args)
               },
-              _showUrqlCache: (parent, { args }: {args: Parameters<Cache['invalidate']>}, cache, info) => {
+              _showUrqlCache: (parent, { args }: { args: Parameters<Cache['invalidate']> }, cache, info) => {
                 this.#lastCache = JSON.stringify(cache, function replacer (key, value) {
                   if (value instanceof Map) {
                     const reducer = (obj: any, mapKey: any) => {

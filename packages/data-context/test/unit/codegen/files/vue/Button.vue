@@ -1,14 +1,21 @@
 <template>
-  <button type="button" :class="classes" @click="onClick" :style="style">{{ label }}</button>
+  <button
+    type="button"
+    :class="classes"
+    :style="style"
+    @click="onClick"
+  >
+    {{ label }}
+  </button>
 </template>
 
 <script>
 // @ts-nocheck
-import './button.css';
-import { reactive, computed } from 'vue';
+import './button.css'
+import { reactive, computed } from 'vue'
 
 export default {
-  name: 'my-button',
+  name: 'MyButton',
 
   props: {
     label: {
@@ -22,7 +29,7 @@ export default {
     size: {
       type: String,
       validator: function (value) {
-        return ['small', 'medium', 'large'].indexOf(value) !== -1;
+        return ['small', 'medium', 'large'].indexOf(value) !== -1
       },
     },
     backgroundColor: {
@@ -32,8 +39,9 @@ export default {
 
   emits: ['click'],
 
-  setup(props, { emit }) {
-    props = reactive(props);
+  setup (props, { emit }) {
+    props = reactive(props)
+
     return {
       classes: computed(() => ({
         'button': true,
@@ -44,10 +52,10 @@ export default {
       style: computed(() => ({
         backgroundColor: props.backgroundColor,
       })),
-      onClick() {
-        emit('click');
-      }
+      onClick () {
+        emit('click')
+      },
     }
   },
-};
+}
 </script>

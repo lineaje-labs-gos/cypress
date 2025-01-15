@@ -111,7 +111,7 @@ describe('Poller', () => {
     const callback = sinon.stub()
     const interval = 5
 
-    const poller = new Poller<'relevantRunChange', { name: string }, { name: string}>(ctx, 'relevantRunChange', interval, callback)
+    const poller = new Poller<'relevantRunChange', { name: string }, { name: string }>(ctx, 'relevantRunChange', interval, callback)
 
     expect(poller.subscriptions).to.have.length(0)
 

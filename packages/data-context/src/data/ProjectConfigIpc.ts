@@ -1,4 +1,3 @@
-/* eslint-disable no-dupe-class-members */
 import { CypressError, getError } from '@packages/errors'
 import type { FullConfig, TestingType } from '@packages/types'
 import { ChildProcess, fork, ForkOptions, spawn } from 'child_process'
@@ -36,7 +35,7 @@ const isSandboxNeeded = () => {
 export interface SetupNodeEventsReply {
   setupConfig: Cypress.ConfigOptions | null
   requires: string[]
-  registrations: Array<{event: string, eventId: string}>
+  registrations: Array<{ event: string, eventId: string }>
 }
 
 export interface LoadConfigReply {
@@ -96,10 +95,10 @@ export class ProjectConfigIpc extends EventEmitter {
   }
 
   // TODO: options => Cypress.TestingTypeOptions
-  send(event: 'execute:plugins', evt: string, ids: {eventId: string, invocationId: string}, args: any[]): boolean
-  send(event: 'setupTestingType', testingType: TestingType, options: Cypress.PluginConfigOptions): boolean
-  send(event: 'loadConfig'): boolean
-  send(event: 'main:process:will:disconnect'): void
+  send (event: 'execute:plugins', evt: string, ids: { eventId: string, invocationId: string }, args: any[]): boolean
+  send (event: 'setupTestingType', testingType: TestingType, options: Cypress.PluginConfigOptions): boolean
+  send (event: 'loadConfig'): boolean
+  send (event: 'main:process:will:disconnect'): void
   send (event: string, ...args: any[]) {
     if (this._childProcess.killed || !this._childProcess.connected) {
       return false
@@ -108,29 +107,29 @@ export class ProjectConfigIpc extends EventEmitter {
     return this._childProcess.send({ event, args })
   }
 
-  on(evt: 'childProcess:unhandledError', listener: (err: CypressError) => void): this
-  on(evt: 'export:telemetry', listener: (data: string) => void): void
-  on(evt: 'main:process:will:disconnect:ack', listener: () => void): void
-  on(evt: 'warning', listener: (warningErr: CypressError) => void): this
+  on (evt: 'childProcess:unhandledError', listener: (err: CypressError) => void): this
+  on (evt: 'export:telemetry', listener: (data: string) => void): void
+  on (evt: 'main:process:will:disconnect:ack', listener: () => void): void
+  on (evt: 'warning', listener: (warningErr: CypressError) => void): this
   on (evt: string, listener: (...args: any[]) => void) {
     return super.on(evt, listener)
   }
 
-  once(evt: `promise:fulfilled:${string}`, listener: (err: any, value: any) => void): this
+  once (evt: `promise:fulfilled:${string}`, listener: (err: any, value: any) => void): this
 
   /**
    * When the config is loaded, it comes back with either a "reply", or an "error" if there was a problem
    * sourcing the config (script error, etc.)
    */
-  once(evt: 'ready', listener: () => void): this
-  once(evt: 'loadConfig:reply', listener: (payload: SerializedLoadConfigReply) => void): this
-  once(evt: 'loadConfig:error', listener: (err: CypressError) => void): this
+  once (evt: 'ready', listener: () => void): this
+  once (evt: 'loadConfig:reply', listener: (payload: SerializedLoadConfigReply) => void): this
+  once (evt: 'loadConfig:error', listener: (err: CypressError) => void): this
 
   /**
    * When
    */
-  once(evt: 'setupTestingType:reply', listener: (payload: SetupNodeEventsReply) => void): this
-  once(evt: 'setupTestingType:error', listener: (error: CypressError) => void): this
+  once (evt: 'setupTestingType:reply', listener: (payload: SetupNodeEventsReply) => void): this
+  once (evt: 'setupTestingType:error', listener: (error: CypressError) => void): this
   once (evt: string, listener: (...args: any[]) => void) {
     return super.once(evt, listener)
   }
