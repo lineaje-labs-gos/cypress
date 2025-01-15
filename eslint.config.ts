@@ -8,7 +8,7 @@ import path from 'path'
 import vue from 'eslint-plugin-vue'
 import stylistic from '@stylistic/eslint-plugin'
 import * as graphql from '@graphql-eslint/eslint-plugin'
-
+import react from 'eslint-plugin-react'
 /**
  * baseConfig should be imported by other packages that define their own eslint.config.ts
  * tsLanguageOptions may be shared, but is probably unnecessary
@@ -22,6 +22,14 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
   cy.configs.recommended,
   mocha.configs.flat.recommended,
   ...vue.configs['flat/recommended'],
+  {
+    ...react.configs.flat.recommended,
+    settings: {
+      react: {
+        version: '18',
+      },
+    },
+  },
   stylistic.configs.customize({
     'braceStyle': '1tbs',
     'arrowParens': true,

@@ -4,16 +4,20 @@ import react from 'eslint-plugin-react'
 
 export default [
   ...baseConfig,
-  react.configs.flat.recommended,
   {
-    files: ['src/createMount.ts'],
-    rules: {
-      'cypress/no-unnecessary-waiting': 'warn',
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['babel.config.js', 'cypress.config.js', 'eslint.config.ts', 'rollup.config.mjs', 'vite.config.ts'],
+        },
+      },
     },
   },
   {
     rules: {
       'react/prop-types': 'warn',
+      'react/display-name': 'warn',
+      'no-console': 'warn',
     },
   },
 ]
