@@ -59,7 +59,7 @@ export default class Command extends Instrument {
   @observable groupLevel?: number
   @observable hasSnapshot?: boolean
   @observable hasConsoleProps?: boolean
-  @observable _isOpen: boolean|null = null
+  @observable _isOpen: boolean | null = null
 
   private _prevState: string | null | undefined = null
   private _pendingTimeout?: TimeoutID = undefined

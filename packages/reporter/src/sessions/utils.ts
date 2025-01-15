@@ -9,7 +9,7 @@ function determineTagType (state: string) {
   }
 }
 
-export type SessionStatus = 'creating' | 'created' | 'restoring' |'restored' | 'recreating' | 'recreated' | 'failed'
+export type SessionStatus = 'creating' | 'created' | 'restoring' | 'restored' | 'recreating' | 'recreated' | 'failed'
 
 export {
   determineTagType,

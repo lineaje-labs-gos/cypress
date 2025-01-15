@@ -305,8 +305,7 @@ const CommandDetails = observer(({ model, groupId, aliasesWithDuplicates }) => (
     {!!groupId && model.type === 'system' && model.state === 'failed' && <StateIcon aria-hidden className='failed-indicator' state={model.state}/>}
     {model.referencesAlias ?
       <AliasesReferences model={model} aliasesWithDuplicates={aliasesWithDuplicates} />
-      : <Message model={model} />
-    }
+      : <Message model={model} />}
   </span>
 ))
 
@@ -370,7 +369,7 @@ const CommandControls = observer(({ model, commandName, events }) => {
 
 @observer
 class Command extends Component<Props> {
-  @observable isOpen: boolean|null = null
+  @observable isOpen: boolean | null = null
   private _showTimeout?: TimeoutID
 
   static defaultProps = {

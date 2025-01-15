@@ -24,7 +24,7 @@ const NoCommands = () => (
   </ul>
 )
 
-const AttemptHeader = ({ index, state }: {index: number, state: TestState }) => (
+const AttemptHeader = ({ index, state }: { index: number, state: TestState }) => (
   <span className='attempt-tag'>
     <span className='open-close-indicator'>
       <CollapseIcon className='collapse-icon' />
@@ -103,7 +103,7 @@ class Attempt extends Component<AttemptProps> {
   }
 }
 
-const Attempts = observer(({ test, scrollIntoView, studioActive }: {test: TestModel, scrollIntoView: Function, studioActive: boolean}) => {
+const Attempts = observer(({ test, scrollIntoView, studioActive }: { test: TestModel, scrollIntoView: Function, studioActive: boolean }) => {
   return (<ul className={cs('attempts', {
     'has-multiple-attempts': test.hasMultipleAttempts,
   })}>

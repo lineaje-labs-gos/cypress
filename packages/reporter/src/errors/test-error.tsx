@@ -113,8 +113,7 @@ const TestError = (props: TestErrorProps) => {
             contentClass='runnable-err-stack-trace'
           >
             <ErrorStack err={err} />
-          </Collapsible>
-          }
+          </Collapsible>}
         </div>
       </div>
     </div>

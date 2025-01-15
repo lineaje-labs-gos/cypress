@@ -37,7 +37,7 @@ export interface BaseReporterProps {
   runnerStore: MobxRunnerStore
 }
 
-export interface SingleReporterProps extends BaseReporterProps{
+export interface SingleReporterProps extends BaseReporterProps {
   runMode: 'single'
 }
 
