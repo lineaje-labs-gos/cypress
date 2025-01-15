@@ -95,7 +95,6 @@ export class DeferredSourceMapCache {
 
       return body
     } catch (error) {
-      // eslint-disable-next-line no-console
       debug('got an error loading user-provided sourcemap, serving proxy-generated sourcemap only %o', { url: request.url, headers, error })
     }
   }
