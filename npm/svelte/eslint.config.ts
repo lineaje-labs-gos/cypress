@@ -4,9 +4,12 @@ import globals from 'globals'
 export default [
   ...baseConfig,
   {
-    files: ['src/mount.ts'],
-    rules: {
-      'cypress/no-unnecessary-waiting': 'warn',
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['eslint.config.ts', 'rollup.config.mjs'],
+        },
+      },
     },
   },
 ]
