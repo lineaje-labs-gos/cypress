@@ -259,7 +259,6 @@ export const getCommonConfig = () => {
   return commonConfig
 }
 
-// eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
 export const getSimpleConfig = () => ({
   ignoreWarnings,
   resolve: {
