@@ -4,10 +4,15 @@ import globals from 'globals'
 export default [
   ...baseConfig,
   {
-    ignores: ['**/__babel_fixtures__/**/*'],
+    ignores: ['**/__babel_fixtures__/**/*', 'index.js'],
   },
   {
     languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['eslint.config.ts'],
+        },
+      },
       globals: {
         exports: 'readonly',
         process: 'readonly',
