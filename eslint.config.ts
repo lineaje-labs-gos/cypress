@@ -226,6 +226,11 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'react/prop-types': 'warn',
       'react/no-unescaped-entities': 'warn',
       'react/jsx-no-target-blank': 'warn',
+      'react/no-unknown-property': 'warn',
+
+      // we use react 18+, so these rules do not apply
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
     },
   },
 
