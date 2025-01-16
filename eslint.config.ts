@@ -39,7 +39,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
 
   // set up ts parser
   {
-    files: ['**/*.{ts,js,jsx,vue}'],
+    files: ['**/*.{ts,js,jsx,tsx,vue}'],
     languageOptions: {
       parserOptions: {
         parser: ts.parser,
