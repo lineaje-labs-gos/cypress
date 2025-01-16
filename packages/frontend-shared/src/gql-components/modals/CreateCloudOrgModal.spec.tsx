@@ -6,7 +6,7 @@ describe('<CreateCloudOrgModal />', () => {
     cy.mountFragment(CreateCloudOrgModalFragmentDoc, {
 
       render (gql) {
-        return (<div class="h-screen">
+        return (<div className="h-screen">
           <CreateCloudOrgModal gql={gql}/>
         </div>)
       },

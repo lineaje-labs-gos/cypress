@@ -14,6 +14,8 @@ import react from 'eslint-plugin-react'
  * tsLanguageOptions may be shared, but is probably unnecessary
  * the default config exported from this file applies to
  *   - ./scripts/*
+ *
+ * This can be simplified if ./scripts is converted to a monorepo package in /tooling
  */
 
 export const baseConfig: InfiniteDepthConfigWithExtends[] = [
@@ -227,6 +229,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'react/no-unescaped-entities': 'warn',
       'react/jsx-no-target-blank': 'warn',
       'react/no-unknown-property': 'warn',
+      'react/jsx-key': 'warn',
 
       // we use react 18+, so these rules do not apply
       'react/react-in-jsx-scope': 'off',
@@ -239,7 +242,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     ignores: [
       '.releaserc.js',
       'dist/**/*',
-      '**/__snapshots__/*',
+      '**/__snapshots__/**/*',
     ],
   },
 
