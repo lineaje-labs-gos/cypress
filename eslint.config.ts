@@ -221,6 +221,11 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'cypress/unsafe-to-chain-command': 'off',
       'cypress/no-async-tests': 'off',
       'cypress/no-assigning-return-values': 'off',
+
+      'react/no-string-refs': 'warn',
+      'react/prop-types': 'warn',
+      'react/no-unescaped-entities': 'warn',
+      'react/jsx-no-target-blank': 'warn',
     },
   },
 
