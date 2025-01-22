@@ -17,6 +17,8 @@ async function connectToNewSpecBiDi (options, automation: Automation, browserBiD
   debug('firefox: reconnecting to blank tab')
   const { contexts } = await webdriverClient.browsingContextGetTree({})
 
+  browserBiDiClient.setTopLevelContextId(contexts[0].context)
+
   await options.onInitializeNewBrowserTab()
 
   debug(`firefox: navigating to ${options.url}`)

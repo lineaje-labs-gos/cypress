@@ -96,62 +96,94 @@ describe('lib/browsers/bidi_automation', () => {
           expect(mockWebdriverClient.networkRemoveIntercept).not.to.have.been.called
         })
 
-        it('correctly sets the AUT frame and intercepts requests from the frame when the top frame is set. Additionally, tears down the AUT / top frame when the contexts are destroyed', async () => {
-          const bidiAutomationInstance = BidiAutomation.create(mockWebdriverClient, mockAutomationClient)
+        describe('correctly sets the AUT frame and intercepts requests from the frame when the top frame is set.', () => {
+          it('Additionally, tears down the AUT when the contexts are destroyed', async () => {
+            const bidiAutomationInstance = BidiAutomation.create(mockWebdriverClient, mockAutomationClient)
 
-          // manually set the top level context which happens outside the scope of the bidi_automation class
-          bidiAutomationInstance.setTopLevelContextId('123')
+            // manually set the top level context which happens outside the scope of the bidi_automation class
+            bidiAutomationInstance.setTopLevelContextId('123')
 
-          // mock the creation of the AUT context
-          mockWebdriverClient.emit('browsingContext.contextCreated', {
-            parent: '123',
-            context: '456',
-            url: 'www.foobar.com',
-            userContext: '',
-            children: [],
+            // mock the creation of the AUT context
+            mockWebdriverClient.emit('browsingContext.contextCreated', {
+              parent: '123',
+              context: '456',
+              url: 'www.foobar.com',
+              userContext: '',
+              children: [],
+            })
+
+            await flushPromises()
+
+            // @ts-expect-error
+            expect(bidiAutomationInstance.autContextId).to.equal('456')
+            // @ts-expect-error
+            expect(bidiAutomationInstance.interceptId).to.equal('mockInterceptId')
+            expect(mockWebdriverClient.networkAddIntercept).to.have.been.calledWith({ phases: ['beforeRequestSent'], contexts: ['123'] })
+
+            // mock the destruction of the AUT context
+            mockWebdriverClient.emit('browsingContext.contextDestroyed', {
+              parent: '123',
+              context: '456',
+              url: 'www.foobar.com',
+              userContext: '',
+              children: [],
+            })
+
+            await flushPromises()
+
+            // @ts-expect-error
+            expect(bidiAutomationInstance.autContextId).to.equal(undefined)
+
+            expect(mockWebdriverClient.networkRemoveIntercept).not.to.have.been.called
+            // @ts-expect-error
+            expect(bidiAutomationInstance.topLevelContextId).to.equal('123')
           })
 
-          await flushPromises()
+          it('Additionally, tears down top frame when the contexts are destroyed', async () => {
+            const bidiAutomationInstance = BidiAutomation.create(mockWebdriverClient, mockAutomationClient)
 
-          // @ts-expect-error
-          expect(bidiAutomationInstance.autContextId).to.equal('456')
-          // @ts-expect-error
-          expect(bidiAutomationInstance.interceptId).to.equal('mockInterceptId')
-          expect(mockWebdriverClient.networkAddIntercept).to.have.been.calledWith({ phases: ['beforeRequestSent'], contexts: ['123'] })
+            // manually set the top level context which happens outside the scope of the bidi_automation class
+            bidiAutomationInstance.setTopLevelContextId('123')
 
-          // mock the destruction of the AUT context
-          mockWebdriverClient.emit('browsingContext.contextDestroyed', {
-            parent: '123',
-            context: '456',
-            url: 'www.foobar.com',
-            userContext: '',
-            children: [],
+            // mock the creation of the AUT context
+            mockWebdriverClient.emit('browsingContext.contextCreated', {
+              parent: '123',
+              context: '456',
+              url: 'www.foobar.com',
+              userContext: '',
+              children: [],
+            })
+
+            await flushPromises()
+
+            // @ts-expect-error
+            expect(bidiAutomationInstance.autContextId).to.equal('456')
+            // @ts-expect-error
+            expect(bidiAutomationInstance.interceptId).to.equal('mockInterceptId')
+            expect(mockWebdriverClient.networkAddIntercept).to.have.been.calledWith({ phases: ['beforeRequestSent'], contexts: ['123'] })
+
+            // Then, mock the destruction of the tab
+            mockWebdriverClient.emit('browsingContext.contextDestroyed', {
+              parent: null,
+              context: '123',
+              url: 'www.foobar.com',
+              userContext: '',
+              children: ['456'],
+            })
+
+            await flushPromises()
+
+            expect(mockWebdriverClient.networkRemoveIntercept).to.have.been.calledWith({
+              intercept: 'mockInterceptId',
+            })
+
+            // @ts-expect-error
+            expect(bidiAutomationInstance.topLevelContextId).to.be.undefined
+            // @ts-expect-error
+            expect(bidiAutomationInstance.interceptId).to.be.undefined
+            // @ts-expect-error
+            expect(bidiAutomationInstance.autContextId).to.equal(undefined)
           })
-
-          await flushPromises()
-
-          // @ts-expect-error
-          expect(bidiAutomationInstance.autContextId).to.equal(undefined)
-
-          // Then, mock the destruction of the tab
-          mockWebdriverClient.emit('browsingContext.contextDestroyed', {
-            parent: null,
-            context: '123',
-            url: 'www.foobar.com',
-            userContext: '',
-            children: ['456'],
-          })
-
-          await flushPromises()
-
-          expect(mockWebdriverClient.networkRemoveIntercept).to.have.been.calledWith({
-            intercept: 'mockInterceptId',
-          })
-
-          // @ts-expect-error
-          expect(bidiAutomationInstance.topLevelContextId).to.be.undefined
-          // @ts-expect-error
-          expect(bidiAutomationInstance.interceptId).to.be.undefined
         })
       })
     })

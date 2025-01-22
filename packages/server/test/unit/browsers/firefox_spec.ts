@@ -155,6 +155,7 @@ describe('lib/browsers/firefox', () => {
 
         expect(this.options.onInitializeNewBrowserTab).to.have.been.called
         expect(wdInstance.browsingContextGetTree).to.have.been.calledWith({})
+        expect(bidiAutomationClient.setTopLevelContextId).to.have.been.calledWith(mockContextId)
 
         // Only happens one time when navigating to the spec since the context gets created on about:blank, which is tested in BidiAutomation
         expect(wdInstance.browsingContextNavigate).to.have.been.calledWith({

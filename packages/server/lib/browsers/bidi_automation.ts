@@ -9,7 +9,7 @@ import type {
   NetworkFetchErrorParameters,
   BrowsingContextInfo,
 } from 'webdriver/build/bidi/localTypes'
-
+const debug = debugModule('cypress:server:browsers:bidi_automation')
 const debugVerbose = debugModule('cypress-verbose:server:browsers:bidi_automation')
 
 // NOTE: these types will eventually be generated automatically via the 'webdriver' package
@@ -89,15 +89,16 @@ export class BidiAutomation {
   }
 
   setTopLevelContextId (contextId?: string) {
-    debugVerbose(`setting top level context ID to: ${contextId}`)
+    debug(`setting top level context ID to: ${contextId}`)
     this.topLevelContextId = contextId
   }
 
   private async onBrowsingContextCreated (params: BrowsingContextInfo) {
+    debugVerbose('received browsingContext.contextCreated %o', params)
     // the AUT iframe is always the FIRST child created by the top level parent (second is the reporter, if it exists which isnt the case for headless/test replay)
     if (!this.autContextId && params.parent && this.topLevelContextId === params.parent) {
-      debugVerbose(`new browsing context ${params.context} created within top-level parent context ${params.parent}.`)
-      debugVerbose(`setting browsing context ${params.context} as the AUT context.`)
+      debug(`new browsing context ${params.context} created within top-level parent context ${params.parent}.`)
+      debug(`setting browsing context ${params.context} as the AUT context.`)
 
       this.autContextId = params.context
 
@@ -121,9 +122,14 @@ export class BidiAutomation {
   }
 
   private async onBrowsingContextDestroyed (params: BrowsingContextInfo) {
+    debugVerbose('received browsingContext.contextDestroyed %o', params)
+
     // if the top level context gets destroyed, we need to clear the AUT context and destroy the interceptor as it is no longer applicable
     if (params.context === this.topLevelContextId) {
-      debugVerbose(`top level browsing context ${params.context} destroyed`)
+      debug(`top level browsing context ${params.context} destroyed`)
+      // if the top level context is destroyed, we can imply that the AUT context is destroyed along with it
+      this.autContextId = undefined
+      this.setTopLevelContextId(undefined)
       if (this.interceptId) {
         // since we either have:
         //   1. a new upper level browser context created above with shouldKeepTabOpen set to true.
@@ -133,17 +139,15 @@ export class BidiAutomation {
           intercept: this.interceptId,
         })
 
-        debugVerbose(`destroyed network intercept ${this.interceptId} for top-level browsing context ${params.parent}`)
+        debug(`destroyed network intercept ${this.interceptId}`)
 
         this.interceptId = undefined
       }
-
-      this.setTopLevelContextId(undefined)
     }
 
     // if the AUT context is destroyed (possible that the top level context did not), clear the AUT context Id
     if (params.context === this.autContextId) {
-      debugVerbose(`AUT browsing context ${params.context} destroyed within top-level parent context ${params.parent}.`)
+      debug(`AUT browsing context ${params.context} destroyed within top-level parent context ${params.parent}.`)
 
       this.autContextId = undefined
     }
@@ -182,7 +186,7 @@ export class BidiAutomation {
 
     if (params.isBlocked) {
       if (params.context === this.autContextId && resourceType === 'document') {
-        debugVerbose(`AUT request detected, adding X-Cypress-Is-AUT-Frame for request ID: ${params.request.request}`)
+        debug(`AUT request detected, adding X-Cypress-Is-AUT-Frame for request ID: ${params.request.request}`)
 
         params.request.headers.push({
           name: 'X-Cypress-Is-AUT-Frame',
@@ -194,7 +198,7 @@ export class BidiAutomation {
       }
 
       try {
-        debugVerbose(`continuing request ID: ${params.request.request}`)
+        debug(`continuing request ID: ${params.request.request}`)
 
         await this.webDriverClient.networkContinueRequest({
           request: params.request.request,
