@@ -2920,10 +2920,10 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@electron/asar@^3.2.1", "@electron/asar@^3.2.7":
-  version "3.2.10"
-  resolved "https://registry.yarnpkg.com/@electron/asar/-/asar-3.2.10.tgz#615cf346b734b23cafa4e0603551010bd0e50aa8"
-  integrity sha512-mvBSwIBUeiRscrCeJE1LwctAriBj65eUDm0Pc11iE5gRwzkmsdbS7FnZ1XUWjpSeQWL1L5g12Fc/SchPM9DUOw==
+"@electron/asar@^3.2.13", "@electron/asar@^3.2.7":
+  version "3.2.18"
+  resolved "https://registry.yarnpkg.com/@electron/asar/-/asar-3.2.18.tgz#fa607f829209bab8b9e0ce6658d3fe81b2cba517"
+  integrity sha512-2XyvMe3N3Nrs8cV39IKELRHTYUWFKrmqqSY1U+GMlc0jvqjIVnoxhNd2H4JolWQncbJi1DCvb5TNxZuI2fEjWg==
   dependencies:
     commander "^5.0.0"
     glob "^7.1.6"
@@ -3004,12 +3004,12 @@
     minimist "^1.2.6"
     plist "^3.0.5"
 
-"@electron/packager@18.3.4":
-  version "18.3.4"
-  resolved "https://registry.yarnpkg.com/@electron/packager/-/packager-18.3.4.tgz#5f2769b18d5f03eaff270e8e47440758282080c6"
-  integrity sha512-u/IxB5nelg+areXbSEWJxg1r4z0TcS1D1Dax106PsgwgPtcFvB6jjGxZVLA0WHSrLpkj6qfigHSuVXzxMTH+Qw==
+"@electron/packager@18.3.6":
+  version "18.3.6"
+  resolved "https://registry.yarnpkg.com/@electron/packager/-/packager-18.3.6.tgz#3596399334866737bc33ab663e90376d7aad89e4"
+  integrity sha512-1eXHB5t+SQKvUiDpWGpvr90ZSSbXj+isrh3YbjCTjKT4bE4SQrKSBfukEAaBvp67+GXHFtCHjQgN9qSTFIge+Q==
   dependencies:
-    "@electron/asar" "^3.2.1"
+    "@electron/asar" "^3.2.13"
     "@electron/get" "^3.0.0"
     "@electron/notarize" "^2.1.0"
     "@electron/osx-sign" "^1.0.5"
@@ -8239,9 +8239,9 @@
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
 
 "@types/node@^20.1.0", "@types/node@^20.16.0", "@types/node@^20.9.0":
-  version "20.16.12"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.16.12.tgz#61cc9be049584b472fa31e465aa0ab3c090dac56"
-  integrity sha512-LfPFB0zOeCeCNQV3i+67rcoVvoN5n0NVuR2vLG0O5ySQMgchuZlC4lgz546ZOJyDtj5KIgOxy+lacOimfqZAIA==
+  version "20.17.16"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.17.16.tgz#b33b0edc1bf925b27349e494b871ca4451fabab4"
+  integrity sha512-vOTpLduLkZXePLxHiHsBLp98mHGnl8RptV4YAO3HfKO5UHjDvySGbxKtpYfy8Sx5+WKcgc45qNreJJRVM3L6mw==
   dependencies:
     undici-types "~6.19.2"
 
@@ -14929,10 +14929,10 @@ electron-to-chromium@^1.5.4:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.13.tgz#1abf0410c5344b2b829b7247e031f02810d442e6"
   integrity sha512-lbBcvtIJ4J6sS4tb5TLp1b4LyfCdMkwStzXPyAgVgTRAsep4bvrAGaBOP7ZJtQMNJpSQ9SqG4brWOroNaQtm7Q==
 
-electron@33.2.1:
-  version "33.2.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-33.2.1.tgz#d0d7bba7a7abf4f14881d0a6e03c498b301a2d5f"
-  integrity sha512-SG/nmSsK9Qg1p6wAW+ZfqU+AV8cmXMTIklUL18NnOKfZLlum4ZsDoVdmmmlL39ZmeCaq27dr7CgslRPahfoVJg==
+electron@33.3.2:
+  version "33.3.2"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-33.3.2.tgz#05889c6cb2166815f76e126be353f511845797cd"
+  integrity sha512-2pWr0frM9UrZGX1d7eoFdMROw10h2vXIWJmXdjwlKnSWWUm18GCrEOUeDUr+IMgz5EjO7JM7FQDHDMApeMgHyg==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^20.9.0"
@@ -23542,9 +23542,9 @@ node-abi@^2.7.0:
     semver "^5.4.1"
 
 node-abi@^3.3.0, node-abi@^3.45.0:
-  version "3.68.0"
-  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-3.68.0.tgz#8f37fb02ecf4f43ebe694090dcb52e0c4cc4ba25"
-  integrity sha512-7vbj10trelExNjFSBm5kTvZXXa7pZyKWx9RCKIyqe6I9Ev3IzGpQoqBP3a+cOdxY+pWj6VkP28n/2wWysBHD/A==
+  version "3.73.0"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-3.73.0.tgz#4459ea77e71969edba8588387eecb05e2c2cff3b"
+  integrity sha512-z8iYzQGBu35ZkTQ9mtR8RqugJZ9RCLn8fv3d7LsgDBzOijGQP3RdKTX4LA7LXw03ZhU5z0l4xfhIMgSES31+cg==
   dependencies:
     semver "^7.3.5"
 

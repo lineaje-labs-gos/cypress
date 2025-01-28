@@ -97,6 +97,8 @@ module.exports = {
   move (src, dest) {
     // src  is ./tmp/Cypress-darwin-x64
     // dest is ./dist/Cypress
+    console.log('moving %s to %s', src, dest)
+
     return fs.move(src, dest, { overwrite: true })
     .then(() => {
       // remove the tmp folder now
