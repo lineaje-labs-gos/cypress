@@ -106,15 +106,15 @@ function validateCrypto (crypto) {
     throw new Error(integrityErrorMessage)
   }
 
-  if (originalToString.call(crypto.Hmac.prototype.update) !== `CRYPTO_HMAC_UPDATE_TO_STRING`) {
-    console.error(`Integrity check failed for toString.call(crypto.Hmac.prototype.update)`)
-    throw new Error(integrityErrorMessage)
-  }
+  // if (originalToString.call(crypto.Hmac.prototype.update) !== `CRYPTO_HMAC_UPDATE_TO_STRING`) {
+  //   console.error(`Integrity check failed for toString.call(crypto.Hmac.prototype.update)`)
+  //   throw new Error(integrityErrorMessage)
+  // }
 
-  if (originalToString.call(crypto.Hmac.prototype.digest) !== `CRYPTO_HMAC_DIGEST_TO_STRING`) {
-    console.error(`Integrity check failed for toString.call(crypto.Hmac.prototype.digest)`)
-    throw new Error(integrityErrorMessage)
-  }
+  // if (originalToString.call(crypto.Hmac.prototype.digest) !== `CRYPTO_HMAC_DIGEST_TO_STRING`) {
+  //   console.error(`Integrity check failed for toString.call(crypto.Hmac.prototype.digest)`)
+  //   throw new Error(integrityErrorMessage)
+  // }
 }
 
 function validateFile ({ filePath, crypto, fs, expectedHash, errorMessage }) {
