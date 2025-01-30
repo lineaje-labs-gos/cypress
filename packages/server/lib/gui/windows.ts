@@ -140,7 +140,7 @@ export function defaults (options = {}) {
       partition: null,
       webSecurity: true,
       nodeIntegration: false,
-      backgroundThrottling: true,
+      backgroundThrottling: false,
     },
   })
 }

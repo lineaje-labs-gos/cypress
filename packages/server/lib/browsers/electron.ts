@@ -152,6 +152,7 @@ export = {
         devTools: 'isBrowserDevToolsOpen',
       },
       webPreferences: {
+        backgroundThrottling: false,
         sandbox: true,
       },
       show: !options.browser.isHeadless,
