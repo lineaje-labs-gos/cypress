@@ -12,6 +12,8 @@ import { createPinia } from '../../src/store'
 import { setActivePinia } from 'pinia'
 import type { Pinia } from 'pinia'
 
+import '../../../../npm/plugin-accessibility-warnings/src/index.js'
+
 let pinia: Pinia
 
 beforeEach(() => {

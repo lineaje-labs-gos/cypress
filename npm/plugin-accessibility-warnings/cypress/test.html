@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>plugin-accessibility-warnings</title>
+</head>
+<body>
+  <h1>DIVs with click handlers are not buttons</h1>
+  <div onclick="document.querySelector('output').innerText='The click happened'">
+    Click Me!
+  </div>
+  <output></output>
+  <a>I'm a bad link</a>
+  <a href="#">I'm probably also a bad link</a>
+  <a href="https://example.cypress.io/">I'm a fine link</a>
+</body>
+</html>
