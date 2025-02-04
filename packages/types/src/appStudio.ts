@@ -9,6 +9,7 @@ export type CloudApi = {
   enc: {
     verifySignature (body: string, signature: string): boolean
   }
+  baseUrl: string
 }
 
 export interface AppStudioShape {

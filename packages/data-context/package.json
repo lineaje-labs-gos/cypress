@@ -53,6 +53,7 @@
     "semver": "7.3.2",
     "simple-git": "3.25.0",
     "stringify-object": "^3.0.0",
+    "tar": "^6.1.0",
     "underscore.string": "^3.3.6",
     "wonka": "^4.0.15"
   },
@@ -78,6 +79,7 @@
     "@types/sinon": "10.0.11",
     "@types/sinon-chai": "3.2.8",
     "@types/stringify-object": "^3.0.0",
+    "@types/tar": "^6.1.0",
     "mocha": "7.0.1",
     "mocha-junit-reporter": "2.2.0",
     "mocha-multi-reporters": "1.5.1",

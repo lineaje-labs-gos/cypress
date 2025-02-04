@@ -160,6 +160,7 @@ export class ProjectBase extends EE {
       requestPromise: cloudApi.rp,
       publicKeyVersion: cloudApi.publicKeyVersion,
       enc,
+      baseUrl: cloudApi.baseUrl,
     })
 
     const [port, warning] = await this._server.open(cfg, {

@@ -1,7 +1,5 @@
 import type { AppStudioShape, CloudApi } from '@packages/types'
 import type { Router } from 'express'
-import path from 'path'
-import os from 'os'
 import Module from 'module'
 import type { DataContext } from '../../DataContext'
 
@@ -23,15 +21,11 @@ export class AppStudio implements AppStudioShape {
 
   constructor (private ctx: DataContext) {}
 
-  async setup (script: string, cloudApi: CloudApi): Promise<void> {
+  async setup ({ script, cloudApi, studioPath }: { script: string, cloudApi: CloudApi, studioPath: string }): Promise<void> {
     if (script) {
-      const cypressProtocolDirectory = path.join(os.tmpdir(), 'cypress', 'protocol')
-
-      await this.ctx.fs.ensureDir(cypressProtocolDirectory)
-
       const { AppStudio } = requireScript(script)
 
-      this._appStudio = new AppStudio(cloudApi)
+      this._appStudio = new AppStudio({ cloudApi, studioPath })
     }
   }
 

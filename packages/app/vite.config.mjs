@@ -29,7 +29,7 @@ export default makeConfig({
     ],
   },
 }, {
-  pluginsToListFirst: [
+  pluginsToProcessFirst: [
     federation({
       name: 'host',
       remotes: {
