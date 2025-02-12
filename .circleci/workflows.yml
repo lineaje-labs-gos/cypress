@@ -1598,12 +1598,31 @@ jobs:
               circleci-agent step halt
             fi
       - run:
-          # Sometimes, even though all the circle jobs have finished, Percy times out during `build:finalize`
-          # If all other jobs finish but `build:finalize` fails, we retry it once
-          name: Finalize percy build - allows single retry
+          name: Finalize percy build
+          # Sometimes it takes a bit of time for percy to go from waiting to processing.
+          # Because of this, we will try to finalize the build a few times before giving up.
+          # We also try to do this as late in the CI process as possible to try and give Percy
+          # some time to process the snapshots so we are able to finalize the build.
           command: |
-            PERCY_PARALLEL_NONCE=$CIRCLE_WORKFLOW_WORKSPACE_ID \
-            yarn percy build:finalize || yarn percy build:finalize
+            interval=120 # Interval in seconds
+            max_attempts=5 # Maximum number of attempts
+
+            attempt=1
+            while true; do
+              echo "Attempt $attempt"
+              if yarn percy build:finalize --verbose; then
+                echo "Script succeeded!"
+                exit 0
+              else
+                echo "percy failed to finalize. Waiting $interval seconds..."
+                if [ $attempt -ge $max_attempts ]; then
+                  echo "Maximum attempts reached. Exiting."
+                  exit 1
+                fi
+                sleep $interval
+                attempt=$((attempt + 1))
+              fi
+            done
 
   # verify accessibility scores from Cypress
   verify-accessibility-results:
@@ -2975,6 +2994,34 @@ linux-x64-workflow: &linux-x64-workflow
           - run-reporter-component-tests-chrome
           - run-webpack-dev-server-integration-tests
           - run-vite-dev-server-integration-tests
+          - npm-angular
+          - npm-eslint-plugin-dev
+          - npm-puppeteer-unit-tests
+          - npm-puppeteer-cypress-tests
+          - npm-react
+          - npm-mount-utils
+          - npm-vue
+          - npm-webpack-batteries-included-preprocessor
+          - npm-webpack-preprocessor
+          - npm-vite-dev-server
+          - npm-vite-plugin-cypress-esm
+          - npm-webpack-dev-server
+          - npm-cypress-schematic
+          - driver-integration-tests-firefox
+          - driver-integration-tests-chrome
+          - driver-integration-tests-chrome-beta
+          - driver-integration-tests-electron
+          - driver-integration-tests-webkit
+          - driver-integration-memory-tests
+          - system-tests-non-root
+          - system-tests-firefox
+          - system-tests-electron
+          - system-tests-chrome
+          - system-tests-webkit
+          - server-performance-tests
+          - server-integration-tests
+          - server-unit-tests
+          - binary-system-tests
     # Cypress run must be completed to fetch Accessibility report
     - verify-accessibility-results:
         context: test-runner:cypress-record-key
@@ -3184,7 +3231,6 @@ linux-x64-workflow: &linux-x64-workflow
     - v8-integration-tests:
         requires:
           - system-tests-node-modules-install
-
     - ready-to-release:
         # <<: *mainBuildFilters
         requires:
@@ -3391,6 +3437,34 @@ linux-x64-contributor-workflow: &linux-x64-contributor-workflow
           - run-reporter-component-tests-chrome
           - run-webpack-dev-server-integration-tests
           - run-vite-dev-server-integration-tests
+          - npm-angular
+          - npm-eslint-plugin-dev
+          - npm-puppeteer-unit-tests
+          - npm-puppeteer-cypress-tests
+          - npm-react
+          - npm-mount-utils
+          - npm-vue
+          - npm-webpack-batteries-included-preprocessor
+          - npm-webpack-preprocessor
+          - npm-vite-dev-server
+          - npm-vite-plugin-cypress-esm
+          - npm-webpack-dev-server
+          - npm-cypress-schematic
+          - driver-integration-tests-firefox
+          - driver-integration-tests-chrome
+          - driver-integration-tests-chrome-beta
+          - driver-integration-tests-electron
+          - driver-integration-tests-webkit
+          - driver-integration-memory-tests
+          - system-tests-non-root
+          - system-tests-firefox
+          - system-tests-electron
+          - system-tests-chrome
+          - system-tests-webkit
+          - server-performance-tests
+          - server-integration-tests
+          - server-unit-tests
+          - binary-system-tests
     - lint-types:
         requires:
           - build
@@ -3580,7 +3654,6 @@ linux-x64-contributor-workflow: &linux-x64-contributor-workflow
     - v8-integration-tests:
         requires:
           - system-tests-node-modules-install
-
     - ready-to-release:
         requires:
           - check-ts
