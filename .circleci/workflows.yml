@@ -89,6 +89,12 @@ windowsWorkflowFilters: &windows-workflow-filters
           value: << pipeline.git.branch >>
 
 executors:
+  cy-percy:
+    resource_class: medium
+    docker:
+      - image: cimg/node:20.18.1
+    environment:
+      db_user: 'ubuntu'
   # the Docker image with Cypress dependencies and Chrome browser
   cy-doc:
     docker:
@@ -1578,6 +1584,7 @@ jobs:
   # a special job that closes the Percy build started by the required jobs
   percy-finalize:
     <<: *defaults
+    executor: cy-percy
     resource_class: small
     parameters:
       <<: *defaultsParameters
