@@ -1,5 +1,5 @@
 import js from '@eslint/js'
-import ts, { InfiniteDepthConfigWithExtends } from 'typescript-eslint'
+import { InfiniteDepthConfigWithExtends, configs as tsConfigs, parser as tsParser } from 'typescript-eslint'
 // @ts-expect-error - this package has no type defs
 import cy from 'eslint-plugin-cypress/flat'
 // @ts-expect error - this package has no type defs
@@ -9,19 +9,11 @@ import vue from 'eslint-plugin-vue'
 import stylistic from '@stylistic/eslint-plugin'
 import * as graphql from '@graphql-eslint/eslint-plugin'
 import react from 'eslint-plugin-react'
+import eslintPluginImportX from 'eslint-plugin-import-x'
 
-/**
- * baseConfig should be imported by other packages that define their own eslint.config.ts
- * tsLanguageOptions may be shared, but is probably unnecessary
- * the default config exported from this file applies to
- *   - ./scripts/*
- *
- * This can be simplified if ./scripts is converted to a monorepo package in /tooling
- */
-
-export const baseConfig: InfiniteDepthConfigWithExtends[] = [
+export default <InfiniteDepthConfigWithExtends[]>[
   js.configs.recommended,
-  ...ts.configs.recommended,
+  ...tsConfigs.recommended,
   cy.configs.recommended,
   mocha.configs.flat.recommended,
   ...vue.configs['flat/recommended'],
@@ -33,17 +25,21 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       },
     },
   },
+  // importing { config } from @stylistic/eslint-plugin causes errors
+  // eslint-disable-next-line import-x/no-named-as-default-member
   stylistic.configs.customize({
     'braceStyle': '1tbs',
     'arrowParens': true,
   }),
+  eslintPluginImportX.flatConfigs.recommended,
+  eslintPluginImportX.flatConfigs.typescript,
 
   // set up ts parser & import plugin
   {
     files: ['**/*.{ts,js,jsx,tsx,vue}'],
     languageOptions: {
       parserOptions: {
-        parser: ts.parser,
+        parser: tsParser,
         projectService: true,
         extraFileExtensions: ['.vue'],
         ecmaFeatures: {
@@ -278,38 +274,3 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     },
   },
 ]
-
-// applies to ./scripts - eslint tends to crash if this config is in the ./scripts dir?
-
-export default ts.config(
-  ...baseConfig,
-  {
-    ignores: [
-      'npm/**/*',
-      'packages/**/*',
-      'system-tests/**/*',
-      'tooling/**/*',
-      'cli/**/*',
-      '**/__snapshots__/**/*',
-      '.nx/**/*',
-      '.releaserc.js',
-      'dist/**',
-    ],
-  },
-  {
-    files: ['**/*.{ts,js}'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-      parserOptions: {
-        projectService: false,
-      },
-    },
-  },
-  {
-    rules: {
-      'no-console': 'off',
-    },
-  },
-)
