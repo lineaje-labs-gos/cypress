@@ -590,4 +590,10 @@ describe('util', () => {
       })
     })
   })
+
+  context('.getRealArch', async () => {
+    const arch = await util.getRealArch()
+
+    expect(arch).to.be.oneOf(['ia32', 'x86', 'x64', 'arm64'])
+  })
 })
