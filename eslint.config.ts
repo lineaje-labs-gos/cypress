@@ -246,6 +246,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'import-x/no-named-as-default-member': 'off', // e.g., import foo from 'foo'; foo.bar(); will error when `bar` is a named export
       'import-x/default': 'off',
       'import-x/export': 'off',
+      'import-x/no-extraneous-dependencies': 'warn',
     },
   },
 
