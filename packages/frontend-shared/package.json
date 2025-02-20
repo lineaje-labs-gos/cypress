@@ -5,7 +5,7 @@
   "module": "es2020",
   "scripts": {
     "build": "node ./script/build.js",
-    "check-ts": "vue-tsc --noEmit && yarn -s tslint",
+    "check-ts": "vue-tsc --noEmit",
     "clean": "rimraf dist ./node_modules/.vite src/*.js src/**/*.js && echo 'cleaned'",
     "clean-deps": "rimraf node_modules",
     "cypress:open": "cross-env TZ=America/New_York node ../../scripts/cypress open --component --project .",

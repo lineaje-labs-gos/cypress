@@ -10,13 +10,12 @@
   ],
   "scripts": {
     "build": "tsc",
-    "check-ts": "tsc --noEmit && yarn -s tslint",
+    "check-ts": "tsc --noEmit",
     "clean": "rimraf dist",
     "clean-deps": "rimraf node_modules",
     "lint": "eslint .",
     "test": "yarn test-unit",
     "test-unit": "mocha --config ./test/.mocharc.js",
-    "tslint": "tslint --config ../ts/tslint.json --project .",
     "watch": "tsc --watch"
   },
   "types": "src/snapshot-require.ts",

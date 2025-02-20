@@ -8,15 +8,14 @@
   ],
   "scripts": {
     "build-prod": "tsc --project .",
-    "check-ts": "tsc --noEmit && yarn -s tslint",
+    "check-ts": "tsc --noEmit",
     "clean": "rimraf --glob \"lib/*.js\" && rimraf --glob \"lib/**/*.js\" || true",
     "clean-deps": "rimraf node_modules",
     "clean-js": "yarn clean",
     "lint": "eslint .",
     "size": "t=\"cypress-v0.0.0.tgz\"; yarn pack --filename \"${t}\"; wc -c \"cli/${t}\"; tar tvf \"${t}\"; rm \"${t}\";",
     "test": "yarn test-unit",
-    "test-unit": "mocha --reporter mocha-multi-reporters --reporter-options configFile=../../mocha-reporter-config.json",
-    "tslint": "tslint --config ../ts/tslint.json --project ."
+    "test-unit": "mocha --reporter mocha-multi-reporters --reporter-options configFile=../../mocha-reporter-config.json"
   },
   "types": "index.ts",
   "dependencies": {

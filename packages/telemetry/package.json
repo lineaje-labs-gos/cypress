@@ -1,20 +1,24 @@
 {
+  "private": true,
   "name": "@packages/telemetry",
   "version": "0.0.0-development",
   "description": "open telemetry wrapper used throughout the cypress monorepo to instrument the cypress app",
-  "private": true,
   "main": "dist/node.js",
   "browser": "src/browser.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "tsc",
-    "check-ts": "tsc --noEmit && yarn -s tslint",
+    "check-ts": "tsc --noEmit",
     "clean": "rimraf dist",
+    "lint": "eslint .",
     "test": "yarn test-unit",
     "test-unit": "mocha --config ./test/.mocharc.js",
-    "lint": "eslint .",
-    "tslint": "tslint --config ../ts/tslint.json --project .",
     "watch": "tsc --watch"
   },
+  "types": "src/node.ts",
   "dependencies": {
     "@opentelemetry/api": "1.4.1",
     "@opentelemetry/core": "1.12.0",
@@ -30,10 +34,5 @@
     "@packages/ts": "0.0.0-development",
     "mocha": "7.0.1"
   },
-  "files": [
-    "dist",
-    "src"
-  ],
-  "types": "src/node.ts",
   "nx": {}
 }

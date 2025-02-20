@@ -9,13 +9,12 @@
   ],
   "scripts": {
     "build-prod": "tsc || echo 'built, with errors'",
-    "check-ts": "tsc --noEmit && yarn -s tslint",
+    "check-ts": "tsc --noEmit",
     "clean": "rimraf ./src/*.js ./src/**/*.js ./src/**/**/*.js ./test/**/*.js || echo 'cleaned'",
     "clean-deps": "rimraf node_modules",
     "lint": "eslint .",
     "test": "yarn test-unit",
-    "test-unit": "mocha -r @packages/ts/register 'test/unit/**' --config ./test/.mocharc.js --exit --reporter mocha-multi-reporters --reporter-options configFile=../../mocha-reporter-config.json",
-    "tslint": "tslint --config ../ts/tslint.json --project ."
+    "test-unit": "mocha -r @packages/ts/register 'test/unit/**' --config ./test/.mocharc.js --exit --reporter mocha-multi-reporters --reporter-options configFile=../../mocha-reporter-config.json"
   },
   "types": "src/index.ts",
   "dependencies": {

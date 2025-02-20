@@ -6,7 +6,7 @@
   "files": [],
   "scripts": {
     "build-for-tests": "node ../../scripts/run-webpack",
-    "check-ts": "yarn -s tslint",
+    "check-ts": "echo \"no ts to check\"",
     "clean-deps": "rimraf node_modules",
     "cypress:open": "node ../../scripts/cypress open --project .",
     "cypress:run": "node ../../scripts/cypress run --project .",
