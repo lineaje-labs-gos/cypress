@@ -11,7 +11,7 @@
     "outDir": "dist",
     "noErrorTruncation": true,
     "types": [],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "exclude": [
     "dist",

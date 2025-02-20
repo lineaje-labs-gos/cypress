@@ -13,7 +13,8 @@
       "cypress-real-events",
       "react",
     ],                           /* Type declaration files to be included in compilation. */
-    "noErrorTruncation": true
+    "noErrorTruncation": true,
+    "allowJs": true
   },
   "exclude": [
     "dist",

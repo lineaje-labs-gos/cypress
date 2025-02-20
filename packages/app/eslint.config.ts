@@ -6,6 +6,10 @@ export default [
   ...baseConfig,
 
   {
+    ignores: ['.__mf__temp/**/*'],
+  },
+
+  {
     languageOptions: {
       parserOptions: {
         projectService: {
@@ -23,6 +27,7 @@ export default [
       },
     },
   },
+
   {
     files: ['vite.config.mjs'],
     languageOptions: {

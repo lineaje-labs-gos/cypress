@@ -10,7 +10,7 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['index.d.ts', 'cypress/e2e/e2e/origin/dependencies.cy.jsx', 'src/cypress/setter_getter.d.ts'],
+          allowDefaultProject: ['index.d.ts', 'cypress/e2e/e2e/origin/dependencies.cy.jsx', 'src/cypress/setter_getter.d.ts', 'vite.config.mjs', 'vitest.config.mjs'],
         },
       },
       globals: {
