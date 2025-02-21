@@ -1,4 +1,4 @@
-require('@packages/ts/register')
+require('tsx/cjs')
 const path = require('path')
 const { promisify } = require('util')
 const glob = promisify(require('glob'))

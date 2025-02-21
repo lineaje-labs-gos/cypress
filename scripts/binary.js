@@ -1,4 +1,4 @@
-require('../packages/ts/register')
+require('tsx/cjs')
 
 const command = process.argv[2]
 

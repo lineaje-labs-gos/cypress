@@ -71,6 +71,7 @@ if (isWindows()) {
     `"-screen 0 1280x1024x24"`,
     `--`,
     'node',
+    '--import tsx',
   ]
 }
 
@@ -118,7 +119,6 @@ commandAndArguments.args.push(
   '--timeout',
   options['inspect-brk'] ? '40000000' : '10000',
   '--recursive',
-  '-r @packages/ts/register',
   '--reporter',
   'mocha-multi-reporters',
   '--reporter-options',
@@ -132,6 +132,9 @@ const env = _.clone(process.env)
 
 env.NODE_ENV = 'test'
 env.CYPRESS_INTERNAL_ENV = 'test'
+// needed to run the tests with tsx to transpile the files on the fly.
+// We want to use our special test config and not the package's build config.
+env.TSX_TSCONFIG_PATH = path.resolve(__dirname, 'tsconfig.json')
 
 if (env.VERBOSE === '1') {
   _.extend(env, {

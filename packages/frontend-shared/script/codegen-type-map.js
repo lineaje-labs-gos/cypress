@@ -1,2 +1,2 @@
-require('@packages/ts/register')
+require('tsx/cjs')
 module.exports = require('./codegen-type-map-ts').default

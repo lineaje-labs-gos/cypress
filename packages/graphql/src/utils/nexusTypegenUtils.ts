@@ -54,12 +54,11 @@ export async function nexusTypegen (cfg: NexusTypegenCfg) {
   }
 
   const nodeCmd = `node${process.platform === 'win32' ? '.cmd' : ''}`
-  const out = spawn(nodeCmd, ['-r', '@packages/ts/register', cfg.filePath], {
+  const out = spawn(nodeCmd, ['--import', 'tsx', cfg.filePath], {
     cwd: cfg.cwd,
     env: {
       ...process.env,
       CYPRESS_INTERNAL_NEXUS_CODEGEN: 'true',
-      TS_NODE_CACHE: 'false',
     },
     ...process.platform === 'win32' ? { shell: true } : {},
   })

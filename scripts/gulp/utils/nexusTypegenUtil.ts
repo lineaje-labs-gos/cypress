@@ -53,7 +53,7 @@ export async function nexusTypegen (cfg: NexusTypegenCfg) {
   }
 
   const nodeCmd = `node${process.platform === 'win32' ? '.cmd' : ''}`
-  const out = spawn(nodeCmd, ['-r', '@packages/ts/register', cfg.filePath], {
+  const out = spawn(nodeCmd, ['--import', 'tsx', cfg.filePath], {
     cwd: cfg.cwd,
     env: {
       ...process.env,

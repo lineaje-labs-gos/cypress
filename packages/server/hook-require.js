@@ -32,7 +32,7 @@ function runWithSnapshot (forceTypeScript) {
 
 const hookRequire = ({ forceTypeScript }) => {
   if (['1', 'true'].includes(process.env.DISABLE_SNAPSHOT_REQUIRE) || typeof getSnapshotResult === 'undefined') {
-    require('@packages/ts/register')
+    require('tsx/cjs')
   } else {
     runWithSnapshot(forceTypeScript)
   }

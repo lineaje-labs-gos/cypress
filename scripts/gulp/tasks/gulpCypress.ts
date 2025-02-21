@@ -96,7 +96,14 @@ async function spawnCypressWithMode (
   const finalEnv: Record<string, string | undefined> = {
     ...process.env,
     ...env,
-    TS_NODE_COMPILER: 'typescript-cached-transpile',
+    // resolve to the root config file for global mode so we are able to load the data-context package
+    TSX_TSCONFIG_PATH: process.env.TSX_TSCONFIG_PATH = path.resolve(__dirname, '..', '..', '..', 'tsconfig.json'),
+  }
+
+  if (finalEnv.NODE_OPTIONS) {
+    finalEnv.NODE_OPTIONS += ' --import tsx'
+  } else {
+    finalEnv.NODE_OPTIONS = '--import tsx'
   }
 
   return await forked(`cy:${mode}:${type}`, pathToCli, [mode, ...argv], {

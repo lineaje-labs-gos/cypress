@@ -6,7 +6,7 @@
 try {
   require.resolve('./src')
 } catch (e) {
-  require('@packages/ts/register')
+  require('tsx/cjs')
 }
 
 module.exports = require('./src')

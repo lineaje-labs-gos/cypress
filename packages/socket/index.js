@@ -1,5 +1,5 @@
 if (process.env.CYPRESS_INTERNAL_ENV !== 'production') {
-  require('@packages/ts/register')
+  require('tsx/cjs')
 }
 
 module.exports = require('./lib/socket')

@@ -1,5 +1,3 @@
-require('@packages/ts/register')
-
 const _ = require('lodash')
 const Jimp = require('jimp')
 const path = require('path')

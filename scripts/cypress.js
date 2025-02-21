@@ -11,6 +11,8 @@ if (inspector.url()) {
   process.CYPRESS_INTERNAL_DEV_DEBUG = `--inspect=${process.debugPort + 1}`
 }
 
+// load the tsconfig path in dev mode
+process.env.TSX_TSCONFIG_PATH = path.resolve(__dirname, '..', 'tsconfig.json')
 // always run the CLI in dev mode
 // so it utilizes the development binary
 // instead of the globally installed prebuilt one

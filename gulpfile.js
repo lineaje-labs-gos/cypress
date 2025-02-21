@@ -1,2 +1,2 @@
-require('@packages/ts/register')
+require('tsx/cjs')
 require('./scripts/gulp/gulpfile')
