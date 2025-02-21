@@ -359,7 +359,7 @@ export const combinedReactVueConfig = ts.config(
 
 // some packages need to disable all of the react rules for a subset of files
 export const disabledReactRules = {
-  ...Object.keys(react.configs.flat.recommended.rules).reduce((rules, rule) => {
+  ...Object.keys(react.configs.flat.recommended?.rules || {}).reduce((rules, rule) => {
     return {
       ...rules,
       [rule]: 'off',
