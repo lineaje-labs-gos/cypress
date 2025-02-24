@@ -3,6 +3,6 @@
 interface CssExports {
 
 }
-export const cssExports: CssExports
+export const cssExports: CssExports;
 
-export default cssExports
+export default cssExports;
