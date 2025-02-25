@@ -3,15 +3,15 @@ import { defaultConfig } from '../../eslint.config'
 export default [
   ...defaultConfig,
   {
+    ignores: ['test/helpers/**/*'],
+  },
+  {
     languageOptions: {
       parserOptions: {
         projectService: false,
         project: './eslint.tsconfig.json',
       },
     },
-  },
-  {
-    files: ['extension/lib/extension.js'],
   },
   {
     files: ['test/**/*.js'],
