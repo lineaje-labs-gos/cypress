@@ -1735,12 +1735,12 @@ describe('lib/cypress', () => {
       sinon.stub(console, 'log')
     })
 
-    it('logs package.json and exits', function () {
-      return cypress.start(['--return-pkg'])
-      .then(() => {
-        expect(console.log).to.be.calledWithMatch('{"name":"cypress"')
-        this.expectExitWith(0)
-      })
+    it('logs package.json and exits', async function () {
+      await cypress.start(['--return-pkg'])
+
+      const [loggedStr] = console.log.firstCall.args
+      expect(JSON.parse(loggedStr)).to.deep.eq(pkg)
+      this.expectExitWith(0)
     })
   })
 
