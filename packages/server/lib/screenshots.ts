@@ -105,7 +105,7 @@ const isWhite = (rgba: RGBA): boolean => {
 }
 
 interface RGBAWithName extends RGBA {
-  name?: string
+  name?: string | null
   isNotWhite?: boolean
   isWhite?: boolean
   isBlack?: boolean
@@ -115,11 +115,11 @@ const intToRGBA = function (int: number): RGBAWithName {
   const obj: RGBAWithName = Jimp.intToRGBA(int) as RGBAWithName
 
   if (debug.enabled) {
-    obj.name = colorString.to.keyword([
+    obj.name = colorString.to.keyword(
       obj.r,
       obj.g,
       obj.b,
-    ])
+    )
   }
 
   return obj
