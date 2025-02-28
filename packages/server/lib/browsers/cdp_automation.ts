@@ -447,6 +447,33 @@ export class CdpAutomation implements CDPClient {
     return false
   }
 
+  private _getAutFrame = async () => {
+    try {
+      const frameTree = (await this.sendDebuggerCommandFn('Page.getFrameTree')).frameTree
+      const frame = _.find(frameTree?.childFrames || [], ({ frame }) => {
+        return frame?.name?.startsWith('Your project:')
+      }) as HasFrame | undefined
+
+      return frame?.frame
+    } catch (err) {
+      debugVerbose('failed to get aut frame:', err.stack)
+
+      return undefined
+    }
+  }
+
+  private _getAutUrl = async () => {
+    const frame = await this._getAutFrame()
+
+    return frame?.url || ''
+  }
+
+  private _getAutUrlHash = async () => {
+    const frame = await this._getAutFrame()
+
+    return frame?.urlFragment || ''
+  }
+
   _handlePausedRequests = async (client: CriClient) => {
     // NOTE: only supported in chromium based browsers
     await client.send('Fetch.enable', {
@@ -586,6 +613,10 @@ export class CdpAutomation implements CDPClient {
         return this.sendDebuggerCommandFn('Runtime.evaluate', { expression: 'performance.memory.jsHeapSizeLimit' })
       case 'collect:garbage':
         return this.sendDebuggerCommandFn('HeapProfiler.collectGarbage')
+      case 'get:aut:url':
+        return this._getAutUrl()
+      case 'get:aut:url:hash':
+        return this._getAutUrlHash()
       default:
         throw new Error(`No automation handler registered for: '${message}'`)
     }
