@@ -61,7 +61,7 @@
     "simple-git": "3.25.0",
     "stringify-object": "^3.0.0",
     "underscore.string": "^3.3.6",
-    "wonka": "^4.0.15"
+    "wonka": "^6.3.4"
   },
   "devDependencies": {
     "@babel/types": "7.25.2",

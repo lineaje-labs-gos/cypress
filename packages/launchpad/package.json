@@ -78,7 +78,7 @@
     "vue-i18n": "9.13.1",
     "vue-tsc": "^2.0.19",
     "vue3-file-selector": "^1.0.1",
-    "wonka": "^4.0.15"
+    "wonka": "^6.3.4"
   },
   "files": [
     "dist"
