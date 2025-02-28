@@ -100,6 +100,11 @@
     "src"
   ],
   "types": "src/index.ts",
+  "workspaces": {
+    "nohoist": [
+      "wonka"
+    ]
+  },
   "nx": {
     "targets": {
       "build": {

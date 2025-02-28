@@ -98,6 +98,11 @@
   "files": [
     "dist"
   ],
+  "workspaces": {
+    "nohoist": [
+      "wonka"
+    ]
+  },
   "nx": {
     "implicitDependencies": [
       "@packages/data-context",

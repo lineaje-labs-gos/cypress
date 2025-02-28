@@ -112,7 +112,8 @@
   "workspaces": {
     "nohoist": [
       "@toycode/markdown-it-class",
-      "patch-package"
+      "patch-package",
+      "wonka"
     ]
   },
   "nx": {
