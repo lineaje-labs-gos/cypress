@@ -1,5 +1,6 @@
 /* tslint:disable:no-empty */
 require('../../spec_helper')
+const _ = require('lodash')
 const http = require('http')
 const socket = require('@packages/socket')
 const mockRequire = require('mock-require')
@@ -20,6 +21,9 @@ const browser = {
     },
   },
   runtime: {},
+  browsingData: {
+    remove () {},
+  },
 }
 
 mockRequire('webextension-polyfill', browser)
@@ -200,6 +204,41 @@ describe('app/background', () => {
 
       expect(onCreated).not.to.be.called
       expect(onChanged).not.to.be.called
+    })
+  })
+
+  context('integration', () => {
+    beforeEach(function (done) {
+      done = _.once(done)
+
+      client.connect.restore()
+
+      this.server.on('connection', (socket1) => {
+        this.socket = socket1
+
+        done()
+      })
+
+      this.client = background.connect(`http://localhost:${PORT}`, '/__socket')
+    })
+
+    describe('reset:browser:state', () => {
+      beforeEach(() => {
+        sinon.stub(browser.browsingData, 'remove').withArgs({}, { cache: true, cookies: true, downloads: true, formData: true, history: true, indexedDB: true, localStorage: true, passwords: true, pluginData: true, serviceWorkers: true }).resolves()
+      })
+
+      it('resets the browser state', function (done) {
+        this.socket.on('automation:response', (id, obj) => {
+          expect(id).to.eq(123)
+          expect(obj.response).to.be.undefined
+
+          expect(browser.browsingData.remove).to.be.called
+
+          done()
+        })
+
+        this.server.emit('automation:request', 123, 'reset:browser:state')
+      })
     })
   })
 })

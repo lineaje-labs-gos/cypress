@@ -498,7 +498,7 @@ export class BidiAutomation {
     return new BidiAutomation(webdriverClient, automation)
   }
 
-  onRequest = async (message: string, data: any) => {
+  onRequest = async (message: string, data: any, fn?: any) => {
     switch (message) {
       case 'get:cookies':
       {
@@ -592,13 +592,14 @@ export class BidiAutomation {
 
       case 'reset:browser:state':
 
-        // patch this for now just to get clean cookies between tests
-        // we really need something similar to the Storage.clearDataForOrigin and Network.clearBrowserCache methods here,
-        // or the web extension https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browsingData/remove API
+        // FIXME: patch this for now just to get clean cookies between tests
+        // we really need something similar to the Storage.clearDataForOrigin and Network.clearBrowserCache methods here.
+        // For now we can forward to the web extension or the web extension https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browsingData/remove API
         debug('reset:browser:state')
-        await this.webDriverClient.storageDeleteCookies({})
+        // await this.webDriverClient.storageDeleteCookies({})
 
-        return
+        // forward this to the web extension
+        return this.automation.requestAutomationResponse(message, data, fn)
       case 'reset:browser:tabs:for:next:spec':
         {
           const { contexts } = await this.webDriverClient.browsingContextGetTree({})

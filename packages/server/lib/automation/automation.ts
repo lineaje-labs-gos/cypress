@@ -84,7 +84,7 @@ export class Automation {
       // if we have an onRequest function
       // then just invoke that
       if (onReq) {
-        return Bluebird.resolve(onReq(msg, data))
+        return Bluebird.resolve(onReq(msg, data, fn))
       }
 
       // do the default

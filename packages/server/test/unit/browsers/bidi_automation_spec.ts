@@ -2089,13 +2089,25 @@ describe('lib/browsers/bidi_automation', () => {
         })
       })
 
-      it('calls through to storageDeleteCookies when "reset:browser:state" is emitted', async () => {
+      // FIXME: reinstate test when options similar to Storage.clearDataForOrigin and Network.clearBrowserCache are available
+      it.skip('calls through to storageDeleteCookies when "reset:browser:state" is emitted', async () => {
         mockWebdriverClient.storageDeleteCookies = sinon.stub().resolves()
 
         const returnedValue = await bidiAutomationInstance.onRequest('reset:browser:state', undefined)
 
         expect(returnedValue).to.be.undefined
         expect(mockWebdriverClient.storageDeleteCookies).to.have.been.calledWith({})
+      })
+
+      it('forwards through to the web extension (default automation client) when "reset:browser:state" is emitted', async () => {
+        mockAutomationClient.requestAutomationResponse = sinon.stub()
+
+        const dataRef = {}
+        const fnRef = () => undefined
+
+        await bidiAutomationInstance.onRequest('reset:browser:state', dataRef, fnRef)
+
+        expect(mockAutomationClient.requestAutomationResponse).to.have.been.calledWith('reset:browser:state', dataRef, fnRef)
       })
 
       describe('reset:browser:tabs:for:next:spec', () => {

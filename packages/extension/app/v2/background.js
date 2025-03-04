@@ -1,5 +1,6 @@
 const get = require('lodash/get')
 const once = require('lodash/once')
+const Promise = require('bluebird')
 const browser = require('webextension-polyfill')
 
 const client = require('./client')
@@ -50,7 +51,36 @@ const connect = function (host, path, extraOpts) {
     })
   })
 
+  const fail = (id, err) => {
+    return ws.emit('automation:response', id, {
+      __error: err.message,
+      __stack: err.stack,
+      __name: err.name,
+    })
+  }
+
+  const invoke = function (method, id, ...args) {
+    const respond = (data) => {
+      return ws.emit('automation:response', id, { response: data })
+    }
+
+    return Promise.try(() => {
+      return automation[method].apply(automation, args.concat(respond))
+    }).catch((err) => {
+      return fail(id, err)
+    })
+  }
+
   const ws = client.connect(host, path, extraOpts)
+
+  ws.on('automation:request', (id, msg, data) => {
+    switch (msg) {
+      case 'reset:browser:state':
+        return invoke('resetBrowserState', id)
+      default:
+        return fail(id, { message: `No handler registered for: '${msg}'` })
+    }
+  })
 
   ws.on('automation:config', async (config) => {
     const isFirefox = await checkIfFirefox()
@@ -71,6 +101,13 @@ const connect = function (host, path, extraOpts) {
 
 const automation = {
   connect,
+
+  resetBrowserState (fn) {
+    // We remove browser data. Firefox goes through this path, while chrome goes through cdp automation
+    // Note that firefox does not support fileSystems or serverBoundCertificates
+    // (https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browsingData/DataTypeSet).
+    return browser.browsingData.remove({}, { cache: true, cookies: true, downloads: true, formData: true, history: true, indexedDB: true, localStorage: true, passwords: true, pluginData: true, serviceWorkers: true }).then(fn)
+  },
 }
 
 module.exports = automation

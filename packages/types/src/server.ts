@@ -58,7 +58,7 @@ export interface LaunchArgs {
 
 type NullableMiddlewareHook = ((message: unknown, data: unknown) => void) | null
 
-export type OnRequestEvent = (eventName: string, data: any) => void
+export type OnRequestEvent = (eventName: string, data: any, fn?: any) => void
 
 export type OnServiceWorkerRegistrationUpdated = (data: Protocol.ServiceWorker.WorkerRegistrationUpdatedEvent) => void
 
