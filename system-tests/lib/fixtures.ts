@@ -18,7 +18,7 @@ export const cyTmpDir = _path.join(tempDir, 'cy-projects')
 
 const projectFixtureDirs = fs.readdirSync(projectFixtures, { withFileTypes: true }).filter((f) => f.isDirectory()).map((f) => f.name)
 
-const safeRemove = (path) => {
+const safeRemove = (path: string) => {
   try {
     fs.removeSync(path)
   } catch (_err) {
@@ -37,7 +37,7 @@ const safeRemove = (path) => {
 
 // copy contents instead of deleting+creating new file, which can cause
 // filewatchers to lose track of toFile.
-const copyContents = (fromFile, toFile) => {
+const copyContents = (fromFile: string, toFile: string) => {
   return Promise.all([
     fs.open(toFile, 'w'),
     fs.readFile(fromFile),
@@ -131,7 +131,7 @@ export function projectPath (name: ProjectFixtureDir) {
   return _path.join(cyTmpDir, name)
 }
 
-export function get (fixture, encoding: BufferEncoding = 'utf8') {
+export function get (fixture: string, encoding: BufferEncoding = 'utf8') {
   return fs.readFileSync(_path.join(serverRoot, 'test', 'support', 'fixtures', fixture), { encoding })
 }
 

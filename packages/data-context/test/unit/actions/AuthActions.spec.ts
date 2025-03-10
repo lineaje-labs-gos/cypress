@@ -4,7 +4,7 @@ import { createTestDataContext } from '../helper'
 import sinon, { SinonStub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import chai, { expect } from 'chai'
-import { FoundBrowser } from '@packages/types'
+import type { FoundBrowser } from '@packages/types'
 
 chai.use(sinonChai)
 
@@ -25,13 +25,14 @@ describe('AuthActions', () => {
     })
 
     it('sets coreData.user', async () => {
+      // @ts-expect-error
       await actions.login()
       expect(ctx.coreData.user).to.include({ name: 'steve', email: 'steve@apple.com', authToken: 'foo' })
     })
 
     it('focuses the main window if there is no activeBrowser', async () => {
       ctx.coreData.activeBrowser = null
-
+      // @ts-expect-error
       await actions.login()
 
       expect(ctx._apis.electronApi.focusMainWindow).to.be.calledOnce
@@ -42,7 +43,7 @@ describe('AuthActions', () => {
       const browser = ctx.coreData.activeBrowser = { name: 'foo' } as FoundBrowser
 
       sinon.stub(ctx.browser, 'isFocusSupported').withArgs(browser).resolves(false)
-
+      // @ts-expect-error
       await actions.login()
 
       expect(ctx._apis.electronApi.focusMainWindow).to.be.calledOnce
@@ -55,7 +56,7 @@ describe('AuthActions', () => {
       ctx.coreData.app.browserStatus = 'closed'
 
       sinon.stub(ctx.browser, 'isFocusSupported').withArgs(browser).resolves(true)
-
+      // @ts-expect-error
       await actions.login()
 
       expect(ctx._apis.electronApi.focusMainWindow).to.be.calledOnce
@@ -68,7 +69,7 @@ describe('AuthActions', () => {
       ctx.coreData.app.browserStatus = 'opening'
 
       sinon.stub(ctx.browser, 'isFocusSupported').withArgs(browser).resolves(true)
-
+      // @ts-expect-error
       await actions.login()
 
       expect(ctx._apis.electronApi.focusMainWindow).to.be.calledOnce
@@ -81,7 +82,7 @@ describe('AuthActions', () => {
       ctx.coreData.app.browserStatus = 'open'
 
       sinon.stub(ctx.browser, 'isFocusSupported').withArgs(browser).resolves(true)
-
+      // @ts-expect-error
       await actions.login()
 
       expect(ctx._apis.electronApi.focusMainWindow).to.not.be.called
@@ -95,6 +96,7 @@ describe('AuthActions', () => {
 
       ;(ctx._apis.electronApi.isMainWindowFocused as SinonStub).returns(true)
 
+      // @ts-expect-error
       await actions.login()
 
       expect(ctx._apis.electronApi.focusMainWindow).to.not.be.called

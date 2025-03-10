@@ -16,7 +16,7 @@ import { CloudQuery } from '@packages/graphql/test/stubCloudTypes'
 import { remoteSchema } from '@packages/graphql/src/stitching/remoteSchema'
 import type { OpenModeOptions, RunModeOptions } from '@packages/types'
 import { GET_MAJOR_VERSION_FOR_CONTENT } from '@packages/types'
-import { RelevantRunInfo } from '../../src/gen/graphcache-config.gen'
+import type { RelevantRunInfo } from '../../src/gen/graphcache-config.gen'
 
 type SystemTestProject = typeof fixtureDirs[number]
 type SystemTestProjectPath<T extends SystemTestProject> = `${string}/system-tests/projects/${T}`
@@ -68,7 +68,7 @@ export function createTestDataContext (mode: DataContextConfig['mode'] = 'run', 
     electronApi: {
       isMainWindowFocused: sinon.stub().returns(false),
       focusMainWindow: sinon.stub(),
-      copyTextToClipboard: (text) => {},
+      copyTextToClipboard: (text: any) => {},
     } as unknown as ElectronApiShape,
     browserApi: {
       focusActiveBrowserWindow: sinon.stub(),
@@ -115,6 +115,7 @@ export function createTestDataContext (mode: DataContextConfig['mode'] = 'run', 
 export function createRelevantRun (runNumber: number): RelevantRunInfo {
   return {
     runNumber,
+    // @ts-expect-error
     ciBuildNumber: '123',
     branch: 'feature/branch',
     organizationId: 'org-id',

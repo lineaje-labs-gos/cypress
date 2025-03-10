@@ -8,6 +8,7 @@
     "./../ts/index.d.ts"
   ],
   "compilerOptions": {
+    "experimentalDecorators": false,
     "lib": ["esnext"],
     "allowJs": false,
     "noImplicitAny": true,

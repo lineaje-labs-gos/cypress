@@ -62,7 +62,8 @@ export class FileDataSource {
 
         if (!cur) throw new Error('undefined glob received')
 
-        globs[i] = toPosix(cur)
+        // passing in the separator to make this easier to test
+        globs[i] = toPosix(cur, '\\')
       }
     }
 

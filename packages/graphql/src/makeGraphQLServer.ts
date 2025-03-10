@@ -17,6 +17,8 @@ import { useServer } from 'graphql-ws/lib/use/ws'
 import { graphqlSchema } from './schema'
 import { DefinitionNode, DocumentNode, execute, Kind, OperationDefinitionNode, OperationTypeNode, parse } from 'graphql'
 
+export const PROXY_SOURCE_SYM = Symbol('PROXY_SOURCE_SYM')
+
 const debug = debugLib(`cypress-verbose:graphql:operation`)
 
 const IS_DEVELOPMENT = process.env.CYPRESS_INTERNAL_ENV !== 'production'
@@ -277,7 +279,7 @@ function graphqlRequestContext (options: GraphQLRequestContextOptions) {
 
   debug('Creating context for %s, operation %s', app, primaryOperation?.name?.value)
 
-  return new Proxy(options.context, {
+  const proxy = new Proxy(options.context, {
     get (target, p, receiver) {
       if (p === 'graphqlRequestInfo') {
         return requestInfo
@@ -293,6 +295,11 @@ function graphqlRequestContext (options: GraphQLRequestContextOptions) {
       return Reflect.get(target, p, receiver)
     },
   })
+
+  // @ts-ignore
+  proxy[PROXY_SOURCE_SYM] = options.context
+
+  return proxy
 }
 
 function getPrimaryOperation (query: DocumentNode): OperationDefinitionNode | undefined {

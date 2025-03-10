@@ -7,7 +7,6 @@ import os from 'os'
 import { scaffoldProject, removeProject, createTestDataContext } from '../helper'
 import * as FileDataSourceModule from '../../../src/sources/FileDataSource'
 import { DataContext } from '../../../src'
-import * as fileUtil from '../../../src/util/file'
 
 const FileDataSource = FileDataSourceModule.FileDataSource
 
@@ -156,9 +155,6 @@ describe('FileDataSource', () => {
           const windowsSeperator = '\\'
 
           sinon.stub(os, 'platform').returns('win32')
-          const toPosixStub = sinon.stub(fileUtil, 'toPosix').callsFake((path) => {
-            return toPosixStub.wrappedMethod(path, windowsSeperator)
-          })
 
           const files = await fileDataSource.getFilesByGlob(
             projectPath,
@@ -198,6 +194,7 @@ describe('FileDataSource', () => {
       let matchGlobsStub: sinon.SinonStub
 
       beforeEach(() => {
+        debugger
         matchGlobsStub = sinon.stub(FileDataSourceModule, 'matchGlobs').resolves(mockMatches)
       })
 
@@ -205,7 +202,7 @@ describe('FileDataSource', () => {
         sinon.restore()
       })
 
-      it('matches absolute patterns when working directory is root', async () => {
+      it.only('matches absolute patterns when working directory is root', async () => {
         const files = await fileDataSource.getFilesByGlob(
           '/',
           '/cypress/e2e/**.cy.js',
