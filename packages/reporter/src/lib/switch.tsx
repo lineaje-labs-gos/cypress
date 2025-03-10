@@ -9,9 +9,8 @@ interface Props {
   onUpdate: (e: MouseEvent) => void
 }
 
-@observer
 class Switch extends Component<Props> {
-  @action _onClick = (e: MouseEvent) => {
+  _onClick = (e: MouseEvent) => {
     const { onUpdate } = this.props
 
     onUpdate(e)
@@ -19,7 +18,10 @@ class Switch extends Component<Props> {
 
   constructor (props: Props) {
     super(props)
-    makeObservable(this)
+
+    makeObservable(this, {
+      _onClick: action,
+    })
   }
 
   render () {
@@ -39,4 +41,4 @@ class Switch extends Component<Props> {
   }
 }
 
-export default Switch
+export default observer(Switch)

@@ -56,7 +56,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noErrorTruncation": true,
-    "experimentalDecorators": true,
+    "experimentalDecorators": false,
     "skipLibCheck": true
     // "noResolve": true
   },

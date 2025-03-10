@@ -1,7 +1,7 @@
 require('@babel/register')({
   'plugins': [
     // "istanbul",
-    [require.resolve('@babel/plugin-proposal-decorators'), { 'legacy': true }],
+    //  [require.resolve('@babel/plugin-proposal-decorators'), { 'legacy': true }],
     [require.resolve('@babel/plugin-transform-class-properties'), { 'loose': true }],
   ],
   'presets': [

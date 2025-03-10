@@ -12,7 +12,6 @@ interface Props {
   wrapperClassName?: string
 }
 
-@observer
 class FlashOnClick extends Component<Props> {
   static propTypes = {
     message: PropTypes.string.isRequired,
@@ -25,11 +24,15 @@ class FlashOnClick extends Component<Props> {
     shouldShowMessage: () => true,
   }
 
-  @observable _show = false
+  _show = false
 
   constructor (props: Props) {
     super(props)
-    makeObservable(this)
+
+    makeObservable(this, {
+      _show: observable,
+      _onClick: action,
+    })
   }
 
   render () {
@@ -48,7 +51,7 @@ class FlashOnClick extends Component<Props> {
     )
   }
 
-  @action _onClick = (e: MouseEvent) => {
+  _onClick = (e: MouseEvent) => {
     const { onClick, shouldShowMessage } = this.props
 
     onClick(e)
@@ -61,4 +64,4 @@ class FlashOnClick extends Component<Props> {
   }
 }
 
-export default FlashOnClick
+export default observer(FlashOnClick)

@@ -71,7 +71,6 @@ interface AttemptProps {
   studioActive: boolean
 }
 
-@observer
 class Attempt extends Component<AttemptProps> {
   componentDidUpdate () {
     this.props.scrollIntoView()

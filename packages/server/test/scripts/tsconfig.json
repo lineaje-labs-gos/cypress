@@ -1,9 +1,9 @@
 {
   "extends":"../../tsconfig.json",
-  "compilerOptions": {
-      /** NOTE: only needed to run data-context package */
-    "experimentalDecorators": true
-  },
-  /** NOTE: only needed to run data-context package */
-  "include": ["../../../data-context/src/**/*.ts"],
+  // "compilerOptions": {
+  //     /** NOTE: only needed to run data-context package */
+  //   "experimentalDecorators": true
+  // },
+  // /** NOTE: only needed to run data-context package */
+  // "include": ["../../../data-context/src/**/*.ts"],
 }

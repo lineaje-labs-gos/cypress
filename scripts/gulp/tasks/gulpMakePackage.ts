@@ -101,7 +101,7 @@ export async function makePackage () {
             'outDir': 'dist',
             'noImplicitAny': true,
             'resolveJsonModule': true,
-            'experimentalDecorators': true,
+            'experimentalDecorators': false,
             'noUncheckedIndexedAccess': true,
             'importsNotUsedAsValues': 'error',
             'types': [],

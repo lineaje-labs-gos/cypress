@@ -30,7 +30,6 @@ interface StudioControlsState {
   copySuccess: boolean
 }
 
-@observer
 class StudioControls extends Component<StudioControlsProps, StudioControlsState> {
   static defaultProps = {
     events,
@@ -111,7 +110,6 @@ interface TestProps {
   canSaveStudioLogs: boolean
 }
 
-@observer
 class Test extends Component<TestProps> {
   static defaultProps = {
     events,
@@ -237,4 +235,4 @@ class Test extends Component<TestProps> {
   }
 }
 
-export default Test
+export default observer(Test)

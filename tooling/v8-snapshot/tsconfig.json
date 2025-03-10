@@ -2,6 +2,7 @@
   "extends": "../../packages/ts/tsconfig.json",
   "include": ["src"],
   "compilerOptions": {
+    "experimentalDecorators": false,
     "lib": ["esnext"],
     "outDir": "./dist",
     "allowJs": true,

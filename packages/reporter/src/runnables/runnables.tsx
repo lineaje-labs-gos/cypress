@@ -154,7 +154,6 @@ export interface RunnablesProps {
   canSaveStudioLogs: boolean
 }
 
-@observer
 class Runnables extends Component<RunnablesProps> {
   render () {
     const { error, runnablesStore, spec, studioEnabled, canSaveStudioLogs } = this.props
@@ -197,4 +196,4 @@ class Runnables extends Component<RunnablesProps> {
 
 export { RunnablesList }
 
-export default Runnables
+export default observer(Runnables)

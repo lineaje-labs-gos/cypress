@@ -369,9 +369,8 @@ const CommandControls = observer(({ model, commandName, events }) => {
   )
 })
 
-@observer
 class Command extends Component<Props> {
-  @observable isOpen: boolean|null = null
+  isOpen: boolean|null = null
   private _showTimeout?: TimeoutID
 
   static defaultProps = {
@@ -382,7 +381,11 @@ class Command extends Component<Props> {
 
   constructor (props: Props) {
     super(props)
-    makeObservable(this)
+
+    makeObservable(this, {
+      isOpen: observable,
+      _toggleColumnPin: action,
+    })
   }
 
   render () {
@@ -489,7 +492,7 @@ class Command extends Component<Props> {
     return !this.props.appState.isRunning && !!this.props.model.hasConsoleProps
   }
 
-  @action _toggleColumnPin = () => {
+  _toggleColumnPin = () => {
     if (this.props.appState.isRunning) return
 
     const { testId, id } = this.props.model
@@ -550,4 +553,4 @@ class Command extends Component<Props> {
 
 export { Aliases, AliasesReferences, Message, Progress }
 
-export default Command
+export default observer(Command)

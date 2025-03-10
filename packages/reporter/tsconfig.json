@@ -1,6 +1,7 @@
 {
   "extends": "../ts/tsconfig.json",
   "compilerOptions": {
+    // needed for mobx
     "useDefineForClassFields": true,
     "types": [
       "node",

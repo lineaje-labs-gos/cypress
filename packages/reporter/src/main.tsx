@@ -41,8 +41,7 @@ export interface SingleReporterProps extends BaseReporterProps{
   runMode: 'single'
 }
 
-@observer
-class Reporter extends Component<SingleReporterProps> {
+const Reporter = observer(class Reporter extends Component<SingleReporterProps> {
   static defaultProps: Partial<SingleReporterProps> = {
     runMode: 'single',
     appState,
@@ -139,7 +138,7 @@ class Reporter extends Component<SingleReporterProps> {
   componentWillUnmount () {
     shortcuts.stop()
   }
-}
+})
 
 declare global {
   interface Window {

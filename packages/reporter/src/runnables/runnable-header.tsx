@@ -12,7 +12,6 @@ interface RunnableHeaderProps {
   statsStore: StatsStore
 }
 
-@observer
 class RunnableHeader extends Component<RunnableHeaderProps> {
   render () {
     const { spec, statsStore } = this.props
@@ -61,4 +60,4 @@ class RunnableHeader extends Component<RunnableHeaderProps> {
   }
 }
 
-export default RunnableHeader
+export default observer(RunnableHeader)

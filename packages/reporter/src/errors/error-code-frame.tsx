@@ -9,7 +9,6 @@ interface Props {
   codeFrame: CodeFrame
 }
 
-@observer
 class ErrorCodeFrame extends Component<Props> {
   componentDidMount () {
     Prism.highlightAllUnder(this.refs.codeFrame as ParentNode)
@@ -33,4 +32,4 @@ class ErrorCodeFrame extends Component<Props> {
   }
 }
 
-export default ErrorCodeFrame
+export default observer(ErrorCodeFrame)
