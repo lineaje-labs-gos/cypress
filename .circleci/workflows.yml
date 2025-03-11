@@ -88,6 +88,7 @@ windowsWorkflowFilters: &windows-workflow-filters
       - equal: [ 'update-v8-snapshot-cache-on-develop', << pipeline.git.branch >> ]
       - equal: [ 'feat/implement_bidi', << pipeline.git.branch >> ]
       - equal: [ 'electron-34', << pipeline.git.branch >> ]
+      - equal: [ 'mschile/studio/windows_url_fix', << pipeline.git.branch >> ]
       - matches:
           pattern: /^release\/\d+\.\d+\.\d+$/
           value: << pipeline.git.branch >>
