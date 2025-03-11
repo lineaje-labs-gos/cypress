@@ -87,3 +87,12 @@ Upgrading `electron` involves more than just bumping this package's `package.jso
 
 *Solution*: This is often due to a mismatched prebuild of `better-sqlite3`. Ensure your repository is clear of untracked files with `git clean -xfd`, and run `yarn` again. If the issue persists, ensure you are running the latest version of your operating system. Electron prebuilds key to darwin/linux/windows, and do not differentiate between versions of the same.
 
+#### node-abi out of date
+
+If you run into an error like below, please try some of the strategies below.
+
+```shell
+Could not detect abi for version X.X.X and runtime electron.  Updating "node-abi" might help solve this issue if it is a new release of electron
+```
+
+*Solution*: See if there's a new version of `@electron/rebuild` with a newer version of `node-abi` within it. If there is not a newer version, find the [latest release](https://github.com/electron/node-abi/releases) of `node-abi` that has an updated ABI registry with an `abi` entry matching the major version of Electron that you're updating to. Set this `node-abi` version in the `resolutions` of our [package.json](./package.json) file and rerun `yarn`.

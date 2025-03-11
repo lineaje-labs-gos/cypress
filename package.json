@@ -141,7 +141,7 @@
     "dedent": "^0.7.0",
     "del": "3.0.0",
     "detect-port": "^1.6.1",
-    "electron": "33.2.1",
+    "electron": "34.3.2",
     "electron-builder": "^25.1.8",
     "enzyme-adapter-react-16": "1.12.1",
     "eslint": "^8.56.0",
@@ -279,6 +279,7 @@
     "@types/react": "18.3.12",
     "browserify-sign": "4.2.2",
     "devtools-protocol": "0.0.1413303",
+    "node-abi": "3.74.0",
     "sharp": "0.29.3",
     "vue-template-compiler": "2.6.12"
   },
