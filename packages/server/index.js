@@ -27,7 +27,6 @@ const startCypress = async () => {
 const { entryPoint } = require('minimist')(process.argv.slice(1))
 
 if (entryPoint) {
-  require('@packages/server/lib/plugins/child/register_ts_node')
   module.exports = runChildProcess(entryPoint)
 } else {
   module.exports = startCypress()
