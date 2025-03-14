@@ -19,11 +19,11 @@ export const create = (Cypress: ICypress, state: StateFunc) => ({
     }
 
     Cypress.action('cy:before:stability:release')
-    .then(() => {
+    .then(async () => {
       const whenStable = state('whenStable')
 
       if (whenStable) {
-        whenStable()
+        await whenStable()
       }
     })
   },

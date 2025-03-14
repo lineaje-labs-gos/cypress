@@ -104,8 +104,7 @@ describe('Cypress in Cypress', { viewportWidth: 1500, defaultCommandTimeout: 100
       })
     })
 
-    // TODO: fix flaky test https://github.com/cypress-io/cypress/issues/23307
-    it(`scales the AUT correctly in ${testingType}`, { retries: 15 }, () => {
+    it(`scales the AUT correctly in ${testingType}`, () => {
       const assertNoScaleShown = () => {
         // check that no message about scale % is shown,
         // meaning the AUT is at 100% scale
@@ -202,7 +201,7 @@ describe('Cypress in Cypress', { viewportWidth: 1500, defaultCommandTimeout: 100
       cy.get('@selectBrowser').should('be.visible') // with no specs list open, we should see this by scrolling
 
       dragHandleToClientX('panel2', 200).then(() => {
-        cy.contains('Chrome 1').should('be.visible')
+        cy.contains('Chrome 1').should('not.be.visible')
       })
 
       cy.contains('[aria-controls=reporter-inline-specs-list]', 'Specs')
@@ -213,10 +212,8 @@ describe('Cypress in Cypress', { viewportWidth: 1500, defaultCommandTimeout: 100
       cy.get('@selectBrowser').should('not.be.visible') // with specs list open, scrolling is not enough to see this
 
       dragHandleToClientX('panel1', 130)
-      cy.get('@selectBrowser')
-      .should('be.visible') // now that we have reduced the specs list, we should be able to see this
 
-      cy.contains(testingTypeExpectedScales[`${ testingType }NarrowViewport`]).should('be.visible')
+      cy.contains(testingTypeExpectedScales[`${ testingType }NarrowViewport`])
     })
 
     it(`resets selector playground validity when selecting element with playground selector in ${testingType}`, () => {

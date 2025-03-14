@@ -9,7 +9,8 @@
     "check-ts": "tsc --noEmit",
     "lint": "eslint .",
     "test": "yarn test-unit",
-    "test-unit": "NODE_ENV=test mocha -r @packages/ts/register test/*.ts"
+    "test-unit": "NODE_ENV=test mocha -r @packages/ts/register test/*.ts",
+    "tslint": "tslint --config ../ts/tslint.json --project ."
   },
   "devDependencies": {
     "@types/mocha": "^8.0.3",

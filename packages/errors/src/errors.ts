@@ -10,6 +10,7 @@ import { humanTime, logError, parseResolvedPattern, pluralize } from './errorUti
 import { errPartial, errTemplate, fmt, theme, PartialErr } from './errTemplate'
 import { stackWithoutMessage } from './stackUtils'
 import type { ClonedError, ConfigValidationFailureInfo, CypressError, ErrTemplateResult, ErrorLike } from './errorTypes'
+import { normalizeNetworkErrorMessage } from './normalizeNetworkErrorMessage'
 
 const ansi_up = new AU()
 
@@ -155,24 +156,30 @@ export const AllCypressErrors = {
   CLOUD_CANCEL_SKIPPED_SPEC: () => {
     return errTemplate`${fmt.off(`\n  `)}This spec and its tests were skipped because the run has been canceled.`
   },
-  CLOUD_API_RESPONSE_FAILED_RETRYING: (arg1: { tries: number, delayMs: number, response: Error }) => {
+  CLOUD_API_RESPONSE_FAILED_RETRYING: (
+    arg1: {tries: number, delayMs: number, response: Error },
+  ) => {
     const time = pluralize('time', arg1.tries)
     const delay = humanTime.long(arg1.delayMs, false)
+
+    const message = normalizeNetworkErrorMessage(arg1.response)
 
     return errTemplate`\
         We encountered an unexpected error communicating with our servers.
 
-        ${fmt.highlightSecondary(arg1.response)}
+        ${fmt.highlightSecondary(message)}
 
         We will retry ${fmt.off(arg1.tries)} more ${fmt.off(time)} in ${fmt.off(delay)}...
         `
     /* Because of fmt.listFlags() and fmt.listItems() */
   },
-  CLOUD_CANNOT_PROCEED_IN_PARALLEL: (arg1: { flags: any, response: Error }) => {
+  CLOUD_CANNOT_PROCEED_IN_PARALLEL: (arg1: {flags: any, response: Error}) => {
+    const message = normalizeNetworkErrorMessage(arg1.response)
+
     return errTemplate`\
         We encountered an unexpected error communicating with our servers.
 
-        ${fmt.highlightSecondary(arg1.response)}
+        ${fmt.highlightSecondary(message)}
 
         Because you passed the ${fmt.flag(`--parallel`)} flag, this run cannot proceed since it requires a valid response from our servers.
 
@@ -181,11 +188,13 @@ export const AllCypressErrors = {
       ciBuildId: '--ciBuildId',
     })}`
   },
-  CLOUD_CANNOT_PROCEED_IN_SERIAL: (arg1: { flags: any, response: Error }) => {
+  CLOUD_CANNOT_PROCEED_IN_SERIAL: (arg1: {flags: any, response: Error}) => {
+    const message = normalizeNetworkErrorMessage(arg1.response)
+
     return errTemplate`\
         We encountered an unexpected error communicating with our servers.
 
-        ${fmt.highlightSecondary(arg1.response)}
+        ${fmt.highlightSecondary(message)}
 
         Because you passed the ${fmt.flag(`--record`)} flag, this run cannot proceed since it requires a valid response from our servers.
 
@@ -194,11 +203,13 @@ export const AllCypressErrors = {
       ciBuildId: '--ciBuildId',
     })}`
   },
-  CLOUD_UNKNOWN_INVALID_REQUEST: (arg1: { flags: any, response: Error }) => {
+  CLOUD_UNKNOWN_INVALID_REQUEST: (arg1: {flags: any, response: Error}) => {
+    const message = normalizeNetworkErrorMessage(arg1.response)
+
     return errTemplate`\
         We encountered an unexpected error communicating with our servers.
 
-        ${fmt.highlightSecondary(arg1.response)}
+        ${fmt.highlightSecondary(message)}
 
         There is likely something wrong with the request.
 
@@ -239,7 +250,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/stale-run`
   },
-  CLOUD_ALREADY_COMPLETE: (props: { runUrl: string }) => {
+  CLOUD_ALREADY_COMPLETE: (props: {runUrl: string, tags: string, group: string, parallel: string, ciBuildId: string}) => {
     return errTemplate`\
         The run you are attempting to access is already complete and will not accept new groups.
 
@@ -256,7 +267,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/already-complete`
   },
-  CLOUD_PARALLEL_REQUIRED: (arg1: { runUrl: string }) => {
+  CLOUD_PARALLEL_REQUIRED: (arg1: {tags: string, group: string, runUrl: string, ciBuildId: string }) => {
     return errTemplate`\
         You did not pass the ${fmt.flag(`--parallel`)} flag, but this run's group was originally created with the --parallel flag.
 
@@ -273,13 +284,14 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/parallel-required`
   },
-  CLOUD_PARALLEL_DISALLOWED: (arg1: { runUrl: string }) => {
+  CLOUD_PARALLEL_DISALLOWED: (arg1: {tags: string, group: string, runUrl: string, ciBuildId: string}) => {
     return errTemplate`\
         You passed the ${fmt.flag(`--parallel`)} flag, but this run group was originally created without the --parallel flag.
 
         The existing run is: ${fmt.url(arg1.runUrl)}
 
         ${fmt.listFlags(arg1, {
+      tags: '--tag',
       group: '--group',
       parallel: '--parallel',
       ciBuildId: '--ciBuildId',
@@ -289,7 +301,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/parallel-disallowed`
   },
-  CLOUD_PARALLEL_GROUP_PARAMS_MISMATCH: (arg1: { runUrl: string, parameters: any, payload: any }) => {
+  CLOUD_PARALLEL_GROUP_PARAMS_MISMATCH: (arg1: {group: string, runUrl: string, ciBuildId: string, parameters: any, payload: any }) => {
     let params: any = arg1.parameters
 
     if (arg1.payload?.differentParams) {
@@ -343,7 +355,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/parallel-group-params-mismatch`
   },
-  CLOUD_RUN_GROUP_NAME_NOT_UNIQUE: (arg1: { runUrl: string, ciBuildId?: string | null }) => {
+  CLOUD_RUN_GROUP_NAME_NOT_UNIQUE: (arg1: {group: string, runUrl: string, ciBuildId?: string | null}) => {
     return errTemplate`\
         You passed the ${fmt.flag(`--group`)} flag, but this group name has already been used for this run.
 
@@ -369,7 +381,7 @@ export const AllCypressErrors = {
 
       ${fmt.off(arg1.link)}`
   },
-  CLOUD_AUTO_CANCEL_MISMATCH: (arg1: { runUrl: string }) => {
+  CLOUD_AUTO_CANCEL_MISMATCH: (arg1: {runUrl: string, tags: string, group: string, parallel: string, ciBuildId: string, autoCancelAfterFailures: string }) => {
     return errTemplate`\
         You passed the ${fmt.flag(`--auto-cancel-after-failures`)} flag, but this run originally started with a different value for the ${fmt.flag(`--auto-cancel-after-failures`)} flag.
 
@@ -602,13 +614,14 @@ export const AllCypressErrors = {
 
         ${fmt.highlightSecondary(error)}`
   },
-  CLOUD_PROTOCOL_UPLOAD_STREAM_STALL_FAILURE: (error: Error & { chunkSizeKB: number, maxActivityDwellTime: number }) => {
-    const kbpsThreshold = (error.chunkSizeKB * 8) / (error.maxActivityDwellTime / 1000)
+  CLOUD_PROTOCOL_UPLOAD_STREAM_STALL_FAILURE: (error: Error & { chunkSizeBytes: number, maxActivityDwellTime: number }) => {
+    const dwellTimeSeconds = error.maxActivityDwellTime / 1000
+    const kbpsThreshold = (error.chunkSizeBytes / 1024) / dwellTimeSeconds
 
     return errTemplate`\
         Warning: We encountered slow network conditions while uploading the Test Replay recording for this spec.
 
-        The upload transfer rate fell below ${fmt.highlightSecondary(`${kbpsThreshold}kbps`)} over a sampling period of ${fmt.highlightSecondary(`${error.maxActivityDwellTime}ms`)}.
+        The upload transfer rate fell below ${fmt.highlightSecondary(`${kbpsThreshold}kbps`)} over a sampling period of ${fmt.highlightSecondary(`${dwellTimeSeconds} seconds`)}.
 
         To prevent long CI execution durations, this Test Replay recording will not be uploaded.
 
@@ -1178,6 +1191,9 @@ export const AllCypressErrors = {
   CDP_RETRYING_CONNECTION: (attempt: string | number, browserName: string, connectRetryThreshold: number) => {
     return errTemplate`Still waiting to connect to ${fmt.off(_.capitalize(browserName))}, retrying in 1 second ${fmt.meta(`(attempt ${attempt}/${connectRetryThreshold})`)}`
   },
+  CDP_FIREFOX_DEPRECATED: () => {
+    return errTemplate`Since Firefox 129, Chrome DevTools Protocol (CDP) has been deprecated in Firefox. In Firefox 135 and above, Cypress defaults to automating the Firefox browser with WebDriver BiDi. Cypress will no longer support CDP within Firefox in the future and is planned for removal in Cypress 15.`
+  },
   BROWSER_PROCESS_CLOSED_UNEXPECTEDLY: (browserName: string) => {
     return errTemplate`\
       We detected that the ${fmt.highlight(browserName)} browser process closed unexpectedly.
@@ -1352,7 +1368,7 @@ export const AllCypressErrors = {
     return errTemplate`\
       The ${fmt.highlight(`experimentalSkipDomainInjection`)} experiment is over. ${fmt.highlight('document.domain')} injection is now off by default.
 
-      Read the migration guide for Cypress v14.0.0: https://on.cypress.com/migration-guide
+      Read the migration guide for Cypress v14.0.0: https://on.cypress.io/migration-guide
     `
   },
   // TODO: link to docs on injectDocumentDomain
@@ -1360,7 +1376,7 @@ export const AllCypressErrors = {
     return errTemplate`\
       The ${fmt.highlight('injectDocumentDomain')} option is deprecated. Interactions with intra-test navigations to differing hostnames must now be wrapped in ${fmt.highlight('cy.origin')} commands, even if the hostname is a subdomain. This configuration option will be removed in Cypress 15.
     
-      Read the documentation for the injectDocumentDomain configuration option: https://on.cypress.com/inject-document-domain-configuration
+      Read the documentation for the injectDocumentDomain configuration option: https://on.cypress.io/inject-document-domain-configuration
     `
   },
   INJECT_DOCUMENT_DOMAIN_E2E_ONLY: () => {
@@ -1368,7 +1384,7 @@ export const AllCypressErrors = {
     return errTemplate`\
       The ${fmt.highlight('injectDocumentDomain')} option is only available for E2E testing.
 
-      Read the documentation for the injectDocumentDomain configuration option: https://on.cypress.com/inject-document-domain-configuration
+      Read the documentation for the injectDocumentDomain configuration option: https://on.cypress.io/inject-document-domain-configuration
     `
   },
   FIREFOX_GC_INTERVAL_REMOVED: () => {
@@ -1391,7 +1407,6 @@ export const AllCypressErrors = {
       https://on.cypress.io/test-retries
       `
   },
-  // TODO: test this
   INVALID_CONFIG_OPTION: (arg1: string[]) => {
     const phrase = arg1.length > 1 ? 'options are' : 'option is'
 
@@ -1852,7 +1867,7 @@ export const AllCypressErrors = {
 
       ${fmt.listItems(deps, { prefix: ' - ' })}
 
-      If you're experiencing problems, downgrade dependencies and restart Cypress.
+      If you're experiencing problems, ensure your dependencies are on a supported version and restart Cypress.
     `
   },
 
@@ -1879,7 +1894,7 @@ export const AllCypressErrors = {
 
 const _typeCheck: Record<keyof AllCypressErrorObj, (...args: any[]) => ErrTemplateResult> = AllCypressErrors
 
-type AllCypressErrorObj = typeof AllCypressErrors
+export type AllCypressErrorObj = typeof AllCypressErrors
 
 export type AllCypressErrorNames = keyof typeof AllCypressErrors
 

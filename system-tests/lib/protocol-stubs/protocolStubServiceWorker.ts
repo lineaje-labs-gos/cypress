@@ -64,6 +64,8 @@ export class AppCaptureProtocol implements AppCaptureProtocolInterface {
       }
     }
 
+    await cdpClient.send('Network.enable')
+    await cdpClient.send('Runtime.enable')
     cdpClient.on('Network.requestWillBeSent', this.currentRequestWillBeSent)
     cdpClient.on('Runtime.exceptionThrown', (event) => {
       this.events.exceptionThrown = true

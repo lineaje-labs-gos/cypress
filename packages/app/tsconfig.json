@@ -21,7 +21,7 @@
       "@cy/store/*": ["../frontend-shared/src/store/*"],
       "@packages/*": ["../*"]
     },
-    "allowJs": true,
+    "target": "ES2022",
     "types": [
       "cypress", 
       "cypress-real-events", 

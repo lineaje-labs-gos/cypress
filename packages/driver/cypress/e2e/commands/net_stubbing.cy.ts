@@ -1,4 +1,4 @@
-import { getDisplayUrlMatcher } from '@packages/driver/src/cy/net-stubbing/route-matcher-log'
+import { getDisplayUrlMatcher } from '../../../src/cy/net-stubbing/route-matcher-log'
 import type { RouteMatcherOptions } from '@packages/net-stubbing/lib/external-types'
 
 const testFail = (cb, expectedDocsUrl = 'https://on.cypress.io/intercept') => {
@@ -1746,6 +1746,7 @@ describe('network stubbing', { retries: 15 }, function () {
       }).as('create')
 
       cy.then(() => {
+        // tslint:disable:no-floating-promises
         fetch('/post-only', {
           method: 'POST', // *GET, POST, PUT, DELETE, etc.
         })

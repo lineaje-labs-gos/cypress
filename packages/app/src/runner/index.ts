@@ -100,9 +100,6 @@ function createIframeModel () {
     autIframe.highlightEl,
     autIframe.doesAUTMatchTopSuperDomainOrigin,
     getEventManager(),
-    {
-      selectorPlaygroundModel: getEventManager().selectorPlaygroundModel,
-    },
   )
 
   iframeModel.listen()
@@ -185,8 +182,6 @@ function teardownSpec (isRerun: boolean = false) {
   return getEventManager().teardown(getMobxRunnerStore(), isRerun)
 }
 
-let isTorndown = false
-
 /**
  * Called when navigating away from the runner page.
  * This will teardown the reporter, event manager, and
@@ -198,7 +193,6 @@ export async function teardown () {
   _eventManager?.teardown(getMobxRunnerStore())
   await _eventManager?.resetReporter()
   _eventManager = undefined
-  isTorndown = true
 }
 
 /**
@@ -324,13 +318,6 @@ async function runSpecE2E (config, spec: SpecFile) {
     specSrc: encodeURIComponent(spec.relative),
   })
 
-  // FIXME: BILL Determine where to call client with to force browser repaint
-  /**
-   * call the clientWidth to force the browser to repaint for viewport changes
-   * otherwise firefox may fail when changing the viewport in between origins
-   * this.refs.container.clientWidth
-   */
-
   // append to document, so the iframe will execute the spec
   addIframe({
     $container,
@@ -353,13 +340,7 @@ async function runSpecE2E (config, spec: SpecFile) {
 async function initialize () {
   await dfd.promise
 
-  isTorndown = false
-
   const config = getRunnerConfigFromWindow()
-
-  if (isTorndown) {
-    return
-  }
 
   // Reset stores
   const autStore = useAutStore()
@@ -368,7 +349,7 @@ async function initialize () {
 
   const studioStore = useStudioStore()
 
-  studioStore.cancel()
+  studioStore.reset()
 
   // TODO(lachlan): UNIFY-1318 - use GraphQL to get the viewport dimensions
   // once it is more practical to do so

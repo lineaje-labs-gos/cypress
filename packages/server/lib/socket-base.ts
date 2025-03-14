@@ -19,8 +19,8 @@ import { cookieJar, SameSiteContext, automationCookieToToughCookie, Serializable
 import runEvents from './plugins/run_events'
 import type { OTLPTraceExporterCloud } from '@packages/telemetry'
 import { telemetry } from '@packages/telemetry'
-import type { Automation } from './automation'
-
+import type { Automation, AutomationCommands } from './automation'
+// eslint-disable-next-line no-duplicate-imports
 import type { Socket } from '@packages/socket'
 
 import type { RunState, CachedTestState, ProtocolManagerShape } from '@packages/types'
@@ -152,6 +152,8 @@ export class SocketBase {
       onSavedStateChanged () {},
       onTestFileChange () {},
       onCaptureVideoFrames () {},
+      onStudioInit () {},
+      onStudioDestroy () {},
     })
 
     let automationClient
@@ -164,9 +166,9 @@ export class SocketBase {
 
     automation.use({
       // @ts-ignore - this error is new, but not introduced in the most recent edit. TODO: fix
-      onPush: (message, data) => {
+      onPush: async (message, data) => {
         socketIo.emit('automation:push:message', message, data)
-        cdpIo.emit('automation:push:message', message, data)
+        await cdpIo.emit('automation:push:message', message, data)
       },
     })
 
@@ -180,7 +182,10 @@ export class SocketBase {
       return this.onAutomation(automationClient, message, data, id)
     }
 
-    const automationRequest = (message: string, data: Record<string, unknown>) => {
+    const automationRequest = <T extends keyof AutomationCommands>(
+      message: T,
+      data: AutomationCommands[T]['dataType'],
+    ) => {
       return automation.request(message, data, onAutomationClientRequestCallback)
     }
 
@@ -222,7 +227,9 @@ export class SocketBase {
           debug('automation:client connected')
 
           // only send the necessary config
-          automationClient.emit('automation:config', {})
+          automationClient.emit('automation:config', {
+            IS_CDP_FORCED_FOR_FIREFOX: !!process.env.FORCE_FIREFOX_CDP,
+          })
 
           // if our automation disconnects then we're
           // in trouble and should probably bomb everything
@@ -257,12 +264,12 @@ export class SocketBase {
             })
           })
 
-          socket.on('automation:push:request', (
-            message: string,
+          socket.on('automation:push:request', async (
+            message: keyof AutomationCommands,
             data: Record<string, unknown>,
             cb: (...args: unknown[]) => any,
           ) => {
-            automation.push(message, data)
+            await automation.push(message, data)
 
             // just immediately callback because there
             // is not really an 'ack' here
@@ -274,7 +281,7 @@ export class SocketBase {
           socket.on('automation:response', automation.response)
         })
 
-        socket.on('automation:request', (message, data, cb) => {
+        socket.on('automation:request', (message: keyof AutomationCommands, data, cb) => {
           debug('automation:request %s %o', message, data)
 
           return automationRequest(message, data)
@@ -397,6 +404,26 @@ export class SocketBase {
           await devServer.updateSpecs([spec], { neededForJustInTimeCompile: true })
 
           return socket.emit('dev-server:on-spec-updated')
+        })
+
+        socket.on('studio:init', async (cb) => {
+          try {
+            await options.onStudioInit()
+
+            cb()
+          } catch (error) {
+            cb(errors.cloneErr(error))
+          }
+        })
+
+        socket.on('studio:destroy', async (cb) => {
+          try {
+            await options.onStudioDestroy()
+
+            cb()
+          } catch (error) {
+            cb(errors.cloneErr(error))
+          }
         })
 
         socket.on('backend:request', (eventName: string, ...args) => {

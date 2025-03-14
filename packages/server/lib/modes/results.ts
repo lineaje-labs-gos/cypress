@@ -3,10 +3,10 @@ import type { FoundBrowser, SpecWithRelativeRoot } from '@packages/types'
 import path from 'path'
 
 import type { Cfg } from '../project-base'
+import type { ScreenshotMetadata } from './run'
 
 type dateTimeISO = string
 type ms = number
-type pixels = number
 
 interface TestError {
   message: string
@@ -46,20 +46,12 @@ interface HookInformation {
   body: string
 }
 
-interface ScreenshotInformation {
-  height: pixels
-  name: string
-  path: string
-  takenAt: dateTimeISO
-  width: pixels
-}
-
-interface RunResult {
+export interface RunResult {
   error: string | null
   hooks: HookInformation[]
   reporter: string
   reporterStats: object
-  screenshots: ScreenshotInformation[]
+  screenshots: ScreenshotMetadata[]
   skippedSpec: boolean
   spec: SpecWithRelativeRoot
   stats: {
@@ -181,7 +173,8 @@ const omitConfigKeys = [
   'specs',
   'state',
   'supportFolder',
-  'protocolEnabled',
+  'isDefaultProtocolEnabled',
+  'isStudioProtocolEnabled',
   'hideCommandLog',
   'hideRunnerUi',
 ]

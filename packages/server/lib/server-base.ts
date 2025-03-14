@@ -26,7 +26,7 @@ import { allowDestroy, DestroyableHttpServer } from './util/server_destroy'
 import { SocketAllowed } from './util/socket_allowed'
 import { createInitialWorkers } from '@packages/rewriter'
 import type { Cfg } from './project-base'
-import type { Browser } from '@packages/server/lib/browsers/types'
+import type { Browser } from './browsers/types'
 import { InitializeRoutes, createCommonRoutes } from './routes'
 import type { FoundSpec, ProtocolManagerShape, TestingType } from '@packages/types'
 import type { Server as WebSocketServer } from 'ws'
@@ -86,6 +86,16 @@ const _forceProxyMiddleware = function (clientRoute, namespace = '__cypress') {
 
   return function (req, res, next) {
     const trimmedUrl = _.trimEnd(req.proxiedUrl, '/')
+
+    // if this request is a non-proxied cy-in-cy request,
+    // we need to update the proxiedUrl and allow it to pass through
+    if (process.env.CYPRESS_INTERNAL_E2E_TESTING_SELF && _isNonProxiedRequest(req)) {
+      const referrerUrl = new URL(req.headers.referer)
+
+      req.proxiedUrl = `${referrerUrl.origin}${req.proxiedUrl}`
+
+      return next()
+    }
 
     if (_isNonProxiedRequest(req) && !ALLOWED_PROXY_BYPASS_URLS.includes(trimmedUrl) && (trimmedUrl !== trimmedClientRoute)) {
       // this request is non-proxied and non-allowed, redirect to the runner error page

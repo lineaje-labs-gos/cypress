@@ -48,6 +48,10 @@ export interface SerializedLoadConfigReply {
   requires: string[]
 }
 
+export interface DebugData {
+  filePreprocessorHandlerText?: string
+}
+
 /**
  * The ProjectConfigIpc is an EventEmitter wrapping the childProcess,
  * adding a "send" method for sending events from the parent process into the childProcess,
@@ -64,6 +68,7 @@ export class ProjectConfigIpc extends EventEmitter {
     readonly configFile: string | false,
     readonly onError: (cypressError: CypressError, title?: string | undefined) => void,
     readonly onWarning: (cypressError: CypressError) => void,
+    readonly onDebugData: (debugData: DebugData) => void,
   ) {
     super()
     this._childProcess = this.forkConfigProcess()
@@ -128,8 +133,9 @@ export class ProjectConfigIpc extends EventEmitter {
   /**
    * When
    */
-  once (evt: 'setupTestingType:reply', listener: (payload: SetupNodeEventsReply) => void): this
-  once (evt: 'setupTestingType:error', listener: (error: CypressError) => void): this
+  once(evt: 'setupTestingType:reply', listener: (payload: SetupNodeEventsReply) => void): this
+  once(evt: 'setupTestingType:error', listener: (error: CypressError) => void): this
+  once(evt: 'file:preprocessor:overridden', listener: (payload: { handlerText: string }) => void): this
   once (evt: string, listener: (...args: any[]) => void) {
     return super.once(evt, listener)
   }
@@ -235,6 +241,12 @@ export class ProjectConfigIpc extends EventEmitter {
       this.once('setupTestingType:error', (err) => {
         this.onError(err)
         reject(err)
+      })
+
+      this.once('file:preprocessor:overridden', ({ handlerText }) => {
+        this.onDebugData({
+          filePreprocessorHandlerText: handlerText,
+        })
       })
 
       const handleWarning = (warningErr: CypressError) => {
