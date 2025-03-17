@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Cookies } from './cookies'
 import { Screenshot } from './screenshot'
 import type { BrowserPreRequest } from '@packages/proxy'
-import type { AutomationMiddleware, OnRequestEvent, OnServiceWorkerClientSideRegistrationUpdated, OnServiceWorkerRegistrationUpdated, OnServiceWorkerVersionUpdated } from '@packages/types'
+import type { AutomationCommands, AutomationMiddleware, OnRequestEvent, OnServiceWorkerClientSideRegistrationUpdated, OnServiceWorkerRegistrationUpdated, OnServiceWorkerVersionUpdated } from '@packages/types'
 import { cookieJar } from '../util/cookies'
 import type { ServiceWorkerEventHandler } from '@packages/proxy/lib/http/util/service-worker-manager'
 import Debug from 'debug'
@@ -24,32 +24,6 @@ export type AutomationOptions = {
   onServiceWorkerVersionUpdated?: OnServiceWorkerVersionUpdated
   onServiceWorkerClientSideRegistrationUpdated?: OnServiceWorkerClientSideRegistrationUpdated
   onServiceWorkerClientEvent: ServiceWorkerEventHandler
-}
-
-interface CommandSignature<P = any, R = any> {
-  dataType: P
-  returnType: R
-}
-
-export interface AutomationCommands {
-  'take:screenshot': CommandSignature
-  'get:cookies': CommandSignature
-  'get:cookie': CommandSignature
-  'set:cookie': CommandSignature
-  'set:cookies': CommandSignature
-  'add:cookies': CommandSignature
-  'clear:cookies': CommandSignature
-  'clear:cookie': CommandSignature
-  'change:cookie': CommandSignature
-  'create:download': CommandSignature
-  'canceled:download': CommandSignature
-  'complete:download': CommandSignature
-  'get:heap:size:limit': CommandSignature
-  'collect:garbage': CommandSignature
-  'reset:browser:tabs:for:next:spec': CommandSignature
-  'reset:browser:state': CommandSignature
-  'focus:browser:window': CommandSignature
-  'is:automation:client:connected': CommandSignature
 }
 
 export class Automation {
