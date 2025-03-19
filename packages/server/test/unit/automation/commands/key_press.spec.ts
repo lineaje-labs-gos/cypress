@@ -12,16 +12,25 @@ describe('key:press automation command', () => {
     })
 
     it('dispaches a keydown followed by a keyup event to the provided send fn with the tab keycode', async () => {
-      await cdpKeyPress({ key: 'TAB' }, sendFn)
+      await cdpKeyPress({ key: 'Tab' }, sendFn)
 
       expect(sendFn).to.have.been.calledWith('Input.dispatchKeyEvent', {
         type: 'keyDown',
-        keyIdentifier: CDP_KEYCODE.TAB,
+        keyIdentifier: CDP_KEYCODE.Tab,
       })
 
       expect(sendFn).to.have.been.calledWith('Input.dispatchKeyEvent', {
         type: 'keyUp',
-        keyIdentifier: CDP_KEYCODE.TAB,
+        keyIdentifier: CDP_KEYCODE.Tab,
+      })
+    })
+
+    describe('when supplied an invalid key', () => {
+      it('errors', async () => {
+        // typescript would keep this from happening, but it hasn't yet
+        // been checked for correctness since being received by automation
+        // @ts-expect-error
+        await expect(cdpKeyPress({ key: 'foo' })).to.be.rejectedWith('foo is not supported by \'cy.press()\'.')
       })
     })
   })

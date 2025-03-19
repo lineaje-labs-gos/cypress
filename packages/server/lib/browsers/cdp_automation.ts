@@ -14,6 +14,7 @@ import type { CDPClient, ProtocolManagerShape, WriteVideoFrame, AutomationMiddle
 import type { Automation } from '../automation'
 import { cookieMatches, CyCookie, CyCookieFilter } from '../automation/util'
 import { DEFAULT_NETWORK_ENABLE_OPTIONS, CriClient } from './cri-client'
+import { cdpKeyPress } from '../automation/commands/key_press'
 
 export type CdpCommand = keyof ProtocolMapping.Commands
 
@@ -586,6 +587,8 @@ export class CdpAutomation implements CDPClient, AutomationMiddleware {
         return this.sendDebuggerCommandFn('Runtime.evaluate', { expression: 'performance.memory.jsHeapSizeLimit' })
       case 'collect:garbage':
         return this.sendDebuggerCommandFn('HeapProfiler.collectGarbage')
+      case 'key:press':
+        return cdpKeyPress(data, this.sendDebuggerCommandFn)
       default:
         throw new Error(`No automation handler registered for: '${message}'`)
     }

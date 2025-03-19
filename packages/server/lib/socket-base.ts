@@ -19,11 +19,11 @@ import { cookieJar, SameSiteContext, automationCookieToToughCookie, Serializable
 import runEvents from './plugins/run_events'
 import type { OTLPTraceExporterCloud } from '@packages/telemetry'
 import { telemetry } from '@packages/telemetry'
-import type { Automation, AutomationCommands } from './automation'
+import type { Automation } from './automation'
 // eslint-disable-next-line no-duplicate-imports
 import type { Socket } from '@packages/socket'
 
-import type { RunState, CachedTestState, ProtocolManagerShape } from '@packages/types'
+import type { RunState, CachedTestState, ProtocolManagerShape, AutomationCommands } from '@packages/types'
 import memory from './browsers/memory'
 import { privilegedCommandsManager } from './privileged-commands/privileged-commands-manager'
 
@@ -95,6 +95,7 @@ export class SocketBase {
   }
 
   onAutomation (socket, message, data, id) {
+    debug('onAutomation', message)
     // instead of throwing immediately here perhaps we need
     // to make this more resilient by automatically retrying
     // up to 1 second in the case where our automation room

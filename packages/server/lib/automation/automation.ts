@@ -130,6 +130,8 @@ export class Automation {
   }
 
   normalize<T extends keyof AutomationCommands> (message: T, data: AutomationCommands[T]['dataType'], automate?): Promise<AutomationCommands[T]['returnType']> {
+    debug('normalize', message)
+
     return Bluebird.try(() => {
       switch (message) {
         case 'take:screenshot':
@@ -184,6 +186,7 @@ export class Automation {
   }
 
   async push<T extends keyof AutomationCommands> (message: T, data: AutomationCommands[T]['dataType']) {
+    debug('push', message)
     const result = await this.normalize(message, data)
 
     if (result) {
@@ -192,6 +195,7 @@ export class Automation {
   }
 
   async request<T extends keyof AutomationCommands> (message: T, data: AutomationCommands[T]['dataType'], fn) {
+    debug('request', message)
     // curry in the message + callback function
     // for obtaining the external automation data
     const automate = this.automationValve(message, fn)
