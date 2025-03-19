@@ -3,6 +3,10 @@
 
 _Released 3/25/2025 (PENDING)_
 
+**Misc:**
+
+- Added an automation command for dispatching key press events to CDP automated browsers. Addressed in [#31329](https://github.com/cypress-io/cypress/pull/31329).
+
 **Dependency Updates:**
 
 - Upgraded `@cypress/request` from `3.0.7` to `3.0.8`. Addressed in [#31311](https://github.com/cypress-io/cypress/pull/31311).
