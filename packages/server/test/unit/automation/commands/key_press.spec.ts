@@ -15,13 +15,17 @@ describe('key:press automation command', () => {
       await cdpKeyPress({ key: 'Tab' }, sendFn)
 
       expect(sendFn).to.have.been.calledWith('Input.dispatchKeyEvent', {
-        type: 'keyDown',
+        type: 'rawKeyDown',
         keyIdentifier: CDP_KEYCODE.Tab,
+        key: 'Tab',
+        code: 'Tab',
       })
 
       expect(sendFn).to.have.been.calledWith('Input.dispatchKeyEvent', {
         type: 'keyUp',
         keyIdentifier: CDP_KEYCODE.Tab,
+        key: 'Tab',
+        code: 'Tab',
       })
     })
 
