@@ -19,11 +19,11 @@ import { cookieJar, SameSiteContext, automationCookieToToughCookie, Serializable
 import runEvents from './plugins/run_events'
 import type { OTLPTraceExporterCloud } from '@packages/telemetry'
 import { telemetry } from '@packages/telemetry'
-import type { Automation, AutomationCommands } from './automation'
+import type { Automation } from './automation'
 // eslint-disable-next-line no-duplicate-imports
 import type { Socket } from '@packages/socket'
 
-import type { RunState, CachedTestState, ProtocolManagerShape } from '@packages/types'
+import type { RunState, CachedTestState, ProtocolManagerShape, AutomationCommands } from '@packages/types'
 import memory from './browsers/memory'
 import { privilegedCommandsManager } from './privileged-commands/privileged-commands-manager'
 
@@ -165,7 +165,6 @@ export class SocketBase {
     const cdpIo = this._cdpIo = this.createCDPIo(socketIoRoute)
 
     automation.use({
-      // @ts-ignore - this error is new, but not introduced in the most recent edit. TODO: fix
       onPush: async (message, data) => {
         socketIo.emit('automation:push:message', message, data)
         await cdpIo.emit('automation:push:message', message, data)
@@ -186,6 +185,8 @@ export class SocketBase {
       message: T,
       data: AutomationCommands[T]['dataType'],
     ) => {
+      debug('request: %s', message)
+
       return automation.request(message, data, onAutomationClientRequestCallback)
     }
 
@@ -408,11 +409,11 @@ export class SocketBase {
 
         socket.on('studio:init', async (cb) => {
           try {
-            await options.onStudioInit()
+            const { canAccessStudioAI } = await options.onStudioInit()
 
-            cb()
+            cb({ canAccessStudioAI })
           } catch (error) {
-            cb(errors.cloneErr(error))
+            cb({ error: errors.cloneErr(error) })
           }
         })
 
@@ -420,9 +421,9 @@ export class SocketBase {
           try {
             await options.onStudioDestroy()
 
-            cb()
+            cb({})
           } catch (error) {
-            cb(errors.cloneErr(error))
+            cb({ error: errors.cloneErr(error) })
           }
         })
 

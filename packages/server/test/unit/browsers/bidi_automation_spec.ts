@@ -26,6 +26,7 @@ describe('lib/browsers/bidi_automation', () => {
         onRequestEvent: sinon.stub(),
         onBrowserPreRequest: sinon.stub().resolves(),
         onRemoveBrowserPreRequest: sinon.stub().resolves(),
+        use: sinon.stub(),
       } as unknown as Automation
     })
 
@@ -282,8 +283,8 @@ describe('lib/browsers/bidi_automation', () => {
               type: 'other',
             },
             headers: {},
-            cdpRequestWillBeSentTimestamp: -1,
-            cdpRequestWillBeSentReceivedTimestamp: -1,
+            cdpRequestWillBeSentTimestamp: 0,
+            cdpRequestWillBeSentReceivedTimestamp: 0,
           })
 
           expect(mockWebdriverClient.networkContinueRequest).to.have.been.calledWith({
@@ -327,8 +328,8 @@ describe('lib/browsers/bidi_automation', () => {
             headers: {
               foo: 'bar',
             },
-            cdpRequestWillBeSentTimestamp: -1,
-            cdpRequestWillBeSentReceivedTimestamp: -1,
+            cdpRequestWillBeSentTimestamp: 0,
+            cdpRequestWillBeSentReceivedTimestamp: 0,
           })
 
           expect(mockWebdriverClient.networkContinueRequest).to.have.been.calledWith({
@@ -368,7 +369,7 @@ describe('lib/browsers/bidi_automation', () => {
           })
         })
 
-        it('swallows "no such request" messages if thrown via killing the Cypress app', () => {
+        it('swallows "no such request" messages if thrown via killing the Cypress app and removes the related prerequest', async () => {
           BidiAutomation.create(mockWebdriverClient, mockAutomationClient)
 
           mockWebdriverClient.networkContinueRequest = sinon.stub().throws('no such request')
@@ -376,6 +377,10 @@ describe('lib/browsers/bidi_automation', () => {
           expect(() => {
             mockWebdriverClient.emit('network.beforeRequestSent', mockRequest)
           }).not.to.throw()
+
+          await flushPromises()
+
+          expect(mockAutomationClient.onRemoveBrowserPreRequest).to.have.been.calledWith('request1')
         })
       })
 
