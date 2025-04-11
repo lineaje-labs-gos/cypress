@@ -4,6 +4,8 @@ export * from './constants'
 
 export * from './preferences'
 
+export { KeyPressSupportedKeys } from './automation'
+
 export * from './automation'
 
 export * from './driver'
