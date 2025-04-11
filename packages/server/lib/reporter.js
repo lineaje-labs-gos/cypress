@@ -4,9 +4,9 @@ const { stackUtils } = require('@packages/errors')
 // mocha-* is used to allow us to have later versions of mocha specified in devDependencies
 // and prevents accidentally upgrading this one
 // TODO: look into upgrading this to version in driver
-const Mocha = require('mocha-7.2.0')
-const mochaReporters = require('mocha-7.2.0/lib/reporters')
-const mochaCreateStatsCollector = require('mocha-7.2.0/lib/stats-collector')
+const Mocha = require('mocha-8.0.1')
+const mochaReporters = require('mocha-8.0.1/lib/reporters')
+const mochaCreateStatsCollector = require('mocha-8.0.1/lib/stats-collector')
 const mochaColor = mochaReporters.Base.color
 const mochaSymbols = mochaReporters.Base.symbols
 
@@ -16,7 +16,7 @@ const { overrideRequire } = require('./override_require')
 
 // override calls to `require('mocha*')` when to always resolve with a mocha we control
 // otherwise mocha will be resolved from project's node_modules and might not work with our code
-const customReporterMochaPath = path.dirname(require.resolve('mocha-7.2.0'))
+const customReporterMochaPath = path.dirname(require.resolve('mocha-8.0.1'))
 
 const buildAttemptMessage = (currentRetry, totalRetries) => {
   return `(Attempt ${currentRetry} of ${totalRetries})`
@@ -413,8 +413,6 @@ class Reporter {
         // eslint-disable-next-line no-console
         console.log(finalMessaging, test.title, test.duration)
       }
-
-      this.runner.ignoreLeaks = true
     }
   }
 
