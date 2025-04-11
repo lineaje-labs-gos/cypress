@@ -4385,7 +4385,7 @@ declare namespace Cypress {
      */
     (chainer: 'be.NaN'): Chainable<Subject>
     /**
-     * Asserts that the target is a number or a date greater than or equal to the given number `start`, and less than or equal to the given number or date `finish` respectively.
+     * Asserts that the target is a number or a date greater than or equal to the given number or date `start`, and less than or equal to the given number or date `finish` respectively.
      * However, it's often best to assert that the target is equal to its expected value.
      * @example
      *    cy.wrap(6).should('be.within', 5, 10)
