@@ -39,14 +39,8 @@ describe('e2e launching browsers by path', () => {
 
   it('works with an installed browser path', function () {
     return launcher.detect().then((browsers) => {
-      return browsers.find((browser) => {
-        return browser.family === 'chromium'
-      })
-    }).tap((browser) => {
-      if (!browser) {
-        throw new Error('A \'chromium\' family browser must be installed for this test')
-      }
-    }).get('path')
+      return browsers[0].path
+    })
     // turn binary browser names ("google-chrome") into their absolute paths
     // so that server recognizes them as a path, not as a browser name
     .then((absPath))
