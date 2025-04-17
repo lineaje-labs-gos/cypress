@@ -854,8 +854,8 @@ commands:
           steps:
             - install-webkit-deps
       - install-browsers:
-          install-chrome: true
-          install-firefox: true
+          install-chrome: << parameters.browser == 'chrome' >>
+          install-firefox: << parameters.browser == 'firefox' >>
       - run:
           name: Run system tests
           environment:
