@@ -845,6 +845,14 @@ commands:
       browser:
         description: browser shortname to target
         type: string
+      install-chrome:
+        description: whether or not to install google chrome
+        type: boolean
+        default: false
+      install-firefox:
+        description: whether or not to install firefox
+        type: boolean
+        default: false
     steps:
       - restore_cached_workspace
       - restore_cached_system_tests_deps
@@ -854,8 +862,8 @@ commands:
           steps:
             - install-webkit-deps
       - install-browsers:
-          install-chrome: << parameters.browser == 'chrome' >>
-          install-firefox: << parameters.browser == 'firefox' >>
+          install-chrome: << parameters.install-chrome >>
+          install-firefox: << parameters.install-firefox >>
       - run:
           name: Run system tests
           environment:
@@ -1963,6 +1971,8 @@ jobs:
     steps:
       - run-system-tests:
           browser: chrome
+          install-chrome: true
+          install-firefox: false
 
   system-tests-electron:
     <<: *defaults
@@ -1971,6 +1981,8 @@ jobs:
     steps:
       - run-system-tests:
           browser: electron
+          install-chrome: false
+          install-firefox: false
 
   system-tests-firefox:
     <<: *defaults
@@ -1979,6 +1991,8 @@ jobs:
     steps:
       - run-system-tests:
           browser: firefox
+          install-chrome: false
+          install-firefox: true
 
   system-tests-webkit:
     <<: *defaults
@@ -1987,6 +2001,8 @@ jobs:
     steps:
       - run-system-tests:
           browser: webkit
+          install-chrome: false
+          install-firefox: false
 
   system-tests-non-root:
     <<: *defaults
