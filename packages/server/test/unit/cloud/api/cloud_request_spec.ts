@@ -9,15 +9,25 @@ import os from 'os'
 import pkg from '@packages/root'
 import { transformError } from '../../../../lib/cloud/api/axios_middleware/transform_error'
 
+import * as agents from '@packages/network/lib/agent'
+
 chai.use(sinonChai)
 
 describe('CloudRequest', () => {
   beforeEach(() => {
     sinon.stub(axios, 'create').callThrough()
+    sinon.stub(agents, 'HttpAgent').returns(agents.httpAgent)
+    sinon.stub(agents, 'HttpsAgent').returns(agents.httpsAgent)
   })
 
   afterEach(() => {
     (axios.create as sinon.SinonStub).restore()
+
+    // @ts-expect-error - this is an unusual usage of stubbing
+    ;(agents.HttpsAgent as sinon.SinonStub).restore()
+
+    // @ts-expect-error - this is an unusual usage of stubbing
+    ;(agents.HttpAgent as sinon.SinonStub).restore()
   })
 
   const getCreatedConfig = (): CreateAxiosDefaults => {
@@ -30,6 +40,7 @@ describe('CloudRequest', () => {
     _create()
     const cfg = getCreatedConfig()
 
+    expect(agents.HttpsAgent).to.have.been.calledWith({ rejectUnauthorized: true })
     expect(cfg.httpAgent).to.eq(httpAgent)
     expect(cfg.httpsAgent).to.eq(httpsAgent)
   })

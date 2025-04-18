@@ -257,7 +257,7 @@ const getProxyOrTargetOverrideForUrl = (href) => {
   return getProxyForUrl(href)
 }
 
-class HttpAgent extends http.Agent {
+export class HttpAgent extends http.Agent {
   httpsAgent: https.Agent
 
   constructor (opts: http.AgentOptions = {}) {
@@ -317,7 +317,7 @@ class HttpAgent extends http.Agent {
   }
 }
 
-class HttpsAgent extends https.Agent {
+export class HttpsAgent extends https.Agent {
   constructor (opts: https.AgentOptions = {}) {
     opts.keepAlive = true
     super(opts)

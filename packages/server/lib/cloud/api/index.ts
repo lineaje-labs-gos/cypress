@@ -17,7 +17,7 @@ import Bluebird from 'bluebird'
 import type { AfterSpecDurations } from '@packages/types'
 import { agent } from '@packages/network'
 import type { CombinedAgent } from '@packages/network/lib/agent'
-
+import { CloudRequest } from './cloud_request'
 import { apiUrl, apiRoutes, makeRoutes } from '../routes'
 import { getText } from '../../util/status_code'
 import * as enc from '../encryption'
@@ -363,9 +363,10 @@ export default {
     }
   },
 
-  ping () {
-    return rp.get(apiRoutes.ping())
-    .catch(tagError)
+  async ping () {
+    const { data } = await CloudRequest.get(apiRoutes.ping())
+
+    return Bluebird.resolve(data)
   },
 
   getAuthUrls () {

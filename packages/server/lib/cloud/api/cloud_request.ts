@@ -6,7 +6,7 @@ import os from 'os'
 import axios, { AxiosInstance } from 'axios'
 
 import pkg from '@packages/root'
-import { httpAgent, httpsAgent } from '@packages/network/lib/agent'
+import { HttpAgent, HttpsAgent } from '@packages/network/lib/agent'
 
 import app_config from '../../../config/app.json'
 import { installErrorTransform } from './axios_middleware/transform_error'
@@ -18,17 +18,29 @@ export const _create = (): AxiosInstance => {
 
   const instance = axios.create({
     baseURL: app_config[cfgKey].api_url,
-    httpAgent,
-    httpsAgent,
+    httpAgent: new HttpAgent(),
+    httpsAgent: new HttpsAgent({ rejectUnauthorized: true }),
     headers: {
-      'x-os-name': os.platform(),
       'x-cypress-version': pkg.version,
       'User-Agent': `cypress/${pkg.version}`,
+      'x-os-name': os.platform(),
     },
+    // this must be disabled, because we are using our own agents
+    proxy: false,
   })
 
   installLogging(instance)
   installErrorTransform(instance)
+
+  // Because of how sinon.stub works, this needs to query `os` at
+  // request time rather than creation time
+  if (process.env.CYPRESS_INTERNAL_ENV === 'test') {
+    instance.interceptors.request.use((cfg) => {
+      cfg.headers['x-os-name'] = os.platform()
+
+      return cfg
+    })
+  }
 
   return instance
 }
