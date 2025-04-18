@@ -1,11 +1,11 @@
 version: 2.1
 
-chrome-stable-version: &chrome-stable-version "135.0.7049.84"
-chrome-beta-version: &chrome-beta-version "136.0.7103.25"
+chrome-stable-version: &chrome-stable-version "135.0.7049.95"
+chrome-beta-version: &chrome-beta-version "136.0.7103.33"
 firefox-stable-version: &firefox-stable-version "137.0"
 
 orbs:
-  browser-tools: circleci/browser-tools@1.5.2
+  browser-tools: circleci/browser-tools@1.5.3
 
 defaults: &defaults
   parallelism: 1
@@ -38,7 +38,6 @@ mainBuildFilters: &mainBuildFilters
         - /^release\/\d+\.\d+\.\d+$/
         # use the following branch as well to ensure that v8 snapshot cache updates are fully tested
         - 'update-v8-snapshot-cache-on-develop'
-        - 'ryanm/chore/add_internal_studio'
         - 'electron-34'
 
 # usually we don't build Mac app - it takes a long time
@@ -50,7 +49,6 @@ macWorkflowFilters: &darwin-workflow-filters
       - equal: [ develop, << pipeline.git.branch >> ]
       # use the following branch as well to ensure that v8 snapshot cache updates are fully tested
       - equal: [ 'update-v8-snapshot-cache-on-develop', << pipeline.git.branch >> ]
-      - equal: [ 'feat/implement_bidi', << pipeline.git.branch >> ]
       - equal: [ 'electron-34', << pipeline.git.branch >> ]
       - matches:
           pattern: /^release\/\d+\.\d+\.\d+$/
@@ -62,7 +60,7 @@ linuxArm64WorkflowFilters: &linux-arm64-workflow-filters
       - equal: [ develop, << pipeline.git.branch >> ]
       # use the following branch as well to ensure that v8 snapshot cache updates are fully tested
       - equal: [ 'update-v8-snapshot-cache-on-develop', << pipeline.git.branch >> ]
-      - equal: [ 'chore/update_mobx_decoratorless', << pipeline.git.branch >> ]
+      - equal: [ 'ryanm/chore/full-snapshot-threaded', << pipeline.git.branch >> ]
       - matches:
           pattern: /^release\/\d+\.\d+\.\d+$/
           value: << pipeline.git.branch >>
@@ -85,7 +83,6 @@ windowsWorkflowFilters: &windows-workflow-filters
       - equal: [ develop, << pipeline.git.branch >> ]
       # use the following branch as well to ensure that v8 snapshot cache updates are fully tested
       - equal: [ 'update-v8-snapshot-cache-on-develop', << pipeline.git.branch >> ]
-      - equal: [ 'feat/implement_bidi', << pipeline.git.branch >> ]
       - equal: [ 'electron-34', << pipeline.git.branch >> ]
       - matches:
           pattern: /^release\/\d+\.\d+\.\d+$/
