@@ -69,11 +69,9 @@ const onClick = (name, value) => {
 </script>
 
 <style lang="scss">
-@import './assertions-style.scss';
 
 .assertion-options {
-  @include menu-style;
-
+  color: white;
   font-size: 14px;
   max-width: 150px;
   overflow: hidden;

@@ -6,32 +6,45 @@
   />
   <div
     ref="assertionsMenu"
-    class="assertions-menu"
+    data-cy="assertions-menu"
+    class="assertions-menu bg-gray-1100 border-{9747FF} rounded-[5px] absolute text-sm text-gray-300"
   >
-    <div class="header">
-      <div class="title">
-        <span>Add Assertion</span>
+    <div class="flex items-center border-b border-gray-900 p-[0.5rem_0.7rem]">
+      <div
+        class="title font-semibold"
+        data-cy="assertions-menu-title"
+      >
+        <span>Assert</span>
       </div>
-      <div class="close-wrapper">
+      <div class="close-wrapper ml-auto mt-[-2.5px]">
         <a
-          class="close"
+          class="close text-[18px] font-medium hover:cursor-pointer focus:cursor-pointer active:cursor-pointer"
+          data-cy="assertions-menu-close"
           @click.stop="onClose"
         >&times;</a>
       </div>
     </div>
     <div
       class="subtitle"
+      data-cy="assertions-menu-subtitle"
     >
-      expect
+      Expect
       {{ ' ' }}
-      <code>
-        {{ tagName }}
-      </code>
+      <Tag
+        :dark="true"
+        color="gray"
+        size="20"
+      >
+        <code>
+          {{ tagName }}
+        </code>
+      </Tag>
       {{ ' ' }}
       to
     </div>
     <div
       class="assertions-list"
+      data-cy="assertions-menu-list"
     >
       <AssertionType
         v-for="(assertion) in possibleAssertions"
@@ -46,10 +59,11 @@
 
 <script lang="ts" setup>
 import { createPopper } from '@popperjs/core'
-import AssertionType from './AssertionType.ce.vue'
+import AssertionType from './AssertionType.vue'
 import _ from 'lodash'
 import { nextTick, onMounted, Ref, ref, StyleValue } from 'vue'
 import type { PossibleAssertions, AddAssertion, AssertionArgs } from './types'
+import Tag from '@cypress-design/vue-tag'
 
 const props = defineProps <{
   jqueryElement: JQuery<HTMLElement>
@@ -99,7 +113,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-@import "./assertions-style.scss";
 
 .highlight {
   background: rgba(159, 196, 231, 0.6);
@@ -108,53 +121,18 @@ onMounted(() => {
 }
 
 .assertions-menu {
-  @include menu-style;
-
-  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  box-shadow: 2px 5px 12px rgba(0, 0, 0, 0.2);
   z-index: 2147483647;
   width: 175px;
-  position: absolute;
-
-  .header {
-    align-items: center;
-    background: #07b282;
-    border-top-left-radius: $border-radius;
-    border-top-right-radius: $border-radius;
-    color: #fff;
-    display: flex;
-    padding: 0.5rem 0.7rem;
-
-    .title {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .close-wrapper {
-      margin-left: auto;
-      margin-top: -2.5px;
-
-      .close {
-        font-size: 18px;
-        font-weight: 500;
-
-        &:hover, &:focus, &:active {
-          cursor: pointer;
-          color: #eee;
-        }
-      }
-    }
-  }
 
   .subtitle {
     border-bottom: 1px solid #c4c4c4;
-    color: #6b6b6b;
-    font-size: 13px;
-    font-style: italic;
+    color: $gray-500;
     font-weight: 400;
     padding: 0.5rem 0.7rem;
 
     code {
-      font-weight: 600;
+      color: $white;
     }
   }
 }

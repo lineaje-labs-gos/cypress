@@ -39,7 +39,7 @@
 
 <script lang="ts" setup>
 import { Ref, ref } from 'vue'
-import AssertionOptions from './AssertionOptions.ce.vue'
+import AssertionOptions from './AssertionOptions.vue'
 
 const props = defineProps<{
   type: string
@@ -83,10 +83,7 @@ const addAssertion = ({ type, name, value }) => {
 </script>
 
 <style lang="scss">
-@import './assertions-style.scss';
-
 .assertion-type {
-  color: #202020;
   cursor: default;
   font-size: 14px;
   padding: 0.4rem 0.4rem 0.4rem 0.7rem;
@@ -97,13 +94,14 @@ const addAssertion = ({ type, name, value }) => {
   }
 
   &:last-of-type {
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
     padding-bottom: 0.5rem;
   }
 
   &:hover {
-    background-color: #e9ecef;
+    background-color: $gray-900;
+    color: $indigo-300;
   }
 
   &.single-assertion {
