@@ -79,7 +79,18 @@ interface DependencyInformation {
 }
 
 // See https://whimsical.com/encryption-logic-BtJJkN7TxacK8kaHDgH1zM for more information on what this is doing
-const getEnvInformationForProjectRoot = async (projectRoot: string, pid: string) => {
+interface EnvInformation {
+  envUrl: string | undefined
+  errors: {
+    dependency?: string | undefined
+    name: string
+    message: string
+    stack: string
+  }[]
+  dependencies: {}
+}
+
+const getEnvInformationForProjectRoot = async (projectRoot: string, pid: string): Promise<EnvInformation> => {
   let dependencies = {}
   let errors: { dependency?: string, name: string, message: string, stack: string }[] = []
   let envDependencies = process.env.CYPRESS_ENV_DEPENDENCIES

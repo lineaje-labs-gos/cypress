@@ -3,7 +3,7 @@ import nock from 'nock'
 import sinonChai from 'sinon-chai'
 import pkg from '@packages/root'
 
-import { createInstance as axiosCreateInstance, CreateInstanceRequestBody, CreateInstanceResponse } from '../../../../lib/cloud/api/create_instance'
+import { createInstance, CreateInstanceRequestBody, CreateInstanceResponse } from '../../../../lib/cloud/api/endpoints/create_instance'
 import api from '../../../../lib/cloud/api'
 
 chai.use(sinonChai)
@@ -54,7 +54,7 @@ context('API createInstance', () => {
   ;[
     {
       label: AXIOS_LABEL,
-      fn: axiosCreateInstance,
+      fn: createInstance,
     },
     {
       label: REQUEST_LABEL,

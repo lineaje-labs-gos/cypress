@@ -1,6 +1,6 @@
-import { CloudRequest, isRetryableCloudError } from './cloud_request'
-import { asyncRetry, exponentialBackoff } from '../../util/async_retry'
-import * as errors from '../../errors'
+import { CloudRequest, isRetryableCloudError } from '../cloud_request'
+import { asyncRetry, exponentialBackoff } from '../../../util/async_retry'
+import * as errors from '../../../errors'
 import { isAxiosError } from 'axios'
 
 const MAX_RETRIES = 3

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { installErrorTransform } from '../../../../lib/cloud/api/axios_middleware/transform_error'
+import { installErrorTransform } from '../../../../../lib/cloud/api/axios_middleware/transform_error'
 import { AxiosError, AxiosResponse, AxiosInstance } from 'axios'
 import sinon, { SinonSpy } from 'sinon'
 

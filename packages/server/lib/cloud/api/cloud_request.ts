@@ -13,13 +13,13 @@ import { installErrorTransform } from './axios_middleware/transform_error'
 import { installLogging } from './axios_middleware/logging'
 
 // initialized with an export for testing purposes
-export const _create = (): AxiosInstance => {
+export const _create = (withAgents: boolean = true): AxiosInstance => {
   const cfgKey = process.env.CYPRESS_CONFIG_ENV || process.env.CYPRESS_INTERNAL_ENV || 'development'
 
   const instance = axios.create({
     baseURL: app_config[cfgKey].api_url,
-    httpAgent: new HttpAgent(),
-    httpsAgent: new HttpsAgent({ rejectUnauthorized: true }),
+    httpAgent: withAgents ? new HttpAgent() : undefined,
+    httpsAgent: withAgents ? new HttpsAgent({ rejectUnauthorized: true }) : undefined,
     headers: {
       'x-cypress-version': pkg.version,
       'User-Agent': `cypress/${pkg.version}`,

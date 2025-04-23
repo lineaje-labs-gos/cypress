@@ -25,7 +25,7 @@ const AUTH_URLS = {
   'dashboardLogoutUrl': 'http://localhost:3000/logout',
 }
 
-const { httpAgent, default: agent } = require('@packages/network/lib/agent')
+const { default: agent } = require('@packages/network/lib/agent')
 
 const {
   PROTOCOL_STUB_VALID,
@@ -140,44 +140,40 @@ describe('lib/cloud/api', () => {
   context('.rp', () => {
     beforeEach(() => {
       sinon.spy(agent, 'addRequest')
-      sinon.spy(httpAgent, 'addRequest')
 
       return nock.enableNetConnect()
     }) // nock will prevent requests from reaching the agent
 
-    it('makes calls using the correct agent', async () => {
+    it('makes calls using the correct agent', () => {
       nock.cleanAll()
 
-      try {
-        await api.ping()
-      } catch (e) {
-        // noop
-      } finally {
-        expect(httpAgent.addRequest).to.be.calledOnce
+      return api.ping()
+      .then(() => {
+        throw new Error('')
+      })
+      .catch(() => {
+        expect(agent.addRequest).to.be.calledOnce
 
-        expect(httpAgent.addRequest).to.be.calledWithMatch(sinon.match.any, {
-          host: 'localhost',
-          port: '1234',
-          path: '/ping',
+        expect(agent.addRequest).to.be.calledWithMatch(sinon.match.any, {
+          href: 'http://localhost:1234/ping',
         })
-      }
+      })
     })
 
-    // .ping() uses axios, which sets rejectUnauthorized on the agents, rather than the
-    // request.
-    // eslint-disable-next-line @cypress/dev/skip-comment
-    it.skip('sets rejectUnauthorized on the request', async () => {
+    it('sets rejectUnauthorized on the request', () => {
       nock.cleanAll()
 
-      try {
-        await api.ping()
-      } catch (e) {
-        // noop
-      } finally {
-        expect(httpAgent.addRequest).to.be.calledOnce
+      return api.ping()
+      .then(() => {
+        throw new Error('')
+      })
+      .catch(() => {
+        expect(agent.addRequest).to.be.calledOnce
 
-        expect(httpAgent.addRequest.firstCall.firstArg.rejectUnauthorized).to.be.true
-      }
+        expect(agent.addRequest).to.be.calledWithMatch(sinon.match.any, {
+          rejectUnauthorized: true,
+        })
+      })
     })
 
     context('with a proxy defined', () => {
@@ -185,22 +181,21 @@ describe('lib/cloud/api', () => {
         nock.cleanAll()
       })
 
-      it('makes calls using the correct agent', async () => {
-        nock.cleanAll()
+      it('makes calls using the correct agent', () => {
+        process.env.HTTP_PROXY = (process.env.HTTPS_PROXY = 'http://foo.invalid:1234')
+        process.env.NO_PROXY = ''
 
-        try {
-          await api.ping()
-        } catch (e) {
-          // noop
-        } finally {
-          expect(httpAgent.addRequest).to.be.calledOnce
+        return api.ping()
+        .then(() => {
+          throw new Error('')
+        })
+        .catch(() => {
+          expect(agent.addRequest).to.be.calledOnce
 
-          expect(httpAgent.addRequest).to.be.calledWithMatch(sinon.match.any, {
-            host: 'localhost',
-            port: '1234',
-            path: '/ping',
+          expect(agent.addRequest).to.be.calledWithMatch(sinon.match.any, {
+            href: 'http://localhost:1234/ping',
           })
-        }
+        })
       })
     })
   })

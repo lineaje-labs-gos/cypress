@@ -15,9 +15,8 @@ const errors = require('../../errors')
 import Bluebird from 'bluebird'
 
 import type { AfterSpecDurations } from '@packages/types'
-import { agent } from '@packages/network'
+import { default as agent } from '@packages/network/lib/agent'
 import type { CombinedAgent } from '@packages/network/lib/agent'
-import { CloudRequest } from './cloud_request'
 import { apiUrl, apiRoutes, makeRoutes } from '../routes'
 import { getText } from '../../util/status_code'
 import * as enc from '../encryption'
@@ -33,7 +32,7 @@ import { PUBLIC_KEY_VERSION } from '../constants'
 // axios implementation disabled until proxy issues can be diagnosed/fixed
 // TODO: https://github.com/cypress-io/cypress/issues/31490
 //import { createInstance } from './create_instance'
-import type { CreateInstanceRequestBody, CreateInstanceResponse } from './create_instance'
+import type { CreateInstanceRequestBody, CreateInstanceResponse } from './endpoints/create_instance'
 
 import { transformError } from './axios_middleware/transform_error'
 
@@ -73,7 +72,7 @@ export interface CypressRequestOptions extends OptionsWithUrl {
 }
 
 // TODO: migrate to fetch from @cypress/request
-const rp = request.defaults((params: CypressRequestOptions, callback) => {
+export const rp = request.defaults((params: CypressRequestOptions, callback) => {
   let resp
 
   if (params.cacheable && (resp = getCachedResponse(params))) {
@@ -364,9 +363,8 @@ export default {
   },
 
   async ping () {
-    const { data } = await CloudRequest.get(apiRoutes.ping())
-
-    return Bluebird.resolve(data)
+    return rp.get(apiRoutes.ping())
+    .catch(tagError)
   },
 
   getAuthUrls () {
