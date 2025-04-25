@@ -3,6 +3,7 @@ import { getApiUrl } from '../../routes'
 import { postPreflight, PreflightRequestBody, PreflightOptions } from '../endpoints/post_preflight'
 import { isArray, isObject } from 'lodash'
 import { asyncRetry, exponentialBackoff } from '../../../util/async_retry'
+import { noProxyPreflightTimeout } from '../preflight_timeout'
 import Debug from 'debug'
 
 const debug = Debug('cypress:server:cloud:api:axios_middleware:preflight')
@@ -58,6 +59,7 @@ export class PreflightMiddleware {
       const options: PreflightOptions = {
         apiUrl: getApiUrl().replace('api', 'api-proxy'),
         attempt: 1,
+        timeout: noProxyPreflightTimeout(),
       }
 
       const preflightState = await postPreflight(projectAttributes, options)

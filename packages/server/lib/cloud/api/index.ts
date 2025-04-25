@@ -35,7 +35,7 @@ import { PUBLIC_KEY_VERSION } from '../constants'
 import type { CreateInstanceRequestBody, CreateInstanceResponse } from './endpoints/create_instance'
 
 import { transformError } from './axios_middleware/transform_error'
-
+import { noProxyPreflightTimeout } from './preflight_timeout'
 const THIRTY_SECONDS = humanInterval('30 seconds')
 const SIXTY_SECONDS = humanInterval('60 seconds')
 const TWO_MINUTES = humanInterval('2 minutes')
@@ -237,16 +237,6 @@ const isRetriableError = (err) => {
   return err instanceof Bluebird.TimeoutError ||
     (err.statusCode >= 500 && err.statusCode < 600) ||
     (err.statusCode == null)
-}
-
-function noProxyPreflightTimeout (): number {
-  try {
-    const timeoutFromEnv = Number(process.env.CYPRESS_INITIAL_PREFLIGHT_TIMEOUT)
-
-    return isNaN(timeoutFromEnv) ? 5000 : timeoutFromEnv
-  } catch (e: unknown) {
-    return 5000
-  }
 }
 
 export type CreateRunOptions = {

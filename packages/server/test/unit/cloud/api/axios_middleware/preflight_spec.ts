@@ -7,6 +7,7 @@ import { PreflightMiddleware } from '../../../../../lib/cloud/api/axios_middlewa
 import axios, { Axios, AxiosInstance, InternalAxiosRequestConfig, AxiosError, AxiosDefaults, HeadersDefaults, AxiosHeaderValue, AxiosResponse } from 'axios'
 import * as preflightEndpoint from '../../../../../lib/cloud/api/endpoints/post_preflight'
 import * as routes from '../../../../../lib/cloud/routes'
+import * as preflightTimeout from '../../../../../lib/cloud/api/preflight_timeout'
 import { HttpAgent, HttpsAgent } from '@packages/network/lib/agent'
 import * as asyncRetryModule from '../../../../../lib/util/async_retry'
 
@@ -34,6 +35,7 @@ describe('PreflightMiddleware', () => {
   let postPreflightStub: SinonStub<Parameters<typeof preflightEndpoint.postPreflight>, ReturnType<typeof preflightEndpoint.postPreflight>>
   let axiosCreateStub: SinonStub<Parameters<typeof axios.create>, ReturnType<typeof axios.create>>
   let getApiUrlStub: SinonStub<Parameters<typeof routes.getApiUrl>, ReturnType<typeof routes.getApiUrl>>
+  let noProxyPreflightTimeoutStub: SinonStub
   let requestConfig: Partial<InternalAxiosRequestConfig>
   let preflightMiddleware: PreflightMiddleware
 
@@ -46,6 +48,7 @@ describe('PreflightMiddleware', () => {
     postPreflightStub = sinon.stub(preflightEndpoint, 'postPreflight')
     axiosCreateStub = sinon.stub(axios, 'create').returns(axiosInstance)
     getApiUrlStub = sinon.stub(routes, 'getApiUrl').returns(apiUrl)
+    noProxyPreflightTimeoutStub = sinon.stub(preflightTimeout, 'noProxyPreflightTimeout').returns(5000)
     requestConfig = {
     }
 
@@ -64,6 +67,7 @@ describe('PreflightMiddleware', () => {
     postPreflightStub.restore()
     axiosCreateStub.restore()
     getApiUrlStub.restore()
+    noProxyPreflightTimeoutStub.restore()
   })
 
   describe('.requestInterceptor', () => {
@@ -88,6 +92,20 @@ describe('PreflightMiddleware', () => {
           axiosInstance.defaults.preflightState = undefined
         })
 
+        describe('and there are no project attributes configured', () => {
+          beforeEach(() => {
+            // @ts-ignore - intentionally setting to undefined for test
+            preflightMiddleware.setProjectAttributes(undefined)
+          })
+
+          it('skips preflight request and returns config unchanged', async () => {
+            const cfg = await preflightMiddleware.requestInterceptor(requestConfig as InternalAxiosRequestConfig)
+
+            expect(postPreflightStub).not.to.be.called
+            expect(cfg).to.deep.equal(requestConfig)
+          })
+        })
+
         describe('and there are project attributes configured', () => {
           beforeEach(() => {
             preflightMiddleware.setProjectAttributes(projectAttributes)
@@ -95,7 +113,11 @@ describe('PreflightMiddleware', () => {
 
           describe('when api-proxy with no agents succeeds', () => {
             beforeEach(() => {
-              postPreflightStub.withArgs(projectAttributes, { apiUrl: apiProxyUrl, attempt: 1 }).resolves(preflightResponse)
+              postPreflightStub.withArgs(projectAttributes, {
+                apiUrl: apiProxyUrl,
+                attempt: 1,
+                timeout: 5000, // Expected timeout from stub
+              }).resolves(preflightResponse)
             })
 
             it('caches the preflight response on the axios instance', async () => {
@@ -103,9 +125,24 @@ describe('PreflightMiddleware', () => {
               expect(axiosInstance.defaults).not.to.be.undefined
               expect(axiosInstance.defaults.preflightState).not.to.be.undefined
 
+              // Type guard to satisfy TypeScript
+              if (!axiosInstance.defaults.preflightState) {
+                throw new Error('preflightState should be defined')
+              }
+
               for (const [k, v] of Object.entries(preflightResponse)) {
                 expect(axiosInstance.defaults.preflightState[k]).to.eq(v)
               }
+            })
+
+            it('passes the timeout from noProxyPreflightTimeout', async () => {
+              const expectedTimeout = 5000 // Stubbed value
+
+              await preflightMiddleware.requestInterceptor(requestConfig as InternalAxiosRequestConfig)
+
+              expect(postPreflightStub).to.be.calledOnce
+              expect(postPreflightStub.firstCall.args[1].timeout).to.equal(expectedTimeout)
+              expect(noProxyPreflightTimeoutStub).to.have.been.called
             })
           })
 
@@ -135,6 +172,7 @@ describe('PreflightMiddleware', () => {
                 postPreflightStub.withArgs(projectAttributes, {
                   apiUrl: apiProxyUrl,
                   attempt: 1,
+                  timeout: 5000,
                 }).rejects(err)
               })
 
@@ -167,9 +205,13 @@ describe('PreflightMiddleware', () => {
                     throw new Error('preflight state should be defined')
                   }
 
+                  // Type guard to satisfy TypeScript
+                  if (!axiosInstance.defaults.preflightState) {
+                    throw new Error('preflightState should be defined')
+                  }
+
                   for (const [k, v] of Object.entries(preflightResponse)) {
                     expect(axiosInstance.defaults.preflightState[k]).to.eq(v)
-
                     expect(cfg.preflightState[k]).to.eq(v)
                   }
                 })
@@ -199,11 +241,17 @@ describe('PreflightMiddleware', () => {
               postPreflightStub.withArgs(projectAttributes, {
                 apiUrl: apiUrl.replace('api', 'api-proxy'),
                 attempt: 1,
+                timeout: 5000,
               }).resolves(preflightResponse)
             })
 
             it('sets the preflight state to the response', async () => {
               const cfg = await preflightMiddleware.requestInterceptor(requestConfig as InternalAxiosRequestConfig)
+
+              // Type guard to satisfy TypeScript
+              if (!axiosInstance.defaults.preflightState) {
+                throw new Error('preflightState should be defined')
+              }
 
               for (const [k, v] of Object.entries(preflightResponse)) {
                 expect(axiosInstance.defaults.preflightState[k]).to.eq(v)
@@ -314,6 +362,21 @@ describe('PreflightMiddleware', () => {
             expect(interceptedResponse.data.warnings).to.have.length(2)
             expect(interceptedResponse.data.warnings).to.contain(preflightWarning)
             expect(interceptedResponse.data.warnings).to.contain(mainRequestWarning)
+          })
+        })
+
+        describe('and warnings in the incoming response is an object, not an array', () => {
+          beforeEach(() => {
+            response.data.warnings = mainRequestWarning
+          })
+
+          it('converts warnings to an array containing both object and preflight warnings', () => {
+            const interceptedResponse = preflightMiddleware.responseInterceptor(response)
+
+            expect(interceptedResponse.data.warnings).to.be.an('array')
+            expect(interceptedResponse.data.warnings).to.have.length(2)
+            expect(interceptedResponse.data.warnings[0]).to.deep.equal(mainRequestWarning)
+            expect(interceptedResponse.data.warnings[1]).to.deep.equal(preflightWarning)
           })
         })
 
