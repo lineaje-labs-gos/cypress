@@ -9,12 +9,17 @@
     data-cy="assertions-menu"
     class="assertions-menu bg-gray-1100 border-{9747FF} rounded-[5px] absolute text-sm text-gray-300"
   >
-    <div class="flex items-center border-b border-gray-900 p-[0.5rem_0.7rem]">
+    <div class="flex items-center border-b border-gray-900 p-[0.5rem]">
       <div
-        class="title font-semibold"
+        class="title font-semibold flex items-center gap-2"
         data-cy="assertions-menu-title"
       >
-        <span>Assert</span>
+        <IconActionTap
+          size="16"
+          fill-color="gray-900"
+          stroke-color="gray-500"
+        />
+        Assert
       </div>
       <div class="close-wrapper ml-auto mt-[-2.5px]">
         <a
@@ -64,6 +69,7 @@ import _ from 'lodash'
 import { nextTick, onMounted, Ref, ref, StyleValue } from 'vue'
 import type { PossibleAssertions, AddAssertion, AssertionArgs } from './types'
 import Tag from '@cypress-design/vue-tag'
+import { IconActionTap } from '@cypress-design/vue-icon'
 
 const props = defineProps <{
   jqueryElement: JQuery<HTMLElement>

@@ -5,7 +5,7 @@
     @mouseover.stop="onOpen"
     @mouseout.stop="onClose"
   >
-    <div class="assertion-type-text">
+    <div class="assertion-type-text hover:cursor-pointer focus:cursor-pointer active:cursor-pointer">
       <span>
         {{ type.replace(/\./g, ' ') }}
       </span>

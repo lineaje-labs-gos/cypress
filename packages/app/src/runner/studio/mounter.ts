@@ -1,7 +1,7 @@
 import { App, createApp, StyleValue } from 'vue'
-import AssertionsMenu from './AssertionsMenu.ce.vue'
-import AssertionType from './AssertionType.ce.vue'
-import AssertionOptions from './AssertionOptions.ce.vue'
+import AssertionsMenu from './AssertionsMenu.vue'
+import AssertionType from './AssertionType.vue'
+import AssertionOptions from './AssertionOptions.vue'
 import { getOrCreateHelperDom, getSelectorHighlightStyles } from '../dom'
 import type { PossibleAssertions, AddAssertion } from './types'
 
