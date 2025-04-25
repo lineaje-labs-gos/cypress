@@ -501,3 +501,27 @@ export const setupStubbedServer = (routes) => {
 
   return mockServerState
 }
+
+interface StubbedServerConfig {
+  routes?: Record<string, any>
+  port: number
+  static?: boolean
+}
+
+export function setupPrimaryAlternateStubbedServer (servers: StubbedServerConfig[]) {
+  console.log('setupPrimaryAlternateStubbedServer', servers)
+  systemTests.setup({
+    servers: [
+      ...servers.map(({ routes, port, static: isStatic }) => {
+        return {
+          port,
+          onServer: onServer(routes),
+          static: isStatic,
+        }
+      }), {
+        port: 3131,
+        static: true,
+      },
+    ],
+  })
+}

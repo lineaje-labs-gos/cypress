@@ -18,7 +18,7 @@ import type { AfterSpecDurations } from '@packages/types'
 import { agent } from '@packages/network'
 import type { CombinedAgent } from '@packages/network/lib/agent'
 
-import { apiUrl, apiRoutes, makeRoutes } from '../routes'
+import { apiUrl, preliminaryApiUrl, apiRoutes, makeRoutes } from '../routes'
 import { getText } from '../../util/status_code'
 import * as enc from '../encryption'
 import getEnvInformationForProjectRoot from '../environment'
@@ -118,6 +118,8 @@ const rp = request.defaults((params: CypressRequestOptions, callback) => {
         const { statusCode } = response
         const options = this // request promise options
 
+        debug('transforming body with statusCode %s', statusCode)
+
         const throwStatusCodeErrWithResp = (message, responseBody) => {
           throw new RequestErrors.StatusCodeError(response.statusCode, message, options, responseBody)
         }
@@ -137,12 +139,15 @@ const rp = request.defaults((params: CypressRequestOptions, callback) => {
               throwStatusCodeErrWithResp(getText(statusCode), body)
             }
 
+            debug('encrypting error', e)
+
             throw new DecryptionError(e.message)
           }
 
           // If we've hit an encrypted payload error case, we need to re-constitute the error
           // as it would happen normally, with the body as an error property
           if (response.statusCode > 400) {
+            debug('status code err', response)
             throwStatusCodeErrWithResp(decryptedBody, decryptedBody)
           }
 
@@ -158,6 +163,11 @@ const rp = request.defaults((params: CypressRequestOptions, callback) => {
     }
 
     return request[method](params, callback).promise()
+  })
+  .catch((err) => {
+    debug('err', JSON.stringify(err, null, 2))
+
+    throw err
   })
   .tap((resp) => {
     if (params.cacheable) {
@@ -628,8 +638,6 @@ export default {
     return retryWithBackoff(async (attemptIndex) => {
       const { projectRoot, timeout, ...preflightRequestBody } = preflightInfo
 
-      const preflightBaseProxy = apiUrl.replace('api', 'api-proxy')
-
       const envInformation = await getEnvInformationForProjectRoot(projectRoot, process.pid.toString())
 
       const makeReq = (baseUrl: string, agent: CombinedAgent | null, timeout: number) => {
@@ -662,7 +670,7 @@ export default {
 
         if (initialPreflightTimeout >= 0) {
           try {
-            return await makeReq(preflightBaseProxy, null, initialPreflightTimeout)
+            return await makeReq(preliminaryApiUrl, null, initialPreflightTimeout)
           } catch (err) {
             if (err.statusCode === 412) {
               throw err
