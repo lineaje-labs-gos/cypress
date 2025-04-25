@@ -26,6 +26,7 @@ export function isSupportedKey (key: string): key is KeyPressSupportedKeys {
   return CDP_KEYCODE[key] && BIDI_VALUE[key]
 }
 
+// CDP accepts unicode codepoints formatted as 'U+<hex>'
 export const CDP_KEYCODE: KeyCodeLookup = {
   '0': 'U+0030',
   '1': 'U+0031',
@@ -235,6 +236,8 @@ export async function cdpKeyPress (
   }
 }
 
+// See: https://www.w3.org/TR/webdriver/#keyboard-actions
+// BIDI accepts unicode codepoints formatted as '\u<hex>', with some exceptions
 export const BIDI_VALUE: KeyCodeLookup = {
   '0': '\u0030',
   '1': '\u0031',
