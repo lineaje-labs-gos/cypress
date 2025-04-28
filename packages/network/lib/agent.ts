@@ -238,8 +238,6 @@ export class CombinedAgent {
         return this.httpsAgent.addRequest(req, options as https.RequestOptions)
       }
 
-      debug('adding request to http agent')
-
       return this.httpAgent.addRequest(req, options)
     })
   }
@@ -270,11 +268,9 @@ class HttpAgent extends http.Agent {
   }
 
   addRequest (req: http.ClientRequest, options: http.RequestOptions) {
-    debug(process.env.HTTP_PROXY, process.env.HTTP_PROXY_TARGET_FOR_ORIGIN_REQUESTS)
     if (process.env.HTTP_PROXY || process.env.HTTP_PROXY_TARGET_FOR_ORIGIN_REQUESTS) {
       const proxy = getProxyOrTargetOverrideForUrl(options.href)
 
-      debug('proxy', proxy)
       if (proxy) {
         options.proxy = proxy
 

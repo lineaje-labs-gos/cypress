@@ -118,8 +118,6 @@ const rp = request.defaults((params: CypressRequestOptions, callback) => {
         const { statusCode } = response
         const options = this // request promise options
 
-        debug('transforming body with statusCode %s', statusCode)
-
         const throwStatusCodeErrWithResp = (message, responseBody) => {
           throw new RequestErrors.StatusCodeError(response.statusCode, message, options, responseBody)
         }
@@ -139,15 +137,12 @@ const rp = request.defaults((params: CypressRequestOptions, callback) => {
               throwStatusCodeErrWithResp(getText(statusCode), body)
             }
 
-            debug('encrypting error', e)
-
             throw new DecryptionError(e.message)
           }
 
           // If we've hit an encrypted payload error case, we need to re-constitute the error
           // as it would happen normally, with the body as an error property
           if (response.statusCode > 400) {
-            debug('status code err', response)
             throwStatusCodeErrWithResp(decryptedBody, decryptedBody)
           }
 
@@ -163,11 +158,6 @@ const rp = request.defaults((params: CypressRequestOptions, callback) => {
     }
 
     return request[method](params, callback).promise()
-  })
-  .catch((err) => {
-    debug('err', JSON.stringify(err, null, 2))
-
-    throw err
   })
   .tap((resp) => {
     if (params.cacheable) {
