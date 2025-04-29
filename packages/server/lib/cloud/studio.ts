@@ -1,13 +1,10 @@
-import type { StudioErrorReport, StudioManagerShape, StudioStatus, StudioServerDefaultShape, StudioServerShape, ProtocolManagerShape, StudioCloudApi, StudioAIInitializeOptions } from '@packages/types'
+import type { StudioManagerShape, StudioStatus, StudioServerDefaultShape, StudioServerShape, ProtocolManagerShape, StudioCloudApi, StudioAIInitializeOptions } from '@packages/types'
 import type { Router } from 'express'
 import type { Socket } from 'socket.io'
-import fetch from 'cross-fetch'
-import pkg from '@packages/root'
-import os from 'os'
-import { agent } from '@packages/network'
 import Debug from 'debug'
 import { requireScript } from './require_script'
 import path from 'path'
+import { reportStudioError, ReportStudioErrorOptions } from './api/studio/report_studio_error'
 
 interface StudioServer { default: StudioServerDefaultShape }
 
@@ -17,40 +14,45 @@ interface SetupOptions {
   studioHash?: string
   projectSlug?: string
   cloudApi: StudioCloudApi
+  shouldEnableStudio: boolean
 }
 
 const debug = Debug('cypress:server:studio')
-const routes = require('./routes')
 
 export class StudioManager implements StudioManagerShape {
   status: StudioStatus = 'NOT_INITIALIZED'
-  isProtocolEnabled: boolean = false
   protocolManager: ProtocolManagerShape | undefined
   private _studioServer: StudioServerShape | undefined
-  private _studioHash: string | undefined
 
-  static createInErrorManager (error: Error): StudioManager {
+  static createInErrorManager ({ cloudApi, studioHash, projectSlug, error, studioMethod, studioMethodArgs }: ReportStudioErrorOptions): StudioManager {
     const manager = new StudioManager()
 
     manager.status = 'IN_ERROR'
 
-    manager.reportError(error).catch(() => { })
+    reportStudioError({
+      cloudApi,
+      studioHash,
+      projectSlug,
+      error,
+      studioMethod,
+      studioMethodArgs,
+    })
 
     return manager
   }
 
-  async setup ({ script, studioPath, studioHash, projectSlug, cloudApi }: SetupOptions): Promise<void> {
+  async setup ({ script, studioPath, studioHash, projectSlug, cloudApi, shouldEnableStudio }: SetupOptions): Promise<void> {
     const { createStudioServer } = requireScript<StudioServer>(script).default
 
     this._studioServer = await createStudioServer({
+      studioHash,
       studioPath,
       projectSlug,
       cloudApi,
       betterSqlite3Path: path.dirname(require.resolve('better-sqlite3/package.json')),
     })
 
-    this._studioHash = studioHash
-    this.status = 'INITIALIZED'
+    this.status = shouldEnableStudio ? 'ENABLED' : 'INITIALIZED'
   }
 
   initializeRoutes (router: Router): void {
@@ -77,32 +79,11 @@ export class StudioManager implements StudioManagerShape {
     await this.invokeAsync('destroy', { isEssential: true })
   }
 
-  private async reportError (error: Error): Promise<void> {
+  reportError (error: unknown, studioMethod: string, ...studioMethodArgs: unknown[]): void {
     try {
-      const payload: StudioErrorReport = {
-        studioHash: this._studioHash,
-        errors: [{
-          name: error.name ?? `Unknown name`,
-          stack: error.stack ?? `Unknown stack`,
-          message: error.message ?? `Unknown message`,
-        }],
-      }
-
-      const body = JSON.stringify(payload)
-
-      await fetch(routes.apiRoutes.studioErrors() as string, {
-        // @ts-expect-error - this is supported
-        agent,
-        method: 'POST',
-        body,
-        headers: {
-          'Content-Type': 'application/json',
-          'x-cypress-version': pkg.version,
-          'x-os-name': os.platform(),
-          'x-arch': os.arch(),
-        },
-      })
+      this._studioServer?.reportError(error, studioMethod, ...studioMethodArgs)
     } catch (e) {
+      // If we fail to report the error, we shouldn't try and report it again
       debug(`Error calling StudioManager.reportError: %o, original error %o`, e, error)
     }
   }
@@ -129,9 +110,12 @@ export class StudioManager implements StudioManagerShape {
       }
 
       this.status = 'IN_ERROR'
-      // Call and forget this, we don't want to block the main thread
-      this.reportError(actualError).catch(() => { })
+      this.reportError(actualError, method, ...args)
     }
+  }
+
+  get isProtocolEnabled () {
+    return !!this.protocolManager
   }
 
   /**
@@ -156,10 +140,8 @@ export class StudioManager implements StudioManagerShape {
       }
 
       this.status = 'IN_ERROR'
-      // Call and forget this, we don't want to block the main thread
-      this.reportError(actualError).catch(() => { })
+      this.reportError(actualError, method, ...args)
 
-      // TODO: Figure out errors
       return undefined
     }
   }
