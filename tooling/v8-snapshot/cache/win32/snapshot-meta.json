@@ -3860,6 +3860,7 @@
     "./packages/scaffold-config/src/index.ts",
     "./packages/scaffold-config/src/supportFile.ts",
     "./packages/server/config/app.json",
+    "./packages/server/lib/StudioLifecycleManager.ts",
     "./packages/server/lib/automation/automation.ts",
     "./packages/server/lib/automation/automation_not_implemented.ts",
     "./packages/server/lib/automation/commands/key_press.ts",
@@ -3886,6 +3887,7 @@
     "./packages/server/lib/cloud/api/axios_middleware/logging.ts",
     "./packages/server/lib/cloud/api/axios_middleware/transform_error.ts",
     "./packages/server/lib/cloud/api/scrub_url.ts",
+    "./packages/server/lib/cloud/api/studio/post_studio_session.ts",
     "./packages/server/lib/cloud/api/studio/report_studio_error.ts",
     "./packages/server/lib/cloud/artifacts/artifact.ts",
     "./packages/server/lib/cloud/artifacts/file_upload_strategy.ts",
@@ -4212,5 +4214,5 @@
     "./tooling/v8-snapshot/cache/win32/snapshot-entry.js"
   ],
   "deferredHashFile": "yarn.lock",
-  "deferredHash": "f0796b776b8ece35b5b1a1fc7889f01a13294e86771b7ecc3dec9abd781de7af"
+  "deferredHash": "f63d2697a50b3b6e3bf056a593ed344e0f266da7bd49e6c4a63288bc0d61a585"
 }
