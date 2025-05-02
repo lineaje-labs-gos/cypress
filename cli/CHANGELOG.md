@@ -15,6 +15,12 @@ _Released 5/6/2025 (PENDING)_
 
 - The URL in the Cypress App no longer displays a white background when the URL is loading. Fixes [#31556](https://github.com/cypress-io/cypress/issues/31556).
 
+**Dependency Updates:**
+
+- Upgraded `electron` from `33.2.1` to `34.3.3`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
+- Upgraded bundled Node.js version from `20.18.1` to `20.18.3`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
+- Upgraded bundled Chromium version from `130.0.6723.137` to `132.0.6834.210`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
+
 ## 14.3.2
 
 _Released 4/22/2025_
@@ -46,12 +52,6 @@ _Released 4/17/2025_
 - Suppress benign warnings that reference OOM score of renderer. Addresses [#29563](https://github.com/cypress-io/cypress/issues/29563). Addressed in [#31521](https://github.com/cypress-io/cypress/pull/31521).
 - The UI of the reporter and URL were updated to a darker gray background for better color contrast. Addressed in [#31475](https://github.com/cypress-io/cypress/pull/31475).
 - Fixed an issue where the error message output when attempting to install Cypress on an unsupported architecture included an outdated documentation link to Cypress system requirements. Fixes [#31512](https://github.com/cypress-io/cypress/issues/31512).
-
-**Dependency Updates:**
-
-- Upgraded `electron` from `33.2.1` to `34.3.3`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
-- Upgraded bundled Node.js version from `20.18.1` to `20.18.3`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
-- Upgraded bundled Chromium version from `130.0.6723.137` to `132.0.6834.210`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
 
 ## 14.3.0
 
