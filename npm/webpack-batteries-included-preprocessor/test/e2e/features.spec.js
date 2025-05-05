@@ -60,9 +60,10 @@ describe('webpack-batteries-included-preprocessor features', () => {
     await runAndEval('node_shim_spec.js')
   })
 
-  it('shims node builtins', async () => {
-    await runAndEval('node_builtins_spec.js')
-  })
+  // Node built-ins are tested in the /cypress/system-tests/test/plugins_spec.js system test. Built-ins needs to be tested there as the preprocessor execution
+  // code runs in the browser as opposed to an eval() in the node environment (like these unit tests).
+  // For instance, require('events') is not available in the browser but is available in the eval() node context
+  // because the 'events' dependency is installed by another dependency and webpack is smart enough to find and source it in the node_modules tree.
 
   it('outputs inline source map', async () => {
     const outputPath = await run('es_features_spec.js')
@@ -105,20 +106,24 @@ describe('webpack-batteries-included-preprocessor features', () => {
       await runAndEval('tsx_spec.tsx', { ...options, ...preprocessor.defaultOptions })
     })
 
-    it('errors when processing .ts file and typescript option is not set', () => {
-      return run('ts_spec.ts')
+    it('errors when processing .ts file and typescript option is set explicitly to false', () => {
+      return run('ts_spec.ts', {
+        typescript: false,
+      })
       .then(shouldntResolve)
       .catch((err) => {
-        expect(err.message).to.include(`You are attempting to run a TypeScript file, but do not have TypeScript installed. Ensure you have 'typescript' installed to enable TypeScript support`)
+        expect(err.message).to.include(`You are attempting to run a TypeScript file, but do not have TypeScript transpilation enabled. Please either pass in your typescript path or set typescript to true.`)
         expect(err.message).to.include('ts_spec.ts')
       })
     })
 
-    it('errors when processing .tsx file and typescript option is not set', () => {
-      return run('tsx_spec.tsx')
+    it('errors when processing .tsx file and typescript option is set explicitly to false', () => {
+      return run('tsx_spec.tsx', {
+        typescript: false,
+      })
       .then(shouldntResolve)
       .catch((err) => {
-        expect(err.message).to.include(`You are attempting to run a TypeScript file, but do not have TypeScript installed. Ensure you have 'typescript' installed to enable TypeScript support`)
+        expect(err.message).to.include(`You are attempting to run a TypeScript file, but do not have TypeScript transpilation enabled. Please either pass in your typescript path or set typescript to true.`)
         expect(err.message).to.include('tsx_spec.tsx')
       })
     })
