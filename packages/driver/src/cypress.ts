@@ -47,6 +47,7 @@ import type { CachedTestState } from '@packages/types'
 import { DocumentDomainInjection } from '@packages/network/lib/document-domain-injection'
 import { setSpecContentSecurityPolicy } from './util/privileged_channel'
 
+import { patchGlobalPromise } from '@packages/frontend-shared/src/utils/promise-debug'
 import { telemetry } from '@packages/telemetry/src/browser'
 
 const debug = debugFn('cypress:driver:cypress')
@@ -879,3 +880,5 @@ $Cypress.utils = $utils
 export default $Cypress
 
 export type ICypress = ReturnType<typeof $Cypress.create>
+
+patchGlobalPromise()
