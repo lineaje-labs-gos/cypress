@@ -46,7 +46,7 @@
               :disabled="!desktopNotificationsEnabled"
               @update="(value) => updatePref(id, value)"
             />
-            {{ gql.localSettings }}
+            {{ props.gql.localSettings }}
           </h4>
         </div>
         <div class="py-[16px]">

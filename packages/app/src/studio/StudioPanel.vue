@@ -15,6 +15,7 @@ import { init, loadRemote } from '@module-federation/runtime'
 import type { StudioAppDefaultShape, StudioPanelShape } from './studio-app-types'
 import LoadingStudioPanel from './LoadingStudioPanel.vue'
 import type { EventManager } from '../runner/event-manager'
+import type { JSX } from 'vue/jsx-runtime'
 
 // Mirrors the ReactDOM.Root type since incorporating those types
 // messes up vue typing elsewhere

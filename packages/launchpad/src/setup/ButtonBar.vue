@@ -24,7 +24,7 @@
       </Button>
       <div class="grow" />
       <div
-        v-if="altFn && alt"
+        v-if="alt !== undefined && altFn !== undefined"
         class="flex px-3 items-center"
       >
         <label

@@ -64,7 +64,7 @@
       variant="outline-indigo"
       size="32"
       class="self-start"
-      @click="openLatest"
+      @click="handleOpenLatest"
     >
       <IconTechnologyCypress class="h-[16px] w-[16px] mr-[8px]" />
       {{ t('runs.layout.viewCloudRuns') }}
@@ -109,6 +109,10 @@ const props = defineProps<{
 }>()
 
 const openLatest = useExternalLink(props.latestRunUrl)
+
+const handleOpenLatest = () => {
+  openLatest()
+}
 
 const Dot: FunctionalComponent = () => {
   return h('span', { ariaHidden: 'true', class: 'px-[8px] text-gray-300' }, '•')

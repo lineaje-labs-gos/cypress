@@ -58,12 +58,9 @@
               size="40"
               disabled
             >
-              <template #prefix>
-                <i-cy-loading_x16
-
-                  class="animate-spin icon-dark-white icon-light-gray-400"
-                />
-              </template>
+              <i-cy-loading_x16
+                class="animate-spin icon-dark-white icon-light-gray-400 mr-[8px]"
+              />
               {{ t('migration.wizard.step2.buttonWait') }}
             </Button>
 

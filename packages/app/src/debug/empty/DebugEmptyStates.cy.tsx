@@ -1,3 +1,4 @@
+import type { VNode } from 'vue'
 import DebugNotLoggedIn from './DebugNotLoggedIn.vue'
 import DebugNoProject from './DebugNoProject.vue'
 import DebugNoRuns from './DebugNoRuns.vue'
@@ -8,7 +9,7 @@ import { useUserProjectStatusStore } from '@packages/frontend-shared/src/store/u
 import { Promo_PromoSeenDocument, _PromoFragmentDoc } from '../../generated/graphql-test'
 import { DEBUG_PROMO_CAMPAIGNS, DEBUG_TAB_MEDIUM } from '../utils/constants'
 
-function mountWithGql (component: JSX.Element) {
+function mountWithGql (component: VNode) {
   const recordEvent = cy.stub().as('recordEvent')
 
   cy.stubMutationResolver(Promo_PromoSeenDocument, (defineResult, args) => {

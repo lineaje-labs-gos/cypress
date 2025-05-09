@@ -49,6 +49,7 @@ const tabs = computed(() => {
       label: shouldUseLongText.value ? t('specPage.e2eSpecsHeader') : t('specPage.e2eSpecsHeaderShort'),
       iconAfter: props.isE2eConfigured === false ? StyledQuestionMarkIcon : undefined,
       active: props.viewedTestingType === 'e2e',
+      'aria-controls': 'e2e-specs-panel',
     },
     {
       id: 'component',
@@ -56,6 +57,7 @@ const tabs = computed(() => {
       label: shouldUseLongText.value ? t('specPage.componentSpecsHeader') : t('specPage.componentSpecsHeaderShort'),
       iconAfter: props.isCtConfigured === false ? StyledQuestionMarkIcon : undefined,
       active: props.viewedTestingType === 'component',
+      'aria-controls': 'component-specs-panel',
     },
   ]
 })

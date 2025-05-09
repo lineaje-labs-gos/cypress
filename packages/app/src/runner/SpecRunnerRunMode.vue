@@ -9,6 +9,7 @@
     />
     <AutomationMissing
       v-else-if="runnerUiStore.automationStatus === 'MISSING'"
+      :gql="query.data.value?.currentProject"
     />
     <ResizablePanels
       v-else
@@ -84,6 +85,7 @@ import { useEventManager } from './useEventManager'
 import SpecRunnerHeaderRunMode from './SpecRunnerHeaderRunMode.vue'
 import AutomationDisconnected from './automation/AutomationDisconnected.vue'
 import AutomationMissing from './automation/AutomationMissing.vue'
+import { gql, useQuery } from '@urql/vue'
 
 const eventManager = getEventManager()
 
@@ -119,6 +121,31 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cleanupRunner()
+})
+
+gql`
+fragment SpecRunner_Config on CurrentProject {
+  id
+  config
+}
+`
+
+gql`
+fragment SpecRunner on Query {
+  currentProject {
+    id
+    ...SpecRunner_Config
+    ...AutomationMissing
+  }
+}
+`
+
+const query = useQuery({
+  query: gql`
+    query SpecRunner {
+      ...SpecRunner
+    }
+  `,
 })
 
 </script>

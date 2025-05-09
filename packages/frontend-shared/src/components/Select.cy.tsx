@@ -170,7 +170,7 @@ describe('<Select />', () => {
             options: defaultOptions,
             placeholder: 'A placeholder',
             label: 'Pick a color',
-            'label-id': 'label',
+            labelId: 'label',
           })
         },
       }).then(() => {

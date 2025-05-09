@@ -91,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, FunctionalComponent, ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { gql, useMutation } from '@urql/vue'
 import SidebarNavigationRow, { Badge, IconStatus } from './SidebarNavigationRow.vue'
 import KeyboardBindingsModal from './KeyboardBindingsModal.vue'
@@ -325,7 +325,7 @@ watchEffect(() => {
 
 interface NavigationItem {
   name: string
-  icon: FunctionalComponent
+  icon: any
   pageComponent: string
   params?: Record<string, any>
   badge?: Badge

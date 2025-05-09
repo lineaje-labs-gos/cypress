@@ -46,7 +46,7 @@
       <Button
         class="whitespace-nowrap"
         size="32"
-        @click="openLearnMoreExternalLink"
+        @click="(e: MouseEvent) => openLearnMoreExternalLink()"
       >
         {{ t('links.learnMoreButton') }}
       </Button>

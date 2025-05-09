@@ -29,9 +29,7 @@
       <component
         :is="icon"
         class="opacity-100"
-        :class="[ hoverIcon && !disabled ? 'group-hover:opacity-0' : undefined,
-                  iconClass]
-        "
+        :class="[iconClass, hasHoverIcon && !disabled ? 'group-hover:opacity-0' : undefined]"
         data-cy="card-icon"
       />
     </div>
@@ -72,6 +70,8 @@ const props = withDefaults(defineProps<{
   hoverIcon: undefined,
   badgeText: '',
 })
+
+const hasHoverIcon = computed(() => props.hoverIcon !== undefined)
 
 const classMap = {
   indigo: 'icon-dark-indigo-400 icon-light-indigo-100 icon-light-secondary-jade-200 icon-dark-secondary-jade-400',
