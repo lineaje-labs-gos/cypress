@@ -17,7 +17,7 @@ import { SocketCt } from './socket-ct'
 import { SocketE2E } from './socket-e2e'
 import { ensureProp } from './util/class-helpers'
 import system from './util/system'
-import type { BannersState, FoundBrowser, FoundSpec, OpenProjectLaunchOptions, ProtocolManagerShape, ReceivedCypressOptions, ResolvedConfigurationOptions, TestingType, VideoRecording, AutomationCommands } from '@packages/types'
+import { BannersState, FoundBrowser, FoundSpec, OpenProjectLaunchOptions, ProtocolManagerShape, ReceivedCypressOptions, ResolvedConfigurationOptions, TestingType, VideoRecording, AutomationCommands, StudioMetricsTypes } from '@packages/types'
 import { DataContext, getCtx } from '@packages/data-context'
 import { createHmac } from 'crypto'
 import { ServerBase } from './server-base'
@@ -407,7 +407,7 @@ export class ProjectBase extends EE {
 
         if (!isStudioReady) {
           debug('User entered studio mode before cloud studio was initialized')
-          const cloudEnv = (process.env.CYPRESS_INTERNAL_ENV || 'production') as 'development' | 'staging' | 'production'
+          const cloudEnv = (process.env.CYPRESS_CONFIG_ENV || process.env.CYPRESS_INTERNAL_ENV || 'production') as 'development' | 'staging' | 'production'
           const cloudUrl = this.ctx.cloud.getCloudUrl(cloudEnv)
           const cloudHeaders = await this.ctx.cloud.additionalHeaders()
 
@@ -430,6 +430,28 @@ export class ProjectBase extends EE {
         }
 
         const studio = await this.ctx.coreData.studioLifecycleManager?.getStudio()
+
+        const isCloudStudio = !!(process.env.CYPRESS_ENABLE_CLOUD_STUDIO || process.env.CYPRESS_LOCAL_STUDIO_PATH)
+
+        // only capture studio started event if the user is accessing legacy studio
+        if (!isCloudStudio) {
+          try {
+            studio?.captureStudioEvent({
+              type: StudioMetricsTypes.STUDIO_STARTED,
+              machineId: await this.ctx.coreData.machineId,
+              projectId: this.cfg.projectId,
+              browser: this.browser ? {
+                name: this.browser.name,
+                family: this.browser.family,
+                channel: this.browser.channel,
+                version: this.browser.version,
+              } : undefined,
+              cypressVersion: pkg.version,
+            })
+          } catch (error) {
+            debug('Error capturing studio event:', error)
+          }
+        }
 
         if (this.spec && studio?.protocolManager) {
           const canAccessStudioAI = await studio?.canAccessStudioAI(this.browser) ?? false
@@ -476,11 +498,12 @@ export class ProjectBase extends EE {
 
         const studio = await this.ctx.coreData.studioLifecycleManager?.getStudio()
 
-        if (studio?.protocolManager) {
+        await studio?.destroy()
+
+        if (this.protocolManager) {
           await browsers.closeProtocolConnection({ browser: this.browser, foundBrowsers: this.options.browsers })
           this.protocolManager?.close()
           this.protocolManager = undefined
-          await studio.destroy()
         }
       },
 
