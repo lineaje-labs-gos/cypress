@@ -7,7 +7,6 @@ import cs from 'classnames'
 import events, { Events } from '../lib/events'
 import appState, { AppState } from '../lib/app-state'
 import Collapsible from '../collapsible/collapsible'
-import { indent } from '../lib/util'
 import TestModel from './test-model'
 
 import scroller, { Scroller } from '../lib/scroller'
@@ -173,13 +172,13 @@ const Test: React.FC<TestProps> = observer(({ model, events: eventsProps = event
       containerRef={containerRef}
       header={_header()}
       headerClass='runnable-wrapper'
-      headerStyle={{ paddingLeft: indent(model.level) }}
+      headerStyle={{ }}
       contentClass='runnable-instruments'
       isOpen={model.isOpen}
       onOpenStateChangeRequested={(isOpen: boolean) => model.setIsOpen(isOpen)}
       hideExpander
     >
-      <div style={{ paddingLeft: indent(model.level) }}>
+      <div style={{ }}>
         <Attempts studioActive={appStateProps.studioActive} test={model} scrollIntoView={() => _scrollIntoView()} />
         {appStateProps.studioActive && <StudioControls canSaveStudioLogs={canSaveStudioLogs}/>}
       </div>

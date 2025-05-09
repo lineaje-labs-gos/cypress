@@ -2,6 +2,7 @@ import cs from 'classnames'
 import React, { CSSProperties, MouseEvent, ReactNode, RefObject, useCallback, useState } from 'react'
 import { onEnterOrSpace } from '../lib/util'
 import ChevronIcon from '@packages/frontend-shared/src/assets/icons/chevron-down-small_x8.svg'
+import DocumentBlankIcon from '@packages/frontend-shared/src/assets/icons/document-blank_x16.svg'
 
 interface CollapsibleProps {
   isOpen?: boolean
@@ -42,11 +43,12 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false,
           tabIndex={0}
         >
           <div
-            className='collapsible-header-inner'
+            className='collapsible-header-inner gray-400'
             style={headerStyle}
             tabIndex={-1}
           >
-            {!hideExpander && <ChevronIcon className='collapsible-indicator' />}
+            {!hideExpander && headerClass === 'hook-header' && <ChevronIcon className='collapsible-indicator gray-400 ' />}
+            {!hideExpander && headerClass !== 'hook-header' && <DocumentBlankIcon className='collapsible-indicator gray-400' />}
             <span className='collapsible-header-text'>
               {header}
             </span>
