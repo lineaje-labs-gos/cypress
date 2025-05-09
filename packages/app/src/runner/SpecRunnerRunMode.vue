@@ -131,7 +131,7 @@ fragment SpecRunner_Config on CurrentProject {
 `
 
 gql`
-fragment SpecRunnerRun on Query {
+fragment SpecRunner_RunMode on Query {
   currentProject {
     id
     ...SpecRunner_Config
@@ -142,8 +142,8 @@ fragment SpecRunnerRun on Query {
 
 const query = useQuery({
   query: gql`
-    query SpecRunner {
-      ...SpecRunnerRun
+    query SpecRunner_RunMode_Query {
+      ...SpecRunner_RunMode
     }
   `,
 })
