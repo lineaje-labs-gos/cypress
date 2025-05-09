@@ -3,8 +3,6 @@ import _ from 'lodash'
 import { observer } from 'mobx-react'
 import React, { MouseEvent, useCallback } from 'react'
 
-import { indent } from '../lib/util'
-
 import appState, { AppState } from '../lib/app-state'
 import events, { Events } from '../lib/events'
 import Test from '../test/test'
@@ -48,7 +46,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     <Collapsible
       header={_header()}
       headerClass='runnable-wrapper'
-      headerStyle={{ paddingLeft: indent(model.level) }}
+      headerStyle={{ }}
       contentClass='runnables-region'
       isOpen
     >
@@ -68,8 +66,8 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
 Suite.displayName = 'Suite'
 
 export interface RunnableProps {
+  appState?: AppState
   model: TestModel | SuiteModel
-  appState: AppState
   studioEnabled: boolean
   canSaveStudioLogs: boolean
 }
@@ -89,7 +87,10 @@ const Runnable: React.FC<RunnableProps> = observer(({ appState: appStateProps = 
     >
       {model.type === 'test'
         ? <Test model={model as TestModel} studioEnabled={studioEnabled} canSaveStudioLogs={canSaveStudioLogs} />
-        : <Suite model={model as SuiteModel} studioEnabled={studioEnabled} canSaveStudioLogs={canSaveStudioLogs} />}
+        : <Suite model={model as SuiteModel}
+          studioEnabled={studioEnabled}
+          canSaveStudioLogs={canSaveStudioLogs}
+        />}
     </li>
   )
 })
