@@ -232,49 +232,7 @@ const { openLoginConnectModal } = useUserProjectStatusStore()
 const route = useRoute()
 const { t } = useI18n()
 const testingType = useTestingType()
-
-const isOnline = useOnline()
-const isOffline = ref(false)
-
-watch(isOnline, (newIsOnlineValue) => isOffline.value = !newIsOnlineValue, { immediate: true })
-
-const tableGridColumns = 'grid-cols-[1fr,135px,130px] md:grid-cols-[1fr,135px,130px,130px] lg:grid-cols-[1fr,160px,160px,180px]'
-
-const projectConnectionStatus = computed(() => {
-  if (!props.gql.cloudViewer) return 'LOGGED_OUT'
-
-  if (!props.gql.currentProject?.cloudProject?.__typename) return 'NOT_CONNECTED'
-
-  if (props.gql.currentProject?.cloudProject?.__typename === 'CloudProjectNotFound') return 'NOT_FOUND'
-
-  if (props.gql.currentProject?.cloudProject?.__typename === 'CloudProjectUnauthorized') {
-    if (props.gql.currentProject?.cloudProject?.hasRequestedAccess) {
-      return 'ACCESS_REQUESTED'
-    }
-
-    return 'UNAUTHORIZED'
-  }
-
-  return 'CONNECTED'
-})
-
-const cloudProjectType = computed(() => props.gql.currentProject?.cloudProject?.__typename)
-
-const hasRequestedAccess = computed(() => {
-  return projectConnectionStatus.value === 'ACCESS_REQUESTED'
-})
-
-const isGitAvailable = computed(() => {
-  return !(props.gql.currentProject?.specs.some((s) => s.gitInfo?.statusType === 'noGitInfo') ?? false)
-})
-
-const hasCloudErrors = computed(() => {
-  return props.gql.currentProject?.specs.some((s) => s.cloudSpec?.fetchingStatus === 'ERRORED') ?? false
-})
-
-const shouldShowFetchError = ref(false)
-
-watch(hasCloudErrors, (wasErrorFound) => shouldShowFetchError.value = wasErrorFound, { immediate: true })
+const runAllSpecsStore = useRunAllSpecsStore()
 
 gql`
 subscription SpecsList_GitInfoUpdated {
@@ -350,6 +308,49 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'showCreateSpecModal'): void
 }>()
+
+const isOnline = useOnline()
+const isOffline = ref(false)
+
+watch(isOnline, (newIsOnlineValue) => isOffline.value = !newIsOnlineValue, { immediate: true })
+
+const tableGridColumns = 'grid-cols-[1fr,135px,130px] md:grid-cols-[1fr,135px,130px,130px] lg:grid-cols-[1fr,160px,160px,180px]'
+
+const projectConnectionStatus = computed(() => {
+  if (!props.gql.cloudViewer) return 'LOGGED_OUT'
+
+  if (!props.gql.currentProject?.cloudProject?.__typename) return 'NOT_CONNECTED'
+
+  if (props.gql.currentProject?.cloudProject?.__typename === 'CloudProjectNotFound') return 'NOT_FOUND'
+
+  if (props.gql.currentProject?.cloudProject?.__typename === 'CloudProjectUnauthorized') {
+    if (props.gql.currentProject?.cloudProject?.hasRequestedAccess) {
+      return 'ACCESS_REQUESTED'
+    }
+
+    return 'UNAUTHORIZED'
+  }
+
+  return 'CONNECTED'
+})
+
+const cloudProjectType = computed(() => props.gql.currentProject?.cloudProject?.__typename)
+
+const hasRequestedAccess = computed(() => {
+  return projectConnectionStatus.value === 'ACCESS_REQUESTED'
+})
+
+const isGitAvailable = computed(() => {
+  return !(props.gql.currentProject?.specs.some((s) => s.gitInfo?.statusType === 'noGitInfo') ?? false)
+})
+
+const hasCloudErrors = computed(() => {
+  return props.gql.currentProject?.specs.some((s) => s.cloudSpec?.fetchingStatus === 'ERRORED') ?? false
+})
+
+const shouldShowFetchError = ref(false)
+
+watch(hasCloudErrors, (wasErrorFound) => shouldShowFetchError.value = wasErrorFound, { immediate: true })
 
 const showSpecPatternModal = ref(false)
 
@@ -441,8 +442,6 @@ const { refetchFailedCloudData } = useCloudSpecData(
   displayedSpecs,
   props.gql.currentProject?.specs as SpecsListFragment[] || [],
 )
-
-const runAllSpecsStore = useRunAllSpecsStore()
 
 watch(collapsible, () => {
   runAllSpecsStore.setRunAllSpecsData(collapsible.value.tree)
