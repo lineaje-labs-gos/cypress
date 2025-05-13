@@ -6,9 +6,9 @@ import type { TestState } from '@packages/types'
 import FailedIcon from '@packages/frontend-shared/src/assets/icons/status-failed_x12.svg'
 import PassedIcon from '@packages/frontend-shared/src/assets/icons/status-passed_x12.svg'
 import PendingIcon from '@packages/frontend-shared/src/assets/icons/status-pending_x12.svg'
-import ProcessingIcon from '@packages/frontend-shared/src/assets/icons/status-processing_x12.svg'
 import RunningIcon from '@packages/frontend-shared/src/assets/icons/status-running_x12.svg'
 import WandIcon from '@packages/frontend-shared/src/assets/icons/object-magic-wand-dark-mode_x16.svg'
+import { IconStatusQueuedOutline } from '@cypress-design/react-icon'
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   state: TestState
@@ -50,7 +50,9 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
 
   if (state === 'processing') {
     return (
-      <ProcessingIcon {...rest} />
+      <IconStatusQueuedOutline
+        size='16'
+        strokeColor="gray-700" />
     )
   }
 

@@ -120,13 +120,11 @@
           width: 100%;
         }
       }
-      &:hover {
-        .runnable-controls-studio {
-          opacity: 0.5;
+      .runnable-controls-studio {
+        opacity: 0.5;
 
-          &:hover {
-            opacity: 1;
-          }
+        &:hover {
+          opacity: 1;
         }
       }
     }
@@ -219,6 +217,22 @@
       .runnable-title {
         color: $gray-400;
         font-size: 14px;
+      }
+
+      .collapsible-header-inner {
+        .runnable-controls-studio {
+          opacity: 0;
+        }
+
+        &:hover {
+          .runnable-controls-studio {
+            opacity: 0.5;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
       }
     }
 
@@ -313,8 +327,6 @@
   }
 
   .runnable-controls {
-    float: right;
-    height: 18px;
 
     label {
       padding: 2px 4px;
@@ -328,8 +340,19 @@
     }
 
     .runnable-controls-studio {
-      color: $purple-300;
+      display: flex;
+      height: 20px;
+      width: 20px;
+      color: $gray-500;
+      border: 1px solid $gray-900;
+      border-radius: 4px;
       opacity: 0;
+      padding-top: 2px;
+      padding-left: 1px;
+
+      svg {
+        flex: auto;
+      }
     }
   }
 
