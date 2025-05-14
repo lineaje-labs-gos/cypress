@@ -327,8 +327,8 @@ export class SnapshotGenerator {
     }
     logDebug(
       Object.assign({}, result, {
-        snapshotScript: `len: ${result.snapshotScript.length}`,
-        bundle: `len: ${result.bundle.length}`,
+        snapshotScript: `len: ${Buffer.byteLength(result.snapshotScript)} bytes`,
+        bundle: `len: ${Buffer.byteLength(result.bundle)} bytes`,
         meta: '<hidden>',
       }),
     )
@@ -503,12 +503,16 @@ export class SnapshotGenerator {
 
       return { v8ContextFile: this.v8ContextFile, snapshotBinDir: this.snapshotBinDir }
     } catch (err: any) {
-      if (err.stderr != null) {
-        logError(err.stderr.toString())
-      }
+      if (err.stderr || err.stdout) {
+        if (err.stderr != null) {
+          logError(err.stderr.toString())
+        }
 
-      if (err.stdout != null) {
-        logDebug(err.stdout.toString())
+        if (err.stdout != null) {
+          logDebug(err.stdout.toString())
+        }
+      } else {
+        logError(err.toString())
       }
 
       // If things went wrong print instructions on how to execute the
