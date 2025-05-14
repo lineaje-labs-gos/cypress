@@ -431,21 +431,24 @@ export class ProjectBase extends EE {
 
         const studio = await this.ctx.coreData.studioLifecycleManager?.getStudio()
 
-        try {
-          studio?.captureStudioEvent({
-            type: StudioMetricsTypes.STUDIO_STARTED,
-            machineId: await this.ctx.coreData.machineId,
-            projectId: this.cfg.projectId,
-            browser: this.browser ? {
-              name: this.browser.name,
-              family: this.browser.family,
-              channel: this.browser.channel,
-              version: this.browser.version,
-            } : undefined,
-            cypressVersion: pkg.version,
-          })
-        } catch (error) {
-          debug('Error capturing studio event:', error)
+        // only capture studio started event if the user is accessing legacy studio
+        if (!this.ctx.coreData.studioLifecycleManager?.cloudStudioRequested) {
+          try {
+            studio?.captureStudioEvent({
+              type: StudioMetricsTypes.STUDIO_STARTED,
+              machineId: await this.ctx.coreData.machineId,
+              projectId: this.cfg.projectId,
+              browser: this.browser ? {
+                name: this.browser.name,
+                family: this.browser.family,
+                channel: this.browser.channel,
+                version: this.browser.version,
+              } : undefined,
+              cypressVersion: pkg.version,
+            })
+          } catch (error) {
+            debug('Error capturing studio event:', error)
+          }
         }
 
         if (this.spec && studio?.protocolManager) {

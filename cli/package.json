@@ -33,7 +33,7 @@
     "check-more-types": "^2.24.0",
     "ci-info": "^4.1.0",
     "cli-cursor": "^3.1.0",
-    "cli-table3": "~0.6.5",
+    "cli-table3": "0.6.1",
     "commander": "^6.2.1",
     "common-tags": "^1.8.0",
     "dayjs": "^1.10.4",
@@ -120,7 +120,7 @@
     "cypress": "bin/cypress"
   },
   "engines": {
-    "node": "^18.0.0 || ^20.0.0 || >=22.0.0"
+    "node": "^20.0.0 || ^22.0.0 || >=24.0.0"
   },
   "types": "types",
   "exports": {

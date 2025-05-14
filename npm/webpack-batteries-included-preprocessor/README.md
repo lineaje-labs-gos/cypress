@@ -14,7 +14,7 @@ This preprocessor is a wrapper for [@cypress/webpack-preprocessor](https://githu
 
 Note that installing [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress-webpack-preprocessor) is also required. This allows you to update its version separately from this wrapper.
 
-For webpack `v5`, use `@cypress/webpack-batteries-included-preprocessor@3.x.x`. For webpack `v4`, use `@cypress/webpack-batteries-included-preprocessor@2.x.x`.
+For webpack `v5`, use `@cypress/webpack-batteries-included-preprocessor@3.x.x` and up. For webpack `v4`, use `@cypress/webpack-batteries-included-preprocessor@2.x.x`.
 
 ```sh
 npm install --save-dev @cypress/webpack-batteries-included-preprocessor @cypress/webpack-preprocessor
@@ -45,6 +45,10 @@ module.exports = (on) => {
 ```
 
 Other than the `typescript` option, this preprocessor supports the same options as [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor#readme), so see its [README](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor#readme) for more information.
+
+## Debugging
+
+If having issues with chunk load errors or bundle size problems, specifically in your end-to-end tests, please try setting `DEBUG=cypress-verbose:webpack-batteries-included-preprocessor:bundle-analyzer` before starting Cypress to get a `webpack-bundle-analyzer` report to help determine the cause of the issue. If filing an issue with Cypress, please include this report with your issue to better help us serve your issue.
 
 ## Contributing
 

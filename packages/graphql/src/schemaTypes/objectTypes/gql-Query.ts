@@ -5,14 +5,11 @@ import { CurrentProject } from './gql-CurrentProject'
 import { DevState } from './gql-DevState'
 import { AuthState } from './gql-AuthState'
 import { LocalSettings } from './gql-LocalSettings'
-import { Migration } from './gql-Migration'
 import { VersionData } from './gql-VersionData'
 import { Wizard } from './gql-Wizard'
 import { ErrorWrapper } from './gql-ErrorWrapper'
 import { CachedUser } from './gql-CachedUser'
 import { Cohort } from './gql-Cohorts'
-import { Studio } from './gql-Studio'
-import type { StudioStatusType } from '@packages/data-context/src/gen/graphcache-config.gen'
 
 export const Query = objectType({
   name: 'Query',
@@ -40,23 +37,6 @@ export const Query = objectType({
       type: Wizard,
       description: 'Metadata about the wizard',
       resolve: (root, args, ctx) => ctx.coreData.wizard,
-    })
-
-    t.field('migration', {
-      type: Migration,
-      description: 'Metadata about the migration, null if we aren\'t showing it',
-      resolve: async (root, args, ctx) => {
-        // First check to see if "legacyConfigForMigration" is defined as that means we have started migration
-        if (ctx.coreData.migration.legacyConfigForMigration) return ctx.coreData.migration.legacyConfigForMigration
-
-        if (!ctx.migration.needsCypressJsonMigration()) {
-          return null
-        }
-
-        await ctx.lifecycleManager.legacyMigration()
-
-        return ctx.coreData.migration.legacyConfigForMigration
-      },
     })
 
     t.nonNull.field('dev', {
@@ -103,20 +83,10 @@ export const Query = objectType({
       resolve: (source, args, ctx) => ctx.coreData.authState,
     })
 
-    t.field('studio', {
-      type: Studio,
-      description: 'Data pertaining to studio and the studio manager that is loaded from the cloud',
-      resolve: async (source, args, ctx) => {
-        const isStudioReady = ctx.coreData.studioLifecycleManager?.isStudioReady()
-
-        if (!isStudioReady) {
-          return { status: 'INITIALIZED' as StudioStatusType }
-        }
-
-        const studio = await ctx.coreData.studioLifecycleManager?.getStudio()
-
-        return studio ? { status: studio.status } : null
-      },
+    t.field('cloudStudioRequested', {
+      type: 'Boolean',
+      description: 'Whether cloud studio is requested by the environment',
+      resolve: (source, args, ctx) => ctx.coreData.studioLifecycleManager?.cloudStudioRequested ?? false,
     })
 
     t.nonNull.field('localSettings', {

@@ -1,7 +1,58 @@
 <!-- See the ../guides/writing-the-cypress-changelog.md for details on writing the changelog. -->
+## 15.0.0
+
+_Released 07/01/2025 (PENDING)_
+
+**Breaking Changes:**
+
+- Removed support for Angular 17. The minimum supported version is now `18.0.0`. Addresses [#31303](https://github.com/cypress-io/cypress/issues/31303).
+- `@cypress/angular` now requires a minimum of `zone.js` `0.14.0`. Addresses [#31582](https://github.com/cypress-io/cypress/issues/31582).
+- Removed support for Node.js 18 and Node.js 23. Addresses [#31302](https://github.com/cypress-io/cypress/issues/31302).
+- Removed support for [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol) with the [firefox](https://www.mozilla.org/) browser. Addresses [#31189](https://github.com/cypress-io/cypress/issues/31189).
+- Removed support of the deprecated 3 argument signature of `cy.stub`. Use `cy.stub(object, name).callsFake(fn)` instead. Addresses [#31346](https://github.com/cypress-io/cypress/issues/31346).
+- The Cypress configuration wizard for Component Testing supports TypeScript 5.0 or greater. Addresses [#31187](https://github.com/cypress-io/cypress/issues/31187).
+- `@cypress/webpack-dev-server` and `@cypress/webpack-preprocessor` no longer support `webpack` version 4. Addresses [#31344](https://github.com/cypress-io/cypress/issues/31344). If you still need to use `webpack` version 4, please see our [migration guide](https://docs.cypress.io/app/references/migration-guide#Migrating-to-Cypress-150).
+- `@cypress/webpack-dev-server` no longer supports `webpack-dev-server` version 4. Addresses [#31605](https://github.com/cypress-io/cypress/issues/31605). If you still need to use `webpack-dev-server` version 4, please see our [migration guide](https://docs.cypress.io/app/references/migration-guide#Migrating-to-Cypress-150).
+
+**Features:**
+
+- [`tsx`](https://tsx.is/) is now used in all cases to run the Cypress config, replacing [ts-node](https://github.com/TypeStrong/ts-node) for TypeScript and Node for commonjs/ESM. This should allow for more interoperability for users who are using any variant of ES Modules. Addresses [#8090](https://github.com/cypress-io/cypress/issues/8090), [#15724](https://github.com/cypress-io/cypress/issues/15724), [#21805](https://github.com/cypress-io/cypress/issues/21805), [#22273](https://github.com/cypress-io/cypress/issues/22273), [#22747](https://github.com/cypress-io/cypress/issues/22747), [#23141](https://github.com/cypress-io/cypress/issues/23141), [#25958](https://github.com/cypress-io/cypress/issues/25958), [#25959](https://github.com/cypress-io/cypress/issues/25959), [#26606](https://github.com/cypress-io/cypress/issues/26606), [#27359](https://github.com/cypress-io/cypress/issues/27359), [#27450](https://github.com/cypress-io/cypress/issues/27450), [#28442](https://github.com/cypress-io/cypress/issues/28442), [#30318](https://github.com/cypress-io/cypress/issues/30318), [#30718](https://github.com/cypress-io/cypress/issues/30718), [#30907](https://github.com/cypress-io/cypress/issues/30907), [#30915](https://github.com/cypress-io/cypress/issues/30915), [#30925](https://github.com/cypress-io/cypress/issues/30925), [#30954](https://github.com/cypress-io/cypress/issues/30954) and [#31185](https://github.com/cypress-io/cypress/issues/31185).
+
+**Misc:**
+
+- Migration helpers and related errors are no longer shown when upgrading from Cypress versions earlier than 10.0.0. To migrate from a pre-10.0.0 version, upgrade one major version at a time to receive the appropriate guidance. Addresses [#31345](https://github.com/cypress-io/cypress/issues/31345). Addressed in [https://github.com/cypress-io/cypress/pull/31629/](https://github.com/cypress-io/cypress/pull/31629/).
+
+**Dependency Updates:**
+- Upgraded `electron` from `33.2.1` to `35.3.0`.
+- Upgraded bundled Node.js version from `20.18.1` to `22.14.0`.
+- Upgraded bundled Chromium version from `130.0.6723.137` to `134.0.6998.165`.
+
+## 14.4.0
+
+_Released 5/20/2025 (PENDING)_
+
+**Features:**
+
+- `@cypress/webpack-dev-server` and `@cypress/webpack-batteries-included-preprocessor` now ship with [webpack-bundle-analyzer](https://www.npmjs.com/package/webpack-bundle-analyzer) as a diagnostic tool to determine bundle statistics, which can be enabled via `DEBUG=cypress-verbose:webpack-dev-server:bundle-analyzer` ( component tests using webpack) or `DEBUG=cypress-verbose:webpack-batteries-included-preprocessor:bundle-analyzer` (e2e tests using webpack, which is the default preprocessor), respectively. Addresses [#30461](https://github.com/cypress-io/cypress/issues/30461).
+
+**Bugfixes:**
+
+- Fixed an issue where framebusting was occurring when `top.window.location` was being set explicitly. This fix does not require the `experimentalModifyObstructiveThirdPartyCode` configuration option. Addresses [#31687](https://github.com/cypress-io/cypress/issues/31687).
+- `cy.press()` now has a return type of `Chainable<null>` instead of `void` to match the convention of other commands that yield `null`. Addressed in [#31698](https://github.com/cypress-io/cypress/pull/31698).
+- Fixed an issue with the experimental usage of WebKit where Cypress incorrectly displayed `0` as the WebKit version. Addresses [#31684](https://github.com/cypress-io/cypress/issues/31684).
+
+**Misc:**
+
+- Cursor is now available as an IDE option for opening files in Cypress, if it is installed on your system. Addressed in [#31691](https://github.com/cypress-io/cypress/pull/31691).
+- The error shown when the `--record` flag is missing has been updated to be shorter. Addressed in [#31676](https://github.com/cypress-io/cypress/pull/31676).
+
+**Dependency Updates:**
+
+- Upgraded `trash` from `5.2.0` to `7.2.0`. Addressed in [#31667](https://github.com/cypress-io/cypress/pull/31667).
+
 ## 14.3.3
 
-_Released 5/6/2025 (PENDING)_
+_Released 5/6/2025_
 
 **Performance:**
 
@@ -10,6 +61,7 @@ _Released 5/6/2025 (PENDING)_
 **Bugfixes:**
 
 - Fixed an issue where the configuration setting `trashAssetsBeforeRuns=false` was ignored for assets in the `videosFolder`. These assets were incorrectly deleted before running tests with `cypress run`. Addresses [#8280](https://github.com/cypress-io/cypress/issues/8280).
+- Fixed an issue where Cypress was hanging when piping stdout and stderr to a file, and using `@cypress/grep` results in many matched files. Fixes [#31625](https://github.com/cypress-io/cypress/issues/31625). Addressed in [31631](https://github.com/cypress-io/cypress/pull/31631).
 - Fixed a potential hang condition when navigating to `about:blank`. Addressed in [#31634](https://github.com/cypress-io/cypress/pull/31634).
 
 **Misc:**
@@ -19,9 +71,8 @@ _Released 5/6/2025 (PENDING)_
 
 **Dependency Updates:**
 
-- Upgraded `electron` from `33.2.1` to `34.3.3`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
-- Upgraded bundled Node.js version from `20.18.1` to `20.18.3`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
-- Upgraded bundled Chromium version from `130.0.6723.137` to `132.0.6834.210`. Addresses [#31245](https://github.com/cypress-io/cypress/issues/31245). Addressed in [#31260](https://github.com/cypress-io/cypress/pull/31260).
+- Downgraded `cli-table3` to 0.6.1. Addressed in [31631](https://github.com/cypress-io/cypress/pull/31631).
+
 
 ## 14.3.2
 
@@ -31,10 +82,6 @@ _Released 4/22/2025_
 
 - Fixed an issue where auto scroll in the Cypress Command Log was not scrolling correctly. Fixes [#31530](https://github.com/cypress-io/cypress/issues/31530).
 - Fixed an issue where a message pointing users to the Cypress Cloud was not displaying on runs with failures in CI. Fixes [#31550](https://github.com/cypress-io/cypress/issues/31550).
-
-**Misc:**
-
-- The URL in the Cypress App no longer displays a white background when the URL is loading. Fixes [#31556](https://github.com/cypress-io/cypress/issues/31556).
 
 ## 14.3.1
 

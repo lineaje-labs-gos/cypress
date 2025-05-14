@@ -304,13 +304,6 @@ describe('visual error templates', () => {
 
   // testVisualErrors('CANNOT_RECORD_NO_PROJECT_ID', {
   testVisualErrors(errorType, {
-    LEGACY_CONFIG_ERROR_DURING_MIGRATION: () => {
-      const err = makeErr()
-
-      return {
-        default: ['cypress/plugins/index.js', err],
-      }
-    },
     CANNOT_TRASH_ASSETS: () => {
       const err = makeErr()
 
@@ -598,7 +591,7 @@ describe('visual error templates', () => {
     },
     CANNOT_RECORD_NO_PROJECT_ID: () => {
       return {
-        default: ['/path/to/cypress.json'],
+        default: ['/path/to/cypress.config.js'],
       }
     },
     PROJECT_ID_AND_KEY_BUT_MISSING_RECORD_OPTION: () => {
@@ -739,12 +732,12 @@ describe('visual error templates', () => {
     },
     CLOUD_PROJECT_NOT_FOUND: () => {
       return {
-        default: ['project-id-123', '/path/to/cypress.json'],
+        default: ['project-id-123', '/path/to/cypress.config.js'],
       }
     },
     NO_PROJECT_ID: () => {
       return {
-        default: ['/path/to/project/cypress.json'],
+        default: ['/path/to/project/cypress.config.js'],
       }
     },
     NO_PROJECT_FOUND_AT_PROJECT_ROOT: () => {
@@ -864,28 +857,28 @@ describe('visual error templates', () => {
     },
     CONFIG_VALIDATION_ERROR: () => {
       return {
-        default: ['configFile', 'cypress.json', {
+        default: ['configFile', 'cypress.config.js', {
           key: 'defaultCommandTimeout',
           type: 'a number',
           value: false,
         }],
-        list: ['configFile', 'cypress.json', {
+        list: ['configFile', 'cypress.config.js', {
           key: 'displayName',
           type: 'a non-empty string',
           value: { name: 'chrome', version: '1.2.3', displayName: null },
           list: 'browsers',
         }],
-        invalidString: ['configFile', 'cypress.json', {
+        invalidString: ['configFile', 'cypress.config.js', {
           key: 'defaultCommandTimeout',
           type: 'a number',
           value: '1234',
         }],
-        invalidObject: ['configFile', 'cypress.json', {
+        invalidObject: ['configFile', 'cypress.config.js', {
           key: 'defaultCommandTimeout',
           type: 'a number',
           value: { foo: 'bar' },
         }],
-        invalidArray: ['configFile', 'cypress.json', {
+        invalidArray: ['configFile', 'cypress.config.js', {
           key: 'defaultCommandTimeout',
           type: 'a number',
           value: [1, 2, 3],
@@ -899,7 +892,7 @@ describe('visual error templates', () => {
     },
     CONFIG_VALIDATION_MSG_ERROR: () => {
       return {
-        default: ['configFile', 'cypress.json', '`something` was not right'],
+        default: ['configFile', 'cypress.config.js', '`something` was not right'],
         noFileType: [null, null, '`something` was not right'],
       }
     },
@@ -958,7 +951,7 @@ describe('visual error templates', () => {
     },
     CONFIG_FILE_NOT_FOUND: () => {
       return {
-        default: ['cypress.json', '/path/to/project/root'],
+        default: ['cypress.config.js', '/path/to/project/root'],
       }
     },
     INVOKED_BINARY_OUTSIDE_NPM_MODULE: () => {
@@ -1079,11 +1072,6 @@ describe('visual error templates', () => {
         default: [1, 'chrome', 62],
       }
     },
-    CDP_FIREFOX_DEPRECATED: () => {
-      return {
-        default: [],
-      }
-    },
     BROWSER_PROCESS_CLOSED_UNEXPECTEDLY: () => {
       return {
         default: ['chrome'],
@@ -1118,22 +1106,7 @@ describe('visual error templates', () => {
         default: ['/path/to/folder'],
       }
     },
-    EXPERIMENTAL_SAMESITE_REMOVED: () => {
-      return {
-        default: [],
-      }
-    },
     EXPERIMENTAL_JIT_COMPILE_REMOVED: () => {
-      return {
-        default: [],
-      }
-    },
-    EXPERIMENTAL_COMPONENT_TESTING_REMOVED: () => {
-      return {
-        default: [{ configFile: '/path/to/cypress.config.js' }],
-      }
-    },
-    EXPERIMENTAL_SESSION_SUPPORT_REMOVED: () => {
       return {
         default: [],
       }
@@ -1141,56 +1114,6 @@ describe('visual error templates', () => {
     EXPERIMENTAL_SESSION_AND_ORIGIN_REMOVED: () => {
       return {
         default: [],
-      }
-    },
-    EXPERIMENTAL_SHADOW_DOM_REMOVED: () => {
-      return {
-        default: [],
-      }
-    },
-    EXPERIMENTAL_NETWORK_STUBBING_REMOVED: () => {
-      return {
-        default: [],
-      }
-    },
-    EXPERIMENTAL_RUN_EVENTS_REMOVED: () => {
-      return {
-        default: [],
-      }
-    },
-    EXPERIMENTAL_STUDIO_REMOVED: () => {
-      return {
-        default: [],
-      }
-    },
-    FIREFOX_GC_INTERVAL_REMOVED: () => {
-      return {
-        default: [],
-      }
-    },
-    INCOMPATIBLE_PLUGIN_RETRIES: () => {
-      return {
-        default: ['./path/to/cypress-plugin-retries'],
-      }
-    },
-    CONFIG_FILE_MIGRATION_NEEDED: () => {
-      return {
-        default: ['/path/to/projectRoot'],
-      }
-    },
-    LEGACY_CONFIG_FILE: () => {
-      return {
-        default: ['cypress.json', '/path/to/projectRoot'],
-      }
-    },
-    SETUP_NODE_EVENTS_DO_NOT_SUPPORT_DEV_SERVER: () => {
-      return {
-        default: ['/path/to/project/cypress.config.js'],
-      }
-    },
-    CONFIG_FILE_INVALID_DEV_START_EVENT: () => {
-      return {
-        default: ['/path/to/plugins/file.js'],
       }
     },
     CONFIG_FILE_DEV_SERVER_INVALID_RETURN: () => {
@@ -1217,11 +1140,6 @@ describe('visual error templates', () => {
     MULTIPLE_SUPPORT_FILES_FOUND: () => {
       return {
         default: ['spec.{ts,js}', ['support.ts', 'support.js']],
-      }
-    },
-    PLUGINS_FILE_CONFIG_OPTION_REMOVED: () => {
-      return {
-        default: [{ name: 'pluginsFile', configFile: '/path/to/cypress.config.js.ts' }],
       }
     },
     VIDEO_UPLOAD_ON_PASSES_REMOVED: () => {
@@ -1277,36 +1195,6 @@ describe('visual error templates', () => {
     CLOUD_GRAPHQL_ERROR: () => {
       return {
         default: [makeErr()],
-      }
-    },
-    MIGRATION_ALREADY_OCURRED: () => {
-      return {
-        default: ['custom.config.js', 'custom.json'],
-      }
-    },
-    TEST_FILES_RENAMED: () => {
-      return {
-        default: [{ name: 'testFiles', newName: 'specPattern', configFile: '/path/to/cypress.config.js.ts' }],
-      }
-    },
-    COMPONENT_FOLDER_REMOVED: () => {
-      return {
-        default: [{ name: 'componentFolder', configFile: '/path/to/cypress.config.js.ts' }],
-      }
-    },
-    INTEGRATION_FOLDER_REMOVED: () => {
-      return {
-        default: [{ name: 'integrationFolder', configFile: '/path/to/cypress.config.js.ts' }],
-      }
-    },
-    MIGRATION_MISMATCHED_CYPRESS_VERSIONS: () => {
-      return {
-        default: ['9.6.0', '10.0.0'],
-      }
-    },
-    MIGRATION_CYPRESS_NOT_FOUND: () => {
-      return {
-        default: [],
       }
     },
     DEV_SERVER_CONFIG_FILE_NOT_FOUND: () => {
