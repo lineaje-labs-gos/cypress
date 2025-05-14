@@ -356,6 +356,8 @@ export class SnapshotGenerator {
     logInfo(`Writing snapshot script to ${this.snapshotScriptPath}`)
 
     if (this.minify) {
+      logInfo('Minifying snapshot script')
+
       const minified = await minify(this.snapshotScript!.toString(), {
         sourceMap: false,
       })
@@ -369,6 +371,8 @@ export class SnapshotGenerator {
     }
 
     // 4. Write the snapshot script to the configured file
+    logInfo(`Writing snapshot script to ${this.snapshotScriptPath}`)
+
     return fs.promises.writeFile(this.snapshotScriptPath, this.snapshotScript)
   }
 
