@@ -92,7 +92,7 @@ executors:
   # the Docker image with Cypress dependencies and Chrome browser
   cy-doc:
     docker:
-      - image: cypress/base-internal:20.18.3-bullseye
+      - image: cypress/base-internal:22.14.0-bullseye
     # by default, we use "medium" to balance performance + CI costs. bump or reduce on a per-job basis if needed.
     resource_class: medium
     environment:
@@ -100,7 +100,7 @@ executors:
 
   kitchensink-executor:
     docker:
-      - image: cypress/base-internal:20.18.3-bullseye
+      - image: cypress/base-internal:22.14.0-bullseye
     # by default, we use "medium" to balance performance + CI costs. bump or reduce on a per-job basis if needed.
     resource_class: medium
     environment:
@@ -109,7 +109,7 @@ executors:
   # Docker image with non-root "node" user
   non-root-docker-user:
     docker:
-      - image: cypress/base-internal:20.18.3-bullseye
+      - image: cypress/base-internal:22.14.0-bullseye
         user: node
     environment:
       PLATFORM: linux
@@ -1875,7 +1875,7 @@ jobs:
     working_directory: ~/cypress
     docker:
       # we need an image with yarn 4 berry installed on it to run this test
-      - image: cypress/base-internal:20.18.3-yarn-berry
+      - image: cypress/base-internal:22.14.0-yarn-berry
     environment:
       # needed to inform the bootstrap-docker-container.sh script to link the binary in the system-test project directory
       REPO_DIR: /root/cypress
@@ -1909,7 +1909,7 @@ jobs:
     parallelism: 1
     working_directory: ~/cypress
     docker:
-      - image: cypress/base-internal:20.18.3-bullseye
+      - image: cypress/base-internal:22.14.0-bullseye
     environment:
       # needed to inform the bootstrap-docker-container.sh script to link the binary in the system-test project directory
       REPO_DIR: /root/cypress
@@ -2563,7 +2563,7 @@ jobs:
     <<: *defaults
     resource_class: small
     docker:
-      - image: cypress/base-internal:18.17.1
+      - image: cypress/base-internal:22.14.0
     steps:
       - maybe_skip_binary_jobs
       - restore_workspace_binaries
