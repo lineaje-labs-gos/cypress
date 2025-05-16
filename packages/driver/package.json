@@ -22,6 +22,7 @@
     "@cypress/unique-selector": "0.0.5",
     "@cypress/webpack-dev-server": "0.0.0-development",
     "@cypress/webpack-preprocessor": "0.0.0-development",
+    "@module-federation/runtime": "^0.8.11",
     "@packages/config": "0.0.0-development",
     "@packages/errors": "0.0.0-development",
     "@packages/net-stubbing": "0.0.0-development",

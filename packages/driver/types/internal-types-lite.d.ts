@@ -1,6 +1,5 @@
 /// <reference path="./cy/logGroup.d.ts" />
 /// <reference path="./cypress/log.d.ts" />
-
 // All of the types needed by packages/app, without any of the additional APIs used in the driver only
 
 declare namespace Cypress {
@@ -41,6 +40,7 @@ declare namespace Cypress {
     (task: 'protocol:test:before:after:run:async', attributes: any, options: any): Promise<void>
     (task: 'protocol:url:changed', input: any): Promise<void>
     (task: 'protocol:page:loading', input: any): Promise<void>
+    (task: 'wait:for:cy:prompt:ready'): Promise<{ success: boolean }>
   }
 
   interface Devices {
