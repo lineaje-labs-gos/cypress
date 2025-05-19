@@ -37,6 +37,11 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress): Promise<CyProm
 export default (Commands, Cypress, cy) => {
   Commands.addAll({
     async prompt (message: string) {
+      if (!Cypress.config('experimentalCyPrompt')) {
+        // TODO: what do we want to do here?
+        throw new Error('cy.prompt() is not enabled. Please enable it by setting `experimentalCyPrompt: true` in your Cypress config.')
+      }
+
       try {
         let cloud = initializedCyPrompt
 

@@ -1,7 +1,7 @@
 import type { CyPromptManagerShape, CyPromptStatus, CyPromptServerDefaultShape, CyPromptServerShape, CyPromptCloudApi } from '@packages/types'
 import type { Router } from 'express'
 import Debug from 'debug'
-import { requireScript } from './require_script'
+import { requireScript } from '../require_script'
 
 interface CyPromptServer { default: CyPromptServerDefaultShape }
 
@@ -64,7 +64,9 @@ export class CyPromptManager implements CyPromptManagerShape {
         actualError = error
       }
 
-      this.status = 'IN_ERROR'
+      if (isEssential) {
+        this.status = 'IN_ERROR'
+      }
 
       // TODO: report error
       debug('Error invoking cy prompt server method %s: %o', method, actualError)

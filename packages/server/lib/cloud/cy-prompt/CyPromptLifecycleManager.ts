@@ -1,53 +1,37 @@
-import { CyPromptManager } from './cloud/cy-prompt'
+import { CyPromptManager } from './CyPromptManager'
 import Debug from 'debug'
 import type { CloudDataSource } from '@packages/data-context/src/sources'
-import type { Cfg } from './project-base'
 import type { DataContext } from '@packages/data-context'
-import { CloudRequest } from './cloud/api/cloud_request'
-import { isRetryableError } from './cloud/network/is_retryable_error'
-import { asyncRetry } from './util/async_retry'
-import { postCyPromptSession } from './cloud/api/cy-prompt/post_cy_prompt_session'
-import type { CyPromptStatus } from '@packages/types'
-import { getCyPromptBundle } from './cloud/api/cy-prompt/get_cy_prompt_bundle'
+import { CloudRequest } from '../api/cloud_request'
+import { isRetryableError } from '../network/is_retryable_error'
+import { asyncRetry } from '../../util/async_retry'
+import { postCyPromptSession } from '../api/cy-prompt/post_cy_prompt_session'
 import path from 'path'
 import os from 'os'
-import tar from 'tar'
-import { ensureDir, copy, readFile, remove } from 'fs-extra'
+import { readFile } from 'fs-extra'
+import { ensureCyPromptBundle } from './ensure_cy_prompt_bundle'
 
 const debug = Debug('cypress:server:cy-prompt-lifecycle-manager')
-
-export const cyPromptPath = path.join(os.tmpdir(), 'cypress', 'cy-prompt')
-
-const bundlePath = path.join(cyPromptPath, 'bundle.tar')
-const serverFilePath = path.join(cyPromptPath, 'server', 'index.js')
 
 export class CyPromptLifecycleManager {
   private cyPromptManagerPromise?: Promise<CyPromptManager | null>
   private cyPromptManager?: CyPromptManager
   private listeners: ((cyPromptManager: CyPromptManager) => void)[] = []
-  private ctx?: DataContext
-  private lastStatus?: CyPromptStatus
 
   /**
    * Initialize the cy prompt manager.
    * Also registers this instance in the data context.
    * @param projectId The project ID
    * @param cloudDataSource The cloud data source
-   * @param cfg The project configuration
-   * @param debugData Debug data for the configuration
    * @param ctx Data context to register this instance with
    */
   initializeCyPromptManager ({
     projectId,
     cloudDataSource,
-    cfg,
-    debugData,
     ctx,
   }: {
     projectId: string
     cloudDataSource: CloudDataSource
-    cfg: Cfg
-    debugData: any
     ctx: DataContext
   }): void {
     // Register this instance in the data context
@@ -55,13 +39,9 @@ export class CyPromptLifecycleManager {
       data.cyPromptLifecycleManager = this
     })
 
-    this.ctx = ctx
-
     const cyPromptManagerPromise = this.createCyPromptManager({
       projectId,
       cloudDataSource,
-      cfg,
-      debugData,
     }).catch(async (error) => {
       debug('Error during cy prompt manager setup: %o', error)
 
@@ -94,10 +74,6 @@ export class CyPromptLifecycleManager {
     this.cyPromptManagerPromise = cyPromptManagerPromise
   }
 
-  isCyPromptReady (): boolean {
-    return !!this.cyPromptManager
-  }
-
   async getCyPrompt () {
     if (!this.cyPromptManagerPromise) {
       throw new Error('cy prompt manager has not been initialized')
@@ -111,48 +87,28 @@ export class CyPromptLifecycleManager {
   private async createCyPromptManager ({
     projectId,
     cloudDataSource,
-    cfg,
-    debugData,
   }: {
     projectId: string
     cloudDataSource: CloudDataSource
-    cfg: Cfg
-    debugData: any
   }): Promise<CyPromptManager> {
     const cyPromptSession = await postCyPromptSession({
       projectId,
     })
 
-    // First remove cyPromptPath to ensure we have a clean slate
-    await remove(cyPromptPath)
-    await ensureDir(cyPromptPath)
+    // The cy prompt hash is the last part of the cy prompt URL, after the last slash and before the extension
+    const cyPromptHash = cyPromptSession.cyPromptUrl.split('/').pop()?.split('.')[0]
+    const cyPromptPath = path.join(os.tmpdir(), 'cypress', 'cy-prompt', cyPromptHash)
+    const bundlePath = path.join(cyPromptPath, 'bundle.tar')
+    const serverFilePath = path.join(cyPromptPath, 'server', 'index.js')
 
-    let cyPromptHash: string | undefined
-
-    if (!process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
-      await getCyPromptBundle({
-        cyPromptUrl: cyPromptSession.cyPromptUrl,
-        projectId,
-        bundlePath,
-      })
-
-      await tar.extract({
-        file: bundlePath,
-        cwd: cyPromptPath,
-      })
-
-      // The cy prompt hash is the last part of the cy prompt URL, after the last slash and before the extension
-      cyPromptHash = cyPromptSession.cyPromptUrl.split('/').pop()?.split('.')[0]
-    } else {
-      const driverPath = path.join(process.env.CYPRESS_LOCAL_CY_PROMPT_PATH, 'driver')
-      const serverPath = path.join(process.env.CYPRESS_LOCAL_CY_PROMPT_PATH, 'server')
-
-      await copy(driverPath, path.join(cyPromptPath, 'driver'))
-      await copy(serverPath, path.join(cyPromptPath, 'server'))
-    }
+    await ensureCyPromptBundle({
+      cyPromptUrl: cyPromptSession.cyPromptUrl,
+      projectId,
+      cyPromptPath,
+      bundlePath,
+    })
 
     const script = await readFile(serverFilePath, 'utf8')
-
     const cyPromptManager = new CyPromptManager()
 
     const cloudEnv = (process.env.CYPRESS_CONFIG_ENV || process.env.CYPRESS_INTERNAL_ENV || 'production') as 'development' | 'staging' | 'production'

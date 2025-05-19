@@ -1,0 +1,102 @@
+import { proxyquire, sinon } from '../../../spec_helper'
+import path from 'path'
+import type { CyPromptServerShape } from '@packages/types'
+import { expect } from 'chai'
+import esbuild from 'esbuild'
+import type { CyPromptManager as CyPromptManagerShape } from '@packages/server/lib/cloud/cy-prompt/CyPromptManager'
+import os from 'os'
+
+const { outputFiles: [{ contents: stubCyPromptRaw }] } = esbuild.buildSync({
+  entryPoints: [path.join(__dirname, '..', '..', '..', 'support', 'fixtures', 'cloud', 'cy-prompt', 'test-cy-prompt.ts')],
+  bundle: true,
+  format: 'cjs',
+  write: false,
+  platform: 'node',
+})
+const stubCyPrompt = new TextDecoder('utf-8').decode(stubCyPromptRaw)
+
+describe('lib/cloud/cy-prompt', () => {
+  let cyPromptManager: CyPromptManagerShape
+  let cyPrompt: CyPromptServerShape
+  let CyPromptManager: typeof import('@packages/server/lib/cloud/cy-prompt/CyPromptManager').CyPromptManager
+
+  beforeEach(async () => {
+    CyPromptManager = (proxyquire('../lib/cloud/cy-prompt/CyPromptManager', {
+    }) as typeof import('@packages/server/lib/cloud/cy-prompt/CyPromptManager')).CyPromptManager
+
+    cyPromptManager = new CyPromptManager()
+    await cyPromptManager.setup({
+      script: stubCyPrompt,
+      cyPromptPath: 'path',
+      cyPromptHash: 'abcdefg',
+      projectSlug: '1234',
+      cloudApi: {} as any,
+    })
+
+    cyPrompt = (cyPromptManager as any)._cyPromptServer
+
+    sinon.stub(os, 'platform').returns('darwin')
+    sinon.stub(os, 'arch').returns('x64')
+  })
+
+  afterEach(() => {
+    sinon.restore()
+  })
+
+  describe('synchronous method invocation', () => {
+    it('reports an error when a synchronous method fails', () => {
+      const error = new Error('foo')
+
+      sinon.stub(cyPrompt, 'initializeRoutes').throws(error)
+
+      cyPromptManager.initializeRoutes({} as any)
+
+      expect(cyPromptManager.status).to.eq('IN_ERROR')
+    })
+  })
+
+  describe('asynchronous method invocation', () => {
+    it('reports an error when a asynchronous method fails', async () => {
+      const error = new Error('foo')
+
+      sinon.stub(cyPrompt, 'handleBackendRequest').throws(error)
+
+      await cyPromptManager.handleBackendRequest('cy:prompt:start', {} as any)
+
+      expect(cyPromptManager.status).to.eq('IN_ERROR')
+    })
+  })
+
+  describe('initializeRoutes', () => {
+    it('initializes routes', () => {
+      sinon.stub(cyPrompt, 'initializeRoutes')
+      const mockRouter = sinon.stub()
+
+      cyPromptManager.initializeRoutes(mockRouter)
+
+      expect(cyPrompt.initializeRoutes).to.be.calledWith(mockRouter)
+    })
+  })
+
+  describe('handleBackendRequest', () => {
+    it('calls handleBackendRequest on the cy prompt server', () => {
+      sinon.stub(cyPrompt, 'handleBackendRequest')
+
+      cyPromptManager.handleBackendRequest('cy:prompt:start', {} as any)
+
+      expect(cyPrompt.handleBackendRequest).to.be.calledWith('cy:prompt:start', {} as any)
+    })
+
+    it('does not call handleBackendRequest when cy prompt server is not defined', () => {
+      // Set _cyPromptServer to undefined
+      (cyPromptManager as any)._cyPromptServer = undefined
+
+      // Create a spy on invokeSync to verify it's not called
+      const invokeSyncSpy = sinon.spy(cyPromptManager, 'invokeSync')
+
+      cyPromptManager.handleBackendRequest('cy:prompt:start', {} as any)
+
+      expect(invokeSyncSpy).to.not.be.called
+    })
+  })
+})

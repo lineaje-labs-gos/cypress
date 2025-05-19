@@ -16,7 +16,8 @@ const system = require(`../../lib/util/system`)
 const { getCtx } = require(`../../lib/makeDataContext`)
 const studio = require('../../lib/cloud/api/studio/get_and_initialize_studio_manager')
 const browsers = require('../../lib/browsers')
-const { StudioLifecycleManager } = require('../../lib/StudioLifecycleManager')
+const { CyPromptLifecycleManager } = require('../../lib/cloud/cy-prompt/CyPromptLifecycleManager')
+const { StudioLifecycleManager } = require('../../lib/cloud/StudioLifecycleManager')
 const { StudioManager } = require('../../lib/cloud/studio')
 
 let ctx
@@ -48,6 +49,8 @@ describe('lib/project-base', () => {
     }
 
     sinon.stub(studio, 'getAndInitializeStudioManager').resolves(this.testStudioManager)
+
+    CyPromptLifecycleManager.prototype.initializeCyPromptManager = sinon.stub()
 
     await ctx.actions.project.setCurrentProjectAndTestingTypeForTestSetup(this.todosPath)
     this.config = await ctx.project.getConfig()
@@ -448,6 +451,42 @@ This option will not have an effect in Some-other-name. Tests that rely on web s
       .then(() => {
         expect(system.info).not.to.be.called
         expect(runEvents.execute).not.to.be.calledWith('before:run')
+      })
+    })
+
+    describe('CyPromptLifecycleManager', function () {
+      it('initializes cy prompt lifecycle manager', function () {
+        this.config.projectId = 'abc123'
+        this.config.experimentalCyPrompt = true
+
+        return this.project.open()
+        .then(() => {
+          expect(CyPromptLifecycleManager.prototype.initializeCyPromptManager).to.be.calledWith({
+            projectId: 'abc123',
+            cloudDataSource: ctx.cloud,
+            ctx,
+          })
+        })
+      })
+
+      it('does not initialize cy prompt lifecycle manager if experimentalCyPrompt is not enabled', function () {
+        this.config.projectId = 'abc123'
+        this.config.experimentalCyPrompt = false
+
+        return this.project.open()
+        .then(() => {
+          expect(CyPromptLifecycleManager.prototype.initializeCyPromptManager).not.to.be.called
+        })
+      })
+
+      it('does not initialize cy prompt lifecycle manager if projectId is not set', function () {
+        this.config.projectId = undefined
+        this.config.experimentalCyPrompt = true
+
+        return this.project.open()
+        .then(() => {
+          expect(CyPromptLifecycleManager.prototype.initializeCyPromptManager).not.to.be.called
+        })
       })
     })
 

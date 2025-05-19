@@ -4,7 +4,7 @@ import fetch from 'cross-fetch'
 import os from 'os'
 import { agent } from '@packages/network'
 import { PUBLIC_KEY_VERSION } from '../../constants'
-import fs from 'fs'
+import { createWriteStream } from 'fs'
 import { verifySignatureFromFile } from '../../encryption'
 
 const pkg = require('@packages/root')
@@ -36,7 +36,7 @@ export const getCyPromptBundle = async ({ cyPromptUrl, projectId, bundlePath }: 
     responseSignature = response.headers.get('x-cypress-signature')
 
     await new Promise<void>((resolve, reject) => {
-      const writeStream = fs.createWriteStream(bundlePath)
+      const writeStream = createWriteStream(bundlePath)
 
       writeStream.on('error', reject)
       writeStream.on('finish', () => {

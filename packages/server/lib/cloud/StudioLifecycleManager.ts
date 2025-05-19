@@ -1,21 +1,21 @@
-import type { StudioManager } from './cloud/studio'
-import { ProtocolManager } from './cloud/protocol'
-import { getAndInitializeStudioManager } from './cloud/api/studio/get_and_initialize_studio_manager'
+import type { StudioManager } from './studio'
+import { ProtocolManager } from './protocol'
+import { getAndInitializeStudioManager } from './api/studio/get_and_initialize_studio_manager'
 import Debug from 'debug'
 import type { CloudDataSource } from '@packages/data-context/src/sources'
-import type { Cfg } from './project-base'
+import type { Cfg } from '../project-base'
 import _ from 'lodash'
 import type { DataContext } from '@packages/data-context'
-import api from './cloud/api'
-import { reportStudioError } from './cloud/api/studio/report_studio_error'
-import { CloudRequest } from './cloud/api/cloud_request'
-import { isRetryableError } from './cloud/network/is_retryable_error'
-import { asyncRetry } from './util/async_retry'
-import { postStudioSession } from './cloud/api/studio/post_studio_session'
+import api from './api'
+import { reportStudioError } from './api/studio/report_studio_error'
+import { CloudRequest } from './api/cloud_request'
+import { isRetryableError } from './network/is_retryable_error'
+import { asyncRetry } from '../util/async_retry'
+import { postStudioSession } from './api/studio/post_studio_session'
 import type { StudioStatus } from '@packages/types'
 
 const debug = Debug('cypress:server:studio-lifecycle-manager')
-const routes = require('./cloud/routes')
+const routes = require('./routes')
 
 export class StudioLifecycleManager {
   private studioManagerPromise?: Promise<StudioManager | null>
