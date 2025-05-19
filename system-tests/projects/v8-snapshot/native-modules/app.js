@@ -9,4 +9,9 @@ async function watchAndLearn () {
   console.log(JSON.stringify({ itemIsDir: fsevents.constants.ItemIsDir }))
 }
 
-watchAndLearn()
+watchAndLearn().then(() => {
+  process.exit(0)
+}).catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
