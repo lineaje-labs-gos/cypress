@@ -16,7 +16,6 @@ describe('CyPromptLifecycleManager', () => {
   let mockCyPromptManager: CyPromptManager
   let mockCtx: DataContext
   let mockCloudDataSource: CloudDataSource
-  let mockCfg: Cfg
   let CyPromptLifecycleManager: typeof import('../../../../lib/cloud/cy-prompt/CyPromptLifecycleManager').CyPromptLifecycleManager
   let postCyPromptSessionStub: sinon.SinonStub
   let cyPromptStatusChangeEmitterStub: sinon.SinonStub
@@ -99,8 +98,6 @@ describe('CyPromptLifecycleManager', () => {
       cyPromptLifecycleManager.initializeCyPromptManager({
         projectId: 'test-project-id',
         cloudDataSource: mockCloudDataSource,
-        cfg: mockCfg,
-        debugData: {},
         ctx: mockCtx,
       })
 
@@ -237,8 +234,6 @@ describe('CyPromptLifecycleManager', () => {
       cyPromptLifecycleManager.initializeCyPromptManager({
         projectId: 'test-project-id',
         cloudDataSource: mockCloudDataSource,
-        cfg: mockCfg,
-        debugData: {},
         ctx: mockCtx,
       })
 
