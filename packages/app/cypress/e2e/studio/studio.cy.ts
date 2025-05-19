@@ -1,6 +1,21 @@
 import { launchStudio, loadProjectAndRunSpec } from './helper'
 import pDefer from 'p-defer'
 
+// Add Chrome-specific performance.memory type
+interface ChromePerformance extends Performance {
+  memory: {
+    jsHeapSizeLimit: number
+    totalJSHeapSize: number
+    usedJSHeapSize: number
+  }
+}
+
+declare global {
+  interface Window {
+    performance: ChromePerformance
+  }
+}
+
 describe('Cypress Studio', () => {
   function incrementCounter (initialCount: number) {
     cy.getAutIframe().within(() => {
@@ -63,16 +78,14 @@ describe('studio functionality', () => {
     it('loads the studio UI correctly when studio bundle is taking too long to load', () => {
       loadProjectAndRunSpec({ enableCloudStudio: false })
 
-      cy.window().then(() => {
-        cy.withCtx((ctx) => {
-          // Mock the studioLifecycleManager.getStudio method to return a hanging promise
-          if (ctx.coreData.studioLifecycleManager) {
-            const neverResolvingPromise = new Promise<null>(() => {})
+      cy.withCtx((ctx) => {
+        // Mock the studioLifecycleManager.getStudio method to return a hanging promise
+        if (ctx.coreData.studioLifecycleManager) {
+          const neverResolvingPromise = new Promise<null>(() => {})
 
-            ctx.coreData.studioLifecycleManager.getStudio = () => neverResolvingPromise
-            ctx.coreData.studioLifecycleManager.isStudioReady = () => false
-          }
-        })
+          ctx.coreData.studioLifecycleManager.getStudio = () => neverResolvingPromise
+          ctx.coreData.studioLifecycleManager.isStudioReady = () => false
+        }
       })
 
       cy.contains('visits a basic html page')
@@ -805,8 +818,6 @@ describe('studio functionality', () => {
   it('does not create a new test if the Save test modal is closed', () => {
     loadProjectAndRunSpec({ specName: 'empty.cy.js', specSelector: 'title' })
 
-    cy.waitForSpecToFinish()
-
     cy.contains('Create test with Cypress Studio').click()
     cy.findByTestId('aut-url').as('urlPrompt')
 
@@ -1273,5 +1284,86 @@ describe('studio functionality', () => {
     cy.get('button').contains('Save Commands').click()
 
     cy.location().its('hash').should('contain', 'testId=r3').and('contain', 'studio=')
+  })
+
+  it('does not leak memory when interacting with studio', () => {
+    const MB = 1000 * 1000
+
+    const getMemoryUsage = async (win: Cypress.AUTWindow) => {
+      await Cypress.automation('remote:debugger:protocol', {
+        command: 'HeapProfiler.collectGarbage',
+      })
+
+      // ideally we'd use win.performance.measureUserAgentSpecificMemory()
+      // but since we aren't cross origin isolated, it's not available,
+      // so we'll just use the memory object
+      const memoryUsage = win.performance.memory
+
+      return memoryUsage
+    }
+
+    cy.mockNodeCloudRequest({
+      url: '/studio/testgen/n69px6/enabled',
+      method: 'get',
+      body: { enabled: true },
+    })
+
+    const aiOutput = `cy.get('button').should('have.text', 'Increment')`
+
+    cy.mockNodeCloudStreamingRequest({
+      url: '/studio/testgen/n69px6/generate',
+      method: 'post',
+      body: { recommendations: [{ content: aiOutput }] },
+    })
+
+    cy.mockStudioFullSnapshot({
+      id: 1,
+      nodeType: 1,
+      nodeName: 'div',
+      localName: 'div',
+      nodeValue: 'div',
+      children: [],
+      shadowRoots: [],
+    })
+
+    loadProjectAndRunSpec({ specName: 'spec-w-long-test.cy.js', enableCloudStudio: true })
+
+    cy.window().then(async (win) => {
+      // collect garbage before inspecting memory
+      const initialMemoryUsage = await getMemoryUsage(win)
+      let endingMemoryUsage
+
+      // load studio for the test
+      cy.contains('visits a basic html page')
+      .closest('.runnable-wrapper')
+      .findByTestId('launch-studio')
+      .click()
+
+      cy.get('[data-cy="studio-panel"]').should('be.visible')
+
+      cy.waitForSpecToFinish()
+
+      // accept the recommendation
+      cy.get('[data-cy="recommendation-accept-button"]').click()
+
+      // undo and redo 10 times
+      for (let i = 0; i < 10; i++) {
+        cy.get('[data-cy="studio-undo-button"]').click()
+        cy.get('[data-cy="studio-redo-button"]').click()
+      }
+
+      // close studio
+      cy.get('[data-cy="studio-header-studio-button"]').click()
+
+      cy.then(async () => {
+        endingMemoryUsage = await getMemoryUsage(win)
+
+        const usedMemory = endingMemoryUsage.usedJSHeapSize - initialMemoryUsage.usedJSHeapSize
+
+        // ~32.5 MB is the amount of memory used when the test is run (this can change as we add more tests)
+        // we allow for 0.5 MB of variance because the memory usage can change as we add more tests
+        expect(usedMemory).to.be.closeTo(32.5 * MB, 2 * MB)
+      })
+    })
   })
 })

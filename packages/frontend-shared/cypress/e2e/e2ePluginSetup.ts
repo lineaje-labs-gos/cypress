@@ -182,6 +182,21 @@ async function makeE2ETasks () {
   }
 
   return {
+    async __internal_getChromeProcessInfo () {
+      const CDP = require('chrome-remote-interface')
+
+      const port = Number(process.env.CYPRESS_REMOTE_DEBUGGING_PORT)
+      const versionInfo = await CDP.Version({ port })
+      const browserWsUrl = versionInfo.webSocketDebuggerUrl
+      const client = await CDP({ target: browserWsUrl })
+
+      const info = await client.SystemInfo.getProcessInfo()
+
+      await client.close()
+
+      return info
+    },
+
     /**
      * Called before all tests, cleans up any scaffolded projects and returns the global "launchpadPort".
      * The same GraphQL server is used for all integration tests, so we can
