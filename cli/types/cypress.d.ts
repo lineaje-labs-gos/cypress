@@ -1827,6 +1827,11 @@ declare namespace Cypress {
     prevUntil<E extends Node = HTMLElement>(element: E | JQuery<E>, filter?: string, options?: Partial<Loggable & Timeoutable>): Chainable<JQuery<E>>
 
     /**
+     * TODO: add docs
+     */
+    prompt(message: string, options?: Partial<Loggable & Timeoutable>): Chainable<Subject>
+
+    /**
      * Read a file and yield its contents.
      *
      * @see https://on.cypress.io/readfile
