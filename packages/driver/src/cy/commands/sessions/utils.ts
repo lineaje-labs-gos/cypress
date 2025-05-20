@@ -2,8 +2,13 @@ import _ from 'lodash'
 import $ from 'jquery'
 import Bluebird from 'bluebird'
 import { $Location } from '../../../cypress/location'
+import Debug from 'debug'
+
+const debug = Debug('cypress:sessions')
 
 const getSessionDetailsByDomain = (sessState: Cypress.SessionData) => {
+  debug('Getting session details by domain:', { id: sessState.id })
+
   return _.merge(
     _.mapValues(_.groupBy(sessState.cookies, 'domain'), (v) => ({ cookies: v })),
     ..._.map(sessState.localStorage, (v) => ({ [$Location.create(v.origin).hostname]: { localStorage: v } })),
@@ -14,6 +19,7 @@ const getSessionDetailsByDomain = (sessState: Cypress.SessionData) => {
 const isSecureContext = (url: string) => url.startsWith('https:')
 
 const getCurrentOriginStorage = () => {
+  debug('Getting current origin storage')
   // localStorage.length property is not always accurate, we must stringify to check for entries
   // for ex) try setting localStorage.key = 'val' and reading localStorage.length, may be 0.
   const _localStorageStr = JSON.stringify(window.localStorage)
@@ -24,10 +30,12 @@ const getCurrentOriginStorage = () => {
   const value = {} as any
 
   if (_localStorage) {
+    debug('Found localStorage data:', { size: Object.keys(_localStorage).length })
     value.localStorage = _localStorage
   }
 
   if (_sessionStorage) {
+    debug('Found sessionStorage data:', { size: Object.keys(_sessionStorage).length })
     value.sessionStorage = _sessionStorage
   }
 
@@ -35,6 +43,7 @@ const getCurrentOriginStorage = () => {
 }
 
 const setPostMessageLocalStorage = async (specWindow, originOptions) => {
+  debug('Setting postMessage localStorage for origins:', originOptions.map((o) => o.origin))
   const origins = originOptions.map((v) => v.origin) as string[]
 
   const iframes: JQuery<HTMLElement>[] = []
@@ -44,12 +53,20 @@ const setPostMessageLocalStorage = async (specWindow, originOptions) => {
   // if we're on an https domain, there is no way for the secure context to access insecure origins from iframes
   // since there is no way for the app to access localStorage on insecure contexts, we don't have to clear any localStorage on http domains.
   if (isSecureContext(specWindow.location.href)) {
+    const secureOrigins = origins.filter((v) => isSecureContext(v))
+
+    debug('Filtered to secure origins:', secureOrigins)
     _.remove(origins, (v) => !isSecureContext(v))
   }
 
-  if (!origins.length) return []
+  if (!origins.length) {
+    debug('No origins to process')
+
+    return []
+  }
 
   _.each(origins, (u) => {
+    debug('Creating iframe for origin:', u)
     const $iframe = $(`<iframe src="${`${u}/__cypress/automation/setLocalStorage?${u}`}"></iframe>`)
 
     $iframe.appendTo($iframeContainer)
@@ -65,7 +82,9 @@ const setPostMessageLocalStorage = async (specWindow, originOptions) => {
       const data = event.data
 
       if (data.type === 'set:storage:load') {
+        debug('Received set:storage:load message from:', event.origin)
         if (!event.source) {
+          debug('Failed to get localStorage - no event source')
           throw new Error('failed to get localStorage')
         }
 
@@ -73,8 +92,10 @@ const setPostMessageLocalStorage = async (specWindow, originOptions) => {
 
         event.source.postMessage({ type: 'set:storage:data', data: opts }, '*')
       } else if (data.type === 'set:storage:complete') {
+        debug('Received set:storage:complete from:', event.origin)
         successOrigins.push(event.origin)
         if (successOrigins.length === origins.length) {
+          debug('All origins completed successfully')
           resolve()
         }
       }
@@ -85,18 +106,23 @@ const setPostMessageLocalStorage = async (specWindow, originOptions) => {
   // timeout just in case something goes wrong and the iframe never loads in
   .timeout(2000)
   .finally(() => {
+    debug('Cleaning up postMessage listeners and iframes')
     specWindow.removeEventListener('message', onPostMessage)
     $iframeContainer.remove()
   })
   .catch(() => {
+    const failedOrigins = _.xor(origins, successOrigins)
+
+    debug('Failed to set localStorage for origins:', failedOrigins)
     Cypress.log({
       name: 'warning',
-      message: `failed to access session localStorage data on origin(s): ${_.xor(origins, successOrigins).join(', ')}`,
+      message: `failed to access session localStorage data on origin(s): ${failedOrigins.join(', ')}`,
     })
   })
 }
 
 const getConsoleProps = (session: Cypress.SessionData) => {
+  debug('Getting console props for session:', session.id)
   const sessionDetails = getSessionDetailsByDomain(session)
 
   const groupsByDomain = _.flatMap(sessionDetails, (val, domain) => {
@@ -141,6 +167,7 @@ const getConsoleProps = (session: Cypress.SessionData) => {
 }
 
 const getPostMessageLocalStorage = (specWindow, origins): Promise<any[]> => {
+  debug('Getting postMessage localStorage for origins:', origins)
   const results = [] as any[]
   const iframes: JQuery<HTMLElement>[] = []
   let onPostMessage
@@ -149,6 +176,7 @@ const getPostMessageLocalStorage = (specWindow, origins): Promise<any[]> => {
   const $iframeContainer = $(`<div style="display:none"></div>`).appendTo($('body', specWindow.document))
 
   _.each(origins, (u) => {
+    debug('Creating iframe for origin:', u)
     const $iframe = $(`<iframe src="${`${u}/__cypress/automation/getLocalStorage`}"></iframe>`)
 
     $iframe.appendTo($iframeContainer)
@@ -163,12 +191,14 @@ const getPostMessageLocalStorage = (specWindow, origins): Promise<any[]> => {
 
       if (data.type !== 'localStorage') return
 
+      debug('Received localStorage data from:', event.origin)
       const value = data.value
 
       results.push([event.origin, value])
 
       successOrigins.push(event.origin)
       if (successOrigins.length === origins.length) {
+        debug('All origins completed successfully')
         resolve(results)
       }
     })
@@ -178,13 +208,17 @@ const getPostMessageLocalStorage = (specWindow, origins): Promise<any[]> => {
   // timeout just in case something goes wrong and the iframe never loads in
   .timeout(2000)
   .finally(() => {
+    debug('Cleaning up postMessage listeners and iframes')
     specWindow.removeEventListener('message', onPostMessage)
     $iframeContainer.remove()
   })
   .catch((err) => {
+    const failedOrigins = _.xor(origins, successOrigins)
+
+    debug('Failed to get localStorage for origins:', failedOrigins)
     Cypress.log({
       name: 'warning',
-      message: `failed to access session localStorage data on origin(s): ${_.xor(origins, successOrigins).join(', ')}`,
+      message: `failed to access session localStorage data on origin(s): ${failedOrigins.join(', ')}`,
     })
 
     return []
@@ -192,17 +226,26 @@ const getPostMessageLocalStorage = (specWindow, origins): Promise<any[]> => {
 }
 
 function navigateAboutBlank ({ inBetweenTestsAndNextTestHasTestIsolationOn }: { inBetweenTestsAndNextTestHasTestIsolationOn?: boolean } = {}) {
+  debug('Navigating to about:blank', { inBetweenTestsAndNextTestHasTestIsolationOn })
   // Component testing never supports navigating to about:blank as that is handled by its unmount mechanism
   // When test isolation is off we typically don't navigate to about blank; however if we are in between tests and the next
   // test has test isolation on, we need to navigate to about blank to ensure the next test is not affected by the previous test
   if (Cypress.testingType === 'component' || (!Cypress.config('testIsolation') && !inBetweenTestsAndNextTestHasTestIsolationOn)) {
+    debug('Skipping about:blank navigation - component testing or test isolation off')
+
     return Promise.resolve()
   }
 
-  return new Promise((resolve) => {
-    cy.once('window:load', resolve)
+  return new Promise<void>((resolve) => {
+    debug('Setting up window:load listener')
+    cy.once('window:load', () => {
+      debug('Window load event received')
+      resolve()
+    })
 
     Cypress.action('cy:url:changed', '')
+
+    debug('Initiating visit to about:blank')
 
     return Cypress.action('cy:visit:blank', { testIsolation: true }) as unknown as Promise<void>
   })
