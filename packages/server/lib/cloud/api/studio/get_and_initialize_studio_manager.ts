@@ -1,10 +1,9 @@
 import path from 'path'
 import os from 'os'
-import { ensureDir, copy, readFile } from 'fs-extra'
+import { ensureDir, copy, readFile, remove } from 'fs-extra'
 import { StudioManager } from '../../studio'
 import tar from 'tar'
 import { verifySignatureFromFile } from '../../encryption'
-import crypto from 'crypto'
 import fs from 'fs'
 import fetch from 'cross-fetch'
 import { agent } from '@packages/network'
@@ -13,6 +12,7 @@ import { isRetryableError } from '../../network/is_retryable_error'
 import { PUBLIC_KEY_VERSION } from '../../constants'
 import { CloudRequest } from '../cloud_request'
 import type { CloudDataSource } from '@packages/data-context/src/sources'
+import type { StudioLifecycleManagerShape } from '@packages/types'
 
 interface Options {
   studioUrl: string
@@ -23,10 +23,25 @@ const pkg = require('@packages/root')
 
 const _delay = linearDelay(500)
 
+// Default timeout of 30 seconds for the download
+const DOWNLOAD_TIMEOUT_MS = 30000
+
 export const studioPath = path.join(os.tmpdir(), 'cypress', 'studio')
 
 const bundlePath = path.join(studioPath, 'bundle.tar')
 const serverFilePath = path.join(studioPath, 'server', 'index.js')
+
+async function downloadStudioBundleWithTimeout (args: Options & { downloadTimeoutMs?: number }) {
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('Cloud studio download timed out'))
+    }, args.downloadTimeoutMs || DOWNLOAD_TIMEOUT_MS)
+  })
+
+  const funcPromise = downloadStudioBundleToTempDirectory(args)
+
+  return Promise.race([funcPromise, timeoutPromise])
+}
 
 const downloadStudioBundleToTempDirectory = async ({ studioUrl, projectId }: Options): Promise<void> => {
   let responseSignature: string | null = null
@@ -46,6 +61,10 @@ const downloadStudioBundleToTempDirectory = async ({ studioUrl, projectId }: Opt
       },
       encrypt: 'signed',
     })
+
+    if (!response.ok) {
+      throw new Error(`Failed to download studio bundle: ${response.statusText}`)
+    }
 
     responseSignature = response.headers.get('x-cypress-signature')
 
@@ -77,26 +96,12 @@ const downloadStudioBundleToTempDirectory = async ({ studioUrl, projectId }: Opt
   }
 }
 
-const getTarHash = (): Promise<string> => {
-  let hash = ''
+export const retrieveAndExtractStudioBundle = async ({ studioUrl, projectId, downloadTimeoutMs }: Options & { downloadTimeoutMs?: number }): Promise<{ studioHash: string | undefined }> => {
+  // The studio hash is the last part of the studio URL, after the last slash and before the extension
+  const studioHash = studioUrl.split('/').pop()?.split('.')[0]
 
-  return new Promise<string>((resolve, reject) => {
-    fs.createReadStream(bundlePath)
-    .pipe(crypto.createHash('sha256'))
-    .setEncoding('base64url')
-    .on('data', (data) => {
-      hash += String(data)
-    })
-    .on('error', reject)
-    .on('close', () => {
-      resolve(hash)
-    })
-  })
-}
-
-export const retrieveAndExtractStudioBundle = async ({ studioUrl, projectId }: Options): Promise<{ studioHash: string | undefined }> => {
   // First remove studioPath to ensure we have a clean slate
-  await fs.promises.rm(studioPath, { recursive: true, force: true })
+  await remove(studioPath)
   await ensureDir(studioPath)
 
   // Note: CYPRESS_LOCAL_STUDIO_PATH is stripped from the binary, effectively removing this code path
@@ -110,9 +115,7 @@ export const retrieveAndExtractStudioBundle = async ({ studioUrl, projectId }: O
     return { studioHash: undefined }
   }
 
-  await downloadStudioBundleToTempDirectory({ studioUrl, projectId })
-
-  const studioHash = await getTarHash()
+  await downloadStudioBundleWithTimeout({ studioUrl, projectId, downloadTimeoutMs })
 
   await tar.extract({
     file: bundlePath,
@@ -122,7 +125,7 @@ export const retrieveAndExtractStudioBundle = async ({ studioUrl, projectId }: O
   return { studioHash }
 }
 
-export const getAndInitializeStudioManager = async ({ studioUrl, projectId, cloudDataSource }: { studioUrl: string, projectId?: string, cloudDataSource: CloudDataSource }): Promise<StudioManager> => {
+export const getAndInitializeStudioManager = async ({ studioUrl, projectId, cloudDataSource, shouldEnableStudio, downloadTimeoutMs, lifecycleManager }: { studioUrl: string, projectId?: string, cloudDataSource: CloudDataSource, shouldEnableStudio: boolean, downloadTimeoutMs?: number, lifecycleManager?: StudioLifecycleManagerShape }): Promise<StudioManager> => {
   let script: string
 
   const cloudEnv = (process.env.CYPRESS_CONFIG_ENV || process.env.CYPRESS_INTERNAL_ENV || 'production') as 'development' | 'staging' | 'production'
@@ -132,7 +135,7 @@ export const getAndInitializeStudioManager = async ({ studioUrl, projectId, clou
   let studioHash: string | undefined
 
   try {
-    ({ studioHash } = await retrieveAndExtractStudioBundle({ studioUrl, projectId }))
+    ({ studioHash } = await retrieveAndExtractStudioBundle({ studioUrl, projectId, downloadTimeoutMs }))
 
     script = await readFile(serverFilePath, 'utf8')
 
@@ -150,7 +153,7 @@ export const getAndInitializeStudioManager = async ({ studioUrl, projectId, clou
         isRetryableError,
         asyncRetry,
       },
-      shouldEnableStudio: !!(process.env.CYPRESS_ENABLE_CLOUD_STUDIO || process.env.CYPRESS_LOCAL_STUDIO_PATH),
+      shouldEnableStudio,
     })
 
     return studioManager
@@ -177,6 +180,6 @@ export const getAndInitializeStudioManager = async ({ studioUrl, projectId, clou
       studioMethod: 'getAndInitializeStudioManager',
     })
   } finally {
-    await fs.promises.rm(bundlePath, { force: true })
+    await remove(bundlePath)
   }
 }
