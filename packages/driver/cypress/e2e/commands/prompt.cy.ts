@@ -1,9 +1,9 @@
 describe('src/cy/commands/prompt', () => {
-  it('errors when cy.prompt() is not enabled', () => {
-    cy.visit('/fixtures/input_events.html')
+  it('executes the prompt command', () => {
+    cy.visit('/fixtures/dom.html')
 
-    cy.prompt('Hello, world!').should('throw')
+    // TODO: add more tests when cy.prompt is built out, but for now this just
+    // verifies that the command executes without throwing an error
+    cy.prompt('Hello, world!')
   })
-
-  // TODO: add more tests when cy.prompt is deployed
 })

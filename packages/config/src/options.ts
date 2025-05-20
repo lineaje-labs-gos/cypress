@@ -260,7 +260,7 @@ const driverConfigOptions: Array<DriverConfigOption> = [
     isExperimental: true,
     requireRestartOnChange: 'browser',
   }, {
-    name: 'experimentalCyPrompt',
+    name: 'experimentalPromptCommand',
     defaultValue: false,
     validation: validate.isBoolean,
     isExperimental: true,

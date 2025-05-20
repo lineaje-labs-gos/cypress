@@ -457,7 +457,7 @@ This option will not have an effect in Some-other-name. Tests that rely on web s
     describe('CyPromptLifecycleManager', function () {
       it('initializes cy prompt lifecycle manager', function () {
         this.config.projectId = 'abc123'
-        this.config.experimentalCyPrompt = true
+        this.config.experimentalPromptCommand = true
 
         return this.project.open()
         .then(() => {
@@ -469,9 +469,9 @@ This option will not have an effect in Some-other-name. Tests that rely on web s
         })
       })
 
-      it('does not initialize cy prompt lifecycle manager if experimentalCyPrompt is not enabled', function () {
+      it('does not initialize cy prompt lifecycle manager if experimentalPromptCommand is not enabled', function () {
         this.config.projectId = 'abc123'
-        this.config.experimentalCyPrompt = false
+        this.config.experimentalPromptCommand = false
 
         return this.project.open()
         .then(() => {
@@ -481,7 +481,7 @@ This option will not have an effect in Some-other-name. Tests that rely on web s
 
       it('does not initialize cy prompt lifecycle manager if projectId is not set', function () {
         this.config.projectId = undefined
-        this.config.experimentalCyPrompt = true
+        this.config.experimentalPromptCommand = true
 
         return this.project.open()
         .then(() => {

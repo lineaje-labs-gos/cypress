@@ -3159,10 +3159,10 @@ declare namespace Cypress {
      */
     experimentalStudio: boolean
     /**
-     * Enables the Cy-Prompt feature.
+     * Enables the prompt command feature.
      * @default false
      */
-    experimentalCyPrompt: boolean
+    experimentalPromptCommand: boolean
     /**
      * Adds support for testing in the WebKit browser engine used by Safari. See https://on.cypress.io/webkit-experiment for more information.
      * @default false
