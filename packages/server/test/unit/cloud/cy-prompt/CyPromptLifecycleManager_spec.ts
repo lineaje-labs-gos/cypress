@@ -3,7 +3,6 @@ import { expect } from 'chai'
 import { CyPromptManager } from '../../../../lib/cloud/cy-prompt/CyPromptManager'
 import { CyPromptLifecycleManager } from '../../../../lib/cloud/cy-prompt/CyPromptLifecycleManager'
 import type { DataContext } from '@packages/data-context'
-import type { Cfg } from '../../../../lib/project-base'
 import type { CloudDataSource } from '@packages/data-context/src/sources'
 import path from 'path'
 import os from 'os'
@@ -73,16 +72,6 @@ describe('CyPromptLifecycleManager', () => {
       getCloudUrl: sinon.stub().returns('https://cloud.cypress.io'),
       additionalHeaders: sinon.stub().resolves({ 'Authorization': 'Bearer test-token' }),
     } as CloudDataSource
-
-    mockCfg = {
-      projectId: 'abc123',
-      testingType: 'e2e',
-      projectRoot: '/test/project',
-      port: 8888,
-      proxyUrl: 'http://localhost:8888',
-      devServerPublicPathRoute: '/__cypress/src',
-      namespace: '__cypress',
-    } as unknown as Cfg
 
     postCyPromptSessionStub.resolves({
       cyPromptUrl: 'https://cloud.cypress.io/cy-prompt/bundle/abc.tgz',
