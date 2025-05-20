@@ -509,7 +509,6 @@ interface StubbedServerConfig {
 }
 
 export function setupPrimaryAlternateStubbedServer (servers: StubbedServerConfig[]) {
-  console.log('setupPrimaryAlternateStubbedServer', servers)
   systemTests.setup({
     servers: [
       ...servers.map(({ routes, port, static: isStatic }) => {
