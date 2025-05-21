@@ -463,7 +463,7 @@ export class SocketBase {
           debug('backend:request %o', { eventName, args })
 
           const backendRequest = () => {
-            if (eventName.startsWith('cy:prompt:')) {
+            if (eventName.startsWith('prompt:')) {
               return cyPrompt?.handleBackendRequest(eventName, ...args)
             }
 

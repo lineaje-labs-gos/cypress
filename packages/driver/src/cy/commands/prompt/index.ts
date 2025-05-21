@@ -36,24 +36,32 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress): Promise<CyProm
 
 export default (Commands, Cypress, cy) => {
   Commands.addAll({
-    async prompt (message: string) {
+    prompt (message: string) {
       if (!Cypress.config('experimentalPromptCommand')) {
         // TODO: what do we want to do here?
         throw new Error('cy.prompt() is not enabled. Please enable it by setting `experimentalPromptCommand: true` in your Cypress config.')
       }
 
-      try {
-        let cloud = initializedCyPrompt
+      const getCloud = async () => {
+        try {
+          let cloud = initializedCyPrompt
 
-        if (!cloud) {
-          cloud = await initializeCloudCyPrompt(Cypress)
+          console.log('cloud', cloud)
+          if (!cloud) {
+            cloud = await initializeCloudCyPrompt(Cypress)
+          }
+          console.log('cloud', cloud)
+          return cloud
+        } catch (error) {
+          // TODO: handle this better
+          console.error('Error in cy.prompt()', error)
+          throw new Error('CyPromptDriver not found')
         }
-
-        return await cloud.cyPrompt(Cypress, message)
-      } catch (error) {
-        // TODO: handle this better
-        throw new Error('CyPromptDriver not found')
       }
+
+      return cy.wrap(getCloud(), { log: false }).then((cloud) => {
+        return cloud.cyPrompt(Cypress, message)
+      })
     },
   })
 }
