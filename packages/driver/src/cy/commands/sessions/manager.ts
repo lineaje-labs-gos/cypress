@@ -2,6 +2,10 @@ import _ from 'lodash'
 import { getAllHtmlOrigins } from './origins'
 import { clearStorage, getStorage, setStorage } from './storage'
 
+const debug = (...args: any[]) => {
+  window.Cypress && Cypress.backend('log', 'cypress:driver:sessions:manager:', ...args)
+}
+
 const LOGS = {
   clearCurrentSessionData: {
     displayName: 'Clear cookies, localStorage and sessionStorage',
@@ -30,6 +34,7 @@ export default class SessionsManager {
   registeredSessions = new Map()
 
   constructor (Cypress, cy) {
+    debug('Initializing SessionsManager')
     this.Cypress = Cypress
     this.cy = cy
   }
@@ -43,12 +48,14 @@ export default class SessionsManager {
   }
 
   getActiveSession = (id: string): Cypress.SessionData => {
+    debug('Getting active session:', id)
     const currentSessions = this.cy.state('activeSessions') || {}
 
     return currentSessions[id]
   }
 
   clearActiveSessions = () => {
+    debug('Clearing active sessions')
     const curSessions = this.cy.state('activeSessions') || {}
     const clearedSessions: Cypress.ActiveSessions = _.mapValues(curSessions, (v) => ({ ...v, hydrated: false }))
 
@@ -56,6 +63,8 @@ export default class SessionsManager {
   }
 
   defineSession = (options = {} as any): Cypress.SessionData => {
+    debug('Defining new session:', options.id)
+
     return {
       id: options.id,
       cookies: null,
@@ -69,14 +78,18 @@ export default class SessionsManager {
   }
 
   saveSessionData = async (data) => {
+    debug('Saving session data:', data.id)
     this.setActiveSession({ [data.id]: data })
 
     // persist the session to the server. Only matters in openMode OR if there's a top navigation on a future test.
-    // eslint-disable-next-line no-console
-    return this.Cypress.backend('save:session', { ...data, setup: data.setup.toString(), validate: data.validate?.toString() }).catch(console.error)
+    return this.Cypress.backend('save:session', { ...data, setup: data.setup.toString(), validate: data.validate?.toString() }).catch((err) => {
+      debug('Error saving session:', err)
+      console.error(err) // eslint-disable-line no-console
+    })
   }
 
   setSessionData = async (data) => {
+    debug('Setting session data:', data.id)
     const allHtmlOrigins = await getAllHtmlOrigins(this.Cypress)
 
     let _localStorage = data.localStorage || []
@@ -92,15 +105,19 @@ export default class SessionsManager {
       }
     })
 
+    debug('Setting storage and cookies for session:', data.id)
     await Promise.all([
       setStorage(this.Cypress, { localStorage: _localStorage, sessionStorage: _sessionStorage }),
       this.sessions.setCookies(data.cookies),
     ])
+
+    debug('Session data set')
   }
 
   // this the public api exposed to consumers as Cypress.session
   sessions = {
     clearAllSavedSessions: async () => {
+      debug('Clearing all saved sessions')
       this.clearActiveSessions()
       this.registeredSessions.clear()
       const clearAllSessions = true
@@ -109,6 +126,7 @@ export default class SessionsManager {
     },
 
     clearCurrentSessionData: async () => {
+      debug('Clearing current session data')
       // this prevents a log occurring when we clear session in-between tests
       if (this.cy.state('duringUserTestExecution')) {
         this.Cypress.log(getLogProperties('clearCurrentSessionData'))
@@ -124,18 +142,25 @@ export default class SessionsManager {
     },
 
     getCookies: async () => {
+      debug('Getting cookies')
+
       return this.Cypress.automation('get:cookies', {})
     },
 
     setCookies: async (cookies) => {
+      debug('Setting cookies:', cookies?.length)
+
       return this.Cypress.automation('set:cookies', cookies)
     },
 
     clearCookies: async () => {
+      debug('Clearing cookies')
+
       return this.Cypress.automation('clear:cookies', await this.sessions.getCookies())
     },
 
     getCurrentSessionData: async () => {
+      debug('Getting current session data')
       const [storage, cookies] = await Promise.all([
         getStorage(this.Cypress, { origin: '*' }),
         this.sessions.getCookies(),
@@ -148,6 +173,8 @@ export default class SessionsManager {
     },
 
     getSession: (id: string): Promise<Cypress.ServerSessionData> => {
+      debug('Getting session:', id)
+
       return this.Cypress.backend('get:session', id)
     },
   }

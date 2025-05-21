@@ -10,6 +10,10 @@ import { getOrCreateHelperDom, getSelectorHighlightStyles, getZIndex, INT32_MAX 
 import highlightMounter from './selector-playground/highlight-mounter'
 import Highlight from './selector-playground/Highlight.ce.vue'
 
+const debug = (...args: any[]) => {
+  window.Cypress && Cypress.backend('log', 'cypress:runner:aut-iframe:', ...args)
+}
+
 // JQuery bundled w/ Cypress
 type $CypressJQuery = any
 
@@ -26,10 +30,12 @@ export class AutIframe {
     private eventManager: any,
     private $: $CypressJQuery,
   ) {
+    debug('Initializing AutIframe for project:', projectName)
     this.debouncedToggleSelectorPlayground = _.debounce(this.toggleSelectorPlayground, 300)
   }
 
   create (): JQuery<HTMLIFrameElement> {
+    debug('Creating iframe')
     const $iframe = this.$('<iframe>', {
       id: `Your project: '${this.projectName}'`,
       title: `Your project: '${this.projectName}'`,
@@ -37,31 +43,39 @@ export class AutIframe {
     })
 
     this.$iframe = $iframe
+    debug('Iframe created:', { id: $iframe.attr('id') })
 
     return $iframe
   }
 
   destroy () {
+    debug('Destroying iframe')
     if (!this.$iframe) {
+      debug('Cannot destroy - iframe not created')
       throw Error(`Cannot call #remove without first calling #create`)
     }
 
     this.$iframe.remove()
+    debug('Iframe removed')
   }
 
   _showInitialBlankPage () {
+    debug('Showing initial blank page')
     this._showContents(blankContents.initial())
   }
 
   _showTestIsolationBlankPage () {
+    debug('Showing test isolation blank page')
     this._showContents(blankContents.testIsolationBlankPage())
   }
 
   showVisitFailure = (props) => {
+    debug('Showing visit failure:', props)
     this._showContents(blankContents.visitFailure(props))
   }
 
   _showContents (contents) {
+    debug('Showing contents in iframe')
     this._body()?.html(contents)
   }
 
@@ -82,9 +96,14 @@ export class AutIframe {
   }
 
   detachDom = () => {
+    debug('Detaching DOM')
     const Cypress = this.eventManager.getCypress()
 
-    if (!Cypress) return
+    if (!Cypress) {
+      debug('Cannot detach DOM - Cypress not available')
+
+      return
+    }
 
     return Cypress.cy.detachDom(this._contents())
   }
@@ -96,21 +115,33 @@ export class AutIframe {
    * If the AUT origin is "about://blank", that means the src attribute has been stripped off the iframe and is adhering to same origin policy
    */
   doesAUTMatchTopSuperDomainOrigin = () => {
+    debug('Checking if AUT matches top super domain origin')
     const Cypress = this.eventManager.getCypress()
 
-    if (!Cypress) return true
+    if (!Cypress) {
+      debug('Cypress not available, assuming match')
+
+      return true
+    }
 
     try {
       const { href: currentHref } = (this.$iframe as any)[0].contentWindow.document.location
       const locationTop = Cypress.Location.create(window.location.href)
       const locationAUT = Cypress.Location.create(currentHref)
 
-      return locationTop.superDomainOrigin === locationAUT.superDomainOrigin || locationAUT.superDomainOrigin === 'about://blank'
+      const matches = locationTop.superDomainOrigin === locationAUT.superDomainOrigin || locationAUT.superDomainOrigin === 'about://blank'
+
+      debug('Origin match result:', { matches, top: locationTop.superDomainOrigin, aut: locationAUT.superDomainOrigin })
+
+      return matches
     } catch (err) {
       if (err.name === 'SecurityError') {
+        debug('Security error checking origins')
+
         return false
       }
 
+      debug('Error checking origins:', err)
       throw err
     }
   }
@@ -120,31 +151,41 @@ export class AutIframe {
    * See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src for more details
    */
   removeSrcAttribute = () => {
+    debug('Removing src attribute from iframe')
     this.$iframe?.removeAttr('src')
   }
 
   visitBlankPage = (testIsolation?: boolean) => {
+    debug('Visiting blank page:', { testIsolation })
+
     return new Promise<void>((resolve) => {
       if (!this.$iframe) {
+        debug('Cannot visit blank page - iframe not created')
+
         return
       }
 
       this.$iframe.one('load', () => {
+        debug('Blank page loaded')
         if (testIsolation) {
           this._showTestIsolationBlankPage()
         } else {
           this._showInitialBlankPage()
         }
 
+        debug('Resolving visit promise')
         resolve()
       })
 
+      debug('Setting iframe src to about:blank')
       this.$iframe[0].src = 'about:blank'
     })
   }
 
   restoreDom = (snapshot) => {
+    debug('Restoring DOM from snapshot')
     if (!this.doesAUTMatchTopSuperDomainOrigin()) {
+      debug('AUT does not match top super domain origin, handling cross-origin case')
       /**
        * A load event fires here when the src is removed (as does an unload event).
        * This is equivalent to loading about:blank (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src).
@@ -152,6 +193,7 @@ export class AutIframe {
        * In the event-manager code, we stop adding logs from other domains once the spec is finished.
        */
       this.$iframe?.one('load', () => {
+        debug('Iframe loaded after src removal, retrying DOM restore')
         this.restoreDom(snapshot)
       })
 
@@ -168,6 +210,8 @@ export class AutIframe {
     const contents = this._contents()
     const $html = contents?.find('html') as any as JQuery<HTMLHtmlElement>
 
+    debug('Restoring DOM elements:', { hasHeadStyles: !!headStyles, hasBodyStyles: !!bodyStyles, hasHtmlAttrs: !!htmlAttrs })
+
     if ($html) {
       this._replaceHtmlAttrs($html, htmlAttrs)
     }
@@ -175,7 +219,7 @@ export class AutIframe {
     this._replaceHeadStyles(headStyles)
 
     // remove the old body and replace with restored one
-
+    debug('Replacing body')
     this._body()?.remove()
     this._insertBodyStyles(body.get(), bodyStyles)
     $html?.append(body.get())
@@ -188,6 +232,7 @@ export class AutIframe {
   // note htmlAttrs is actually `NamedNodeMap`: https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap
   // but typing it correctly gives a lot more weird typing errors
   _replaceHtmlAttrs ($html: JQuery<HTMLHtmlElement>, htmlAttrs: Record<string, string>) {
+    debug('Replacing HTML attributes')
     let oldAttrs = {}
 
     // remove all attributes
@@ -208,6 +253,7 @@ export class AutIframe {
   }
 
   _replaceHeadStyles (styles: Record<string, any> = {}) {
+    debug('Replacing head styles:', { styleCount: Object.keys(styles).length })
     const $head = this._contents()?.find('head')
     const existingStyles = $head?.find('link[rel="stylesheet"],style')
 
@@ -227,11 +273,13 @@ export class AutIframe {
 
     // remove any extra stylesheets
     if (existingStyles && existingStyles.length > styles.length) {
+      debug('Removing extra stylesheets:', { count: existingStyles.length - styles.length })
       existingStyles.slice(styles.length).remove()
     }
   }
 
   _replaceLink ($head, existingStyle, style) {
+    debug('Replacing link stylesheet:', { href: style.href })
     const linkTag = this._linkTag(style)
 
     if (!existingStyle) {
@@ -248,6 +296,7 @@ export class AutIframe {
   }
 
   _replaceStyle ($head, existingStyle, style) {
+    debug('Replacing style tag')
     const styleTag = this._styleTag(style)
 
     if (existingStyle) {
@@ -260,6 +309,7 @@ export class AutIframe {
   }
 
   _insertBodyStyles ($body, styles: Record<string, any> = {}) {
+    debug('Inserting body styles:', { styleCount: Object.keys(styles).length })
     _.each(styles, (style) => {
       $body.append(style.href ? this._linkTag(style) : this._styleTag(style))
     })
@@ -274,6 +324,7 @@ export class AutIframe {
   }
 
   highlightEl = ({ body }, { $el, coords, highlightAttr, scrollBy }) => {
+    debug('Highlighting element:', { hasCoords: !!coords, hasHighlightAttr: !!highlightAttr })
     this.removeHighlights()
 
     if (body) {
@@ -290,11 +341,13 @@ export class AutIframe {
 
     // scroll the top of the element into view
     if (el) {
+      debug('Scrolling element into view')
       el.scrollIntoView()
       // if we have a scrollBy on our command
       // then we need to additional scroll the window
       // by these offsets
       if (scrollBy) {
+        debug('Applying additional scroll:', scrollBy)
         this.$iframe?.prop('contentWindow').scrollBy(scrollBy.x, scrollBy.y)
       }
     }
@@ -303,7 +356,11 @@ export class AutIframe {
       const $_el = this.$(element)
 
       // bail if our el no longer exists in the parent body
-      if (!this.$.contains(body, element)) return
+      if (!this.$.contains(body, element)) {
+        debug('Element no longer exists in parent body')
+
+        return
+      }
 
       // switch to using offsetWidth + offsetHeight
       // because we want to highlight our element even
@@ -312,6 +369,8 @@ export class AutIframe {
 
       // dont show anything if our element displaces nothing
       if (dimensions.width === 0 || dimensions.height === 0 || $_el.css('display') === 'none') {
+        debug('Element has no dimensions or is hidden')
+
         return
       }
 
@@ -319,6 +378,7 @@ export class AutIframe {
     })
 
     if (coords) {
+      debug('Adding hit box layer for coordinates')
       requestAnimationFrame(() => {
         this._addHitBoxLayer(coords, $body.get(0)).setAttribute('data-highlight-hitbox', 'true')
       })
@@ -326,13 +386,19 @@ export class AutIframe {
   }
 
   removeHighlights = () => {
+    debug('Removing highlights')
     this._contents() && this._contents()?.find('.__cypress-highlight').remove()
   }
 
   toggleSelectorPlayground = (isEnabled) => {
+    debug('Toggling selector playground:', { isEnabled })
     const $body = this._body()
 
-    if (!$body) return
+    if (!$body) {
+      debug('Cannot toggle selector playground - no body element')
+
+      return
+    }
 
     if (isEnabled) {
       $body.on('mouseenter', this._resetShowHighlight)
@@ -349,15 +415,21 @@ export class AutIframe {
   }
 
   _resetShowHighlight = () => {
+    debug('Resetting show highlight')
     const selectorPlaygroundStore = useSelectorPlaygroundStore()
 
     selectorPlaygroundStore.setShowingHighlight(false)
   }
 
   _onSelectorMouseMove = (e: JQuery.MouseMoveEvent) => {
+    debug('Selector mouse move')
     const $body = this._body()
 
-    if (!$body) return
+    if (!$body) {
+      debug('Cannot handle mouse move - no body element')
+
+      return
+    }
 
     let el = e.target
     let $el = this.$(el)
@@ -369,6 +441,7 @@ export class AutIframe {
     }
 
     if ($ancestorHighlight.length || $el.hasClass('__cypress-selector-playground')) {
+      debug('Handling highlight element mouse move')
       const $highlight = $el
 
       $highlight.css('display', 'none')
@@ -392,6 +465,7 @@ export class AutIframe {
       selector,
       showTooltip: true,
       onClick: () => {
+        debug('Selector clicked:', { selector })
         selectorPlaygroundStore.setNumElements(1)
         selectorPlaygroundStore.resetMethod()
         selectorPlaygroundStore.setSelector(selector)
@@ -401,9 +475,14 @@ export class AutIframe {
   }
 
   _clearHighlight = () => {
+    debug('Clearing highlight')
     const $body = this._body()
 
-    if (!$body) return
+    if (!$body) {
+      debug('Cannot clear highlight - no body element')
+
+      return
+    }
 
     this._addOrUpdateSelectorPlaygroundHighlight({
       $el: null,
@@ -416,6 +495,7 @@ export class AutIframe {
   }
 
   toggleSelectorHighlight (isShowingHighlight: boolean) {
+    debug('Toggling selector highlight:', { isShowingHighlight })
     const selectorPlaygroundStore = useSelectorPlaygroundStore()
 
     if (!isShowingHighlight) {
@@ -447,10 +527,15 @@ export class AutIframe {
   }
 
   getElements (cypressDom) {
+    debug('Getting elements for selector')
     const selectorPlaygroundStore = useSelectorPlaygroundStore()
     const $contents = this._contents()
 
-    if (!$contents || !selectorPlaygroundStore.selector) return
+    if (!$contents || !selectorPlaygroundStore.selector) {
+      debug('Cannot get elements - no contents or selector')
+
+      return
+    }
 
     return this._getElementsForSelector({
       method: selectorPlaygroundStore.method,
@@ -461,6 +546,7 @@ export class AutIframe {
   }
 
   printSelectorElementsToConsole () {
+    debug('Printing selector elements to console')
     logger.clearLog()
 
     const Cypress = this.eventManager.getCypress()
@@ -470,6 +556,8 @@ export class AutIframe {
     const selectorPlaygroundStore = useSelectorPlaygroundStore()
 
     if (!$el) {
+      debug('No elements found to print')
+
       return logger.logFormatted({
         name: selectorPlaygroundStore.command,
         type: 'command',
@@ -479,6 +567,7 @@ export class AutIframe {
       })
     }
 
+    debug('Printing elements:', { count: $el.length })
     logger.logFormatted({
       name: selectorPlaygroundStore.command,
       type: 'command',
@@ -490,24 +579,33 @@ export class AutIframe {
   }
 
   startStudio () {
+    debug('Starting studio')
     const studioStore = useStudioStore()
 
     if (studioStore.isLoading) {
+      debug('Studio is loading, starting')
       studioStore.start(this._body()?.[0])
+    } else {
+      debug('Studio is not loading, skipping start')
     }
   }
 
   reattachStudio () {
+    debug('Reattaching studio')
     const studioStore = useStudioStore()
 
     if (studioStore.isActive) {
       const body = this._body()?.[0]
 
       if (!body) {
+        debug('Cannot reattach studio - no body element')
         throw Error(`Cannot reattach Studio without the HTMLBodyElement for the app`)
       }
 
+      debug('Reattaching studio listeners to body')
       studioStore.attachListeners(body)
+    } else {
+      debug('Studio is not active, skipping reattach')
     }
   }
 

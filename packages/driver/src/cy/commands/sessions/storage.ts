@@ -4,6 +4,10 @@ import { $Location } from '../../../cypress/location'
 import { getAllHtmlOrigins, mapOrigins } from './origins'
 import { getCurrentOriginStorage, getPostMessageLocalStorage, setPostMessageLocalStorage } from './utils'
 
+const debug = (...args: any[]) => {
+  window.Cypress && Cypress.backend('log', 'cypress:driver:sessions:storage:', ...args)
+}
+
 export type StorageType = 'localStorage' | 'sessionStorage'
 
 interface GetStorageOptions {
@@ -29,9 +33,11 @@ interface SetStoragesOptions {
   *      then follow 2)
   */
 export async function getStorage (Cypress: Cypress.Cypress, options: GetStorageOptions = {}): Promise<Cypress.Storages> {
+  debug('Getting storage with options:', options)
   const specWindow = Cypress.state('specWindow')
 
   if (!_.isObject(options)) {
+    debug('Invalid options - not an object')
     throw new Error('getStorage() takes an object')
   }
 
@@ -41,12 +47,16 @@ export async function getStorage (Cypress: Cypress.Cypress, options: GetStorageO
 
   const currentOrigin = window.location.origin
   const origins: Array<string> = await mapOrigins(Cypress, opts.origin)
+
+  debug('Mapped origins:', origins)
+
   const results = {
     localStorage: [] as Cypress.OriginStorage[],
     sessionStorage: [] as Cypress.OriginStorage[],
   }
 
   function pushValue (origin, value) {
+    debug('Pushing storage value for origin:', origin)
     if (!_.isEmpty(value.localStorage)) {
       results.localStorage.push({ origin, value: value.localStorage })
     }
@@ -59,6 +69,7 @@ export async function getStorage (Cypress: Cypress.Cypress, options: GetStorageO
   const currentOriginIndex = origins.indexOf(currentOrigin)
 
   if (currentOriginIndex !== -1) {
+    debug('Processing current origin storage')
     origins.splice(currentOriginIndex, 1)
     const currentOriginStorage = getCurrentOriginStorage()
 
@@ -66,24 +77,36 @@ export async function getStorage (Cypress: Cypress.Cypress, options: GetStorageO
   }
 
   if (_.isEmpty(origins)) {
+    debug('No additional origins to process')
+
     return results
   }
 
   if (currentOrigin.startsWith('https:')) {
+    debug('Filtering out http origins for https context')
     _.remove(origins, (v) => v.startsWith('http:'))
   }
 
+  debug('Getting postMessage localStorage for remaining origins')
   const postMessageResults = await getPostMessageLocalStorage(specWindow, origins)
 
   postMessageResults.forEach((val) => {
     pushValue(val[0], val[1])
   })
 
+  debug('Storage retrieval complete:', {
+    localStorageCount: results.localStorage.length,
+    sessionStorageCount: results.sessionStorage.length,
+  })
+
   return results
 }
 
 export async function clearStorage (Cypress: Cypress.Cypress, type?: StorageType) {
+  debug('Clearing storage:', type || 'all')
   const origins = await getAllHtmlOrigins(Cypress)
+
+  debug('Found origins to clear:', origins)
   const originOptions = origins.map((origin) => ({ origin, clear: true }))
   const options: SetStoragesOptions = {}
 
@@ -96,9 +119,11 @@ export async function clearStorage (Cypress: Cypress.Cypress, type?: StorageType
   }
 
   await setStorage(Cypress, options)
+  debug('Storage cleared')
 }
 
 async function setStorageOnOrigins (Cypress: Cypress.Cypress, originOptions) {
+  debug('Setting storage on origins:', originOptions?.map((o) => o.origin))
   const specWindow = Cypress.state('specWindow')
 
   const currentOrigin = window.location.origin
@@ -106,10 +131,12 @@ async function setStorageOnOrigins (Cypress: Cypress.Cypress, originOptions) {
   const currentOriginIndex = _.findIndex(originOptions, { origin: currentOrigin })
 
   if (currentOriginIndex !== -1) {
+    debug('Processing current origin storage')
     const opts = originOptions.splice(currentOriginIndex, 1)[0]
 
     if (!_.isEmpty(opts.localStorage)) {
       if (opts.localStorage.clear) {
+        debug('Clearing localStorage')
         window.localStorage.clear()
       }
 
@@ -118,6 +145,7 @@ async function setStorageOnOrigins (Cypress: Cypress.Cypress, originOptions) {
 
     if (opts.sessionStorage) {
       if (opts.sessionStorage.clear) {
+        debug('Clearing sessionStorage')
         window.sessionStorage.clear()
       }
 
@@ -126,13 +154,21 @@ async function setStorageOnOrigins (Cypress: Cypress.Cypress, originOptions) {
   }
 
   if (_.isEmpty(originOptions)) {
+    debug('No additional origins to process')
+
     return
   }
 
+  debug('Setting postMessage localStorage for remaining origins')
   await setPostMessageLocalStorage(specWindow, originOptions)
 }
 
 export async function setStorage (Cypress: Cypress.Cypress, options: SetStoragesOptions) {
+  debug('Setting storage with options:', {
+    localStorageCount: options.localStorage?.length,
+    sessionStorageCount: options.sessionStorage?.length,
+  })
+
   const currentOrigin = window.location.origin
 
   function mapToCurrentOrigin (v) {
@@ -154,5 +190,8 @@ export async function setStorage (Cypress: Cypress.Cypress, options: SetStorages
 
   const storageOptions = _.map(_.groupBy(mappedLocalStorage.concat(mappedSessionStorage), 'origin'), (v) => _.merge({}, ...v))
 
+  debug('Mapped storage options:', storageOptions.map((o) => o.origin))
+
   await setStorageOnOrigins(Cypress, storageOptions)
+  debug('Storage set complete')
 }

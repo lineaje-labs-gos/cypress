@@ -534,6 +534,8 @@ export class SocketBase {
                 })
               case 'close:extra:targets':
                 return options.closeExtraTargets()
+              case 'log':
+                return console.log(...args) // eslint-disable-line no-console
               default:
                 throw new Error(`You requested a backend event we cannot handle: ${eventName}`)
             }

@@ -2,9 +2,10 @@ import _ from 'lodash'
 import $ from 'jquery'
 import Bluebird from 'bluebird'
 import { $Location } from '../../../cypress/location'
-import Debug from 'debug'
 
-const debug = Debug('cypress:sessions')
+const debug = (...args: any[]) => {
+  window.Cypress && Cypress.backend('log', 'cypress:driver:sessions:utils:', ...args)
+}
 
 const getSessionDetailsByDomain = (sessState: Cypress.SessionData) => {
   debug('Getting session details by domain:', { id: sessState.id })

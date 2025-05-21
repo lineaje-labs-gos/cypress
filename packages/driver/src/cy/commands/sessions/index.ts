@@ -11,9 +11,10 @@ import {
   SESSION_STEPS,
   statusMap,
 } from './utils'
-import Debug from 'debug'
 
-const debug = Debug('cypress:sessions')
+const debug = (...args: any[]) => {
+  window.Cypress && Cypress.backend('log', 'cypress:driver:sessions:index:', ...args)
+}
 
 /**
  * Session data should be cleared with spec browser launch.
@@ -52,6 +53,8 @@ export default function (Commands, Cypress, cy) {
       if (!Cypress.config('testIsolation')) {
         return
       }
+
+      debug('Clearing current session data')
 
       return sessions.clearCurrentSessionData()
       .then(() => {
@@ -116,12 +119,6 @@ export default function (Commands, Cypress, cy) {
         const hasUniqSetupDefinition = session.setup.toString().trim() !== setup.toString().trim()
         const hasUniqValidateDefinition = (!!session.validate !== !!options.validate) || (!!session.validate && !!options.validate && session.validate.toString().trim() !== options.validate.toString().trim())
         const hasUniqPersistence = session.cacheAcrossSpecs !== !!options.cacheAcrossSpecs
-
-        debug('Session comparison:', {
-          hasUniqSetupDefinition,
-          hasUniqValidateDefinition,
-          hasUniqPersistence,
-        })
 
         if (isRegisteredSessionForSpec && (hasUniqSetupDefinition || hasUniqValidateDefinition || hasUniqPersistence)) {
           $errUtils.throwErrByPath('sessions.session.duplicateId', {
@@ -492,6 +489,7 @@ export default function (Commands, Cypress, cy) {
           await navigateAboutBlank()
           debug('Clearing current session data')
           await sessions.clearCurrentSessionData()
+          debug('Cleared current session data')
 
           return cy.whenStable(() => createSession(existingSession, step))
         })
@@ -524,6 +522,7 @@ export default function (Commands, Cypress, cy) {
           await navigateAboutBlank()
           debug('Clearing current session data')
           await sessions.clearCurrentSessionData()
+          debug('Cleared current session data')
 
           return restoreSession(existingSession)
         })
