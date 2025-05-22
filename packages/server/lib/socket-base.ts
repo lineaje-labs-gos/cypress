@@ -466,6 +466,10 @@ export class SocketBase {
 
           const backendRequest = () => {
             if (eventName.startsWith('prompt:')) {
+              if (eventName === 'prompt:reset' && runState) {
+                return null
+              }
+
               return cyPrompt?.handleBackendRequest(eventName, ...args)
             }
 

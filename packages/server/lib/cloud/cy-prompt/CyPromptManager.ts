@@ -41,7 +41,7 @@ export class CyPromptManager implements CyPromptManagerShape {
 
   async handleBackendRequest (eventName: string, ...args: any[]): Promise<any> {
     if (this._cyPromptServer) {
-      return this.invokeAsync('handleBackendRequest', { isEssential: true }, eventName, ...args)
+      return this.invokeAsync('handleBackendRequest', { isEssential: false }, eventName, ...args)
     }
   }
 

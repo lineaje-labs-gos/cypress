@@ -1,5 +1,5 @@
 import { init, loadRemote } from '@module-federation/runtime'
-import type{ CyPromptDriverDefaultShape } from './prompt-driver-types'
+import type { CyPromptDriverDefaultShape } from './prompt-driver-types'
 
 interface CyPromptDriver { default: CyPromptDriverDefaultShape }
 
@@ -36,7 +36,9 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress): Promise<CyProm
 
 export default (Commands, Cypress, cy) => {
   Commands.addAll({
-    prompt (message: string) {
+    prompt (message: string | string[], options = {}) {
+      const promptCmd = cy.state('current')
+
       if (!Cypress.config('experimentalPromptCommand')) {
         // TODO: what do we want to do here?
         throw new Error('cy.prompt() is not enabled. Please enable it by setting `experimentalPromptCommand: true` in your Cypress config.')
@@ -55,12 +57,23 @@ export default (Commands, Cypress, cy) => {
           // TODO: handle this better
           // eslint-disable-next-line no-console
           console.error('Error in cy.prompt()', error)
-          throw new Error('CyPromptDriver not found')
+
+          return new Error('CyPromptDriver not found')
         }
       }
 
-      return cy.wrap(getCloud(), { log: false }).then((cloud) => {
-        return cloud.cyPrompt(Cypress, message)
+      return cy.wrap(getCloud(), { log: false }).then((cloudOrError) => {
+        if (cloudOrError instanceof Error) {
+          throw cloudOrError
+        }
+
+        return cloudOrError.cyPrompt({
+          Cypress,
+          message,
+          options,
+          promptCmd,
+          cy,
+        })
       })
     },
   })
