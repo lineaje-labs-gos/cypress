@@ -131,6 +131,7 @@ export class CyPromptLifecycleManager {
 
     debug('cy prompt is ready')
     this.cyPromptManager = cyPromptManager
+
     this.callRegisteredListeners()
 
     return cyPromptManager

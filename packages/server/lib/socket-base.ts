@@ -153,6 +153,7 @@ export class SocketBase {
       onTestFileChange () {},
       onCaptureVideoFrames () {},
       onStudioInit () {},
+      onCyPromptReady () {},
       onStudioDestroy () {},
     })
 
@@ -451,6 +452,7 @@ export class SocketBase {
         let cyPrompt: CyPromptManagerShape | undefined
 
         getCtx().coreData.cyPromptLifecycleManager?.registerCyPromptReadyListener((cp) => {
+          options.onCyPromptReady(cp)
           cyPrompt = cp
         })
 

@@ -439,6 +439,11 @@ export function connectProtocolToBrowser (): Promise<void> {
   throw new Error('Protocol is not yet supported in firefox.')
 }
 
+export function connectCyPromptToBrowser (): Promise<void> {
+  // TODO: we will maybe want to connect BIDI for cy prompt in firefox
+  throw new Error('CyPrompt is not yet supported in firefox.')
+}
+
 export function closeProtocolConnection (): Promise<void> {
   throw new Error('Protocol is not yet supported in firefox.')
 }

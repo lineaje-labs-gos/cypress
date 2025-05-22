@@ -1,4 +1,5 @@
 import type { CyPromptManagerShape, CyPromptStatus, CyPromptServerDefaultShape, CyPromptServerShape, CyPromptCloudApi } from '@packages/types'
+import type { CDPClient } from '@packages/types/src/cy-prompt/cy-prompt-server-types'
 import type { Router } from 'express'
 import Debug from 'debug'
 import { requireScript } from '../require_script'
@@ -44,6 +45,12 @@ export class CyPromptManager implements CyPromptManagerShape {
     }
   }
 
+  connectToBrowser (cdpClient: CDPClient): void {
+    if (this._cyPromptServer) {
+      return this.invokeSync('connectToBrowser', { isEssential: true }, cdpClient)
+    }
+  }
+
   /**
    * Abstracts invoking a synchronous method on the CyPromptServer instance, so we can handle
    * errors in a uniform way
@@ -54,6 +61,7 @@ export class CyPromptManager implements CyPromptManagerShape {
     }
 
     try {
+      // @ts-expect-error - TS not associating the method & args properly, even though we know it's correct
       return this._cyPromptServer[method].apply(this._cyPromptServer, args)
     } catch (error: unknown) {
       let actualError: Error

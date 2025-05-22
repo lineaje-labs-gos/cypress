@@ -46,14 +46,14 @@ export default (Commands, Cypress, cy) => {
         try {
           let cloud = initializedCyPrompt
 
-          console.log('cloud', cloud)
           if (!cloud) {
             cloud = await initializeCloudCyPrompt(Cypress)
           }
-          console.log('cloud', cloud)
+
           return cloud
         } catch (error) {
           // TODO: handle this better
+          // eslint-disable-next-line no-console
           console.error('Error in cy.prompt()', error)
           throw new Error('CyPromptDriver not found')
         }
