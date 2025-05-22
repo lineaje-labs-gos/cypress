@@ -425,7 +425,6 @@ export class EventManager {
 
   async setup (config) {
     this.ws.emit('watch:test:file', config.spec)
-    Cypress.backend('prompt:reset', config.spec).catch(() => {})
 
     if (config.isTextTerminal || config.experimentalInteractiveRunEvents) {
       await new Promise((resolve, reject) => {
@@ -442,6 +441,7 @@ export class EventManager {
     }
 
     Cypress = this.Cypress = this.$CypressDriver.create(config)
+    Cypress.backend('prompt:reset', config.spec).catch(() => {})
     this.localBus.emit('cypress:created', Cypress)
 
     // expose Cypress globally

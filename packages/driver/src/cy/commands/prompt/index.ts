@@ -34,47 +34,50 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress): Promise<CyProm
   return module.default
 }
 
+const getCloud = async (): Promise<CyPromptDriverDefaultShape | Error> => {
+  try {
+    let cloud = initializedCyPrompt
+
+    if (!cloud) {
+      cloud = await initializeCloudCyPrompt(Cypress)
+    }
+
+    return cloud
+  } catch (error) {
+    // TODO: handle this better
+    // eslint-disable-next-line no-console
+    console.error('Error in cy.prompt()', error)
+
+    return new Error('CyPromptDriver not found')
+  }
+}
+
+const isError = (value: unknown): value is Error => {
+  return value instanceof Error
+}
+
 export default (Commands, Cypress, cy) => {
-  Commands.addAll({
-    prompt (message: string | string[], options = {}) {
-      const promptCmd = cy.state('current')
+  if (Cypress.config('experimentalPromptCommand')) {
+    const cloud = getCloud()
 
-      if (!Cypress.config('experimentalPromptCommand')) {
-        // TODO: what do we want to do here?
-        throw new Error('cy.prompt() is not enabled. Please enable it by setting `experimentalPromptCommand: true` in your Cypress config.')
-      }
+    Commands.addAll({
+      prompt (text: string | string[], options = {}) {
+        const promptCmd = cy.state('current')
 
-      const getCloud = async () => {
-        try {
-          let cloud = initializedCyPrompt
-
-          if (!cloud) {
-            cloud = await initializeCloudCyPrompt(Cypress)
+        return cy.wrap(cloud, { log: false }).then((cloudOrError) => {
+          if (isError(cloudOrError)) {
+            throw cloudOrError
           }
 
-          return cloud
-        } catch (error) {
-          // TODO: handle this better
-          // eslint-disable-next-line no-console
-          console.error('Error in cy.prompt()', error)
-
-          return new Error('CyPromptDriver not found')
-        }
-      }
-
-      return cy.wrap(getCloud(), { log: false }).then((cloudOrError) => {
-        if (cloudOrError instanceof Error) {
-          throw cloudOrError
-        }
-
-        return cloudOrError.cyPrompt({
-          Cypress,
-          message,
-          options,
-          promptCmd,
-          cy,
+          return cloudOrError.cyPrompt({
+            Cypress,
+            text,
+            options,
+            promptCmd,
+            cy,
+          })
         })
-      })
-    },
-  })
+      },
+    })
+  }
 }

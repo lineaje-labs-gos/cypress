@@ -1829,7 +1829,7 @@ declare namespace Cypress {
     /**
      * TODO: add docs
      */
-    prompt(message: string, options?: Partial<Loggable & Timeoutable>): Chainable<Subject>
+    prompt(message: string, options?: Partial<Loggable & Timeoutable>): Chainable<null>
 
     /**
      * Read a file and yield its contents.
