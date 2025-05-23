@@ -27,6 +27,4 @@ export const ensureCyPromptBundle = async ({ cyPromptUrl, projectId, cyPromptPat
     file: bundlePath,
     cwd: cyPromptPath,
   })
-
-  return { cyPromptPath }
 }
