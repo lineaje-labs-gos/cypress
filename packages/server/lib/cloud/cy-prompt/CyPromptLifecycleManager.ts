@@ -10,6 +10,7 @@ import path from 'path'
 import os from 'os'
 import { readFile } from 'fs-extra'
 import { ensureCyPromptBundle } from './ensure_cy_prompt_bundle'
+import type { AuthenticatedUserShape } from '@packages/data-context/src/data'
 
 const debug = Debug('cypress:server:cy-prompt-lifecycle-manager')
 
@@ -34,6 +35,7 @@ export class CyPromptLifecycleManager {
     cloudDataSource: CloudDataSource
     ctx: DataContext
   }): void {
+    debug('initializing cy prompt')
     // Register this instance in the data context
     ctx.update((data) => {
       data.cyPromptLifecycleManager = this
@@ -42,6 +44,8 @@ export class CyPromptLifecycleManager {
     const cyPromptManagerPromise = this.createCyPromptManager({
       projectId,
       cloudDataSource,
+      getUser: () => ctx._apis.authApi.getUser(),
+      getConfig: () => ctx.project.getConfig(),
     }).catch(async (error) => {
       debug('Error during cy prompt manager setup: %o', error)
 
@@ -87,9 +91,13 @@ export class CyPromptLifecycleManager {
   private async createCyPromptManager ({
     projectId,
     cloudDataSource,
+    getUser,
+    getConfig,
   }: {
     projectId: string
     cloudDataSource: CloudDataSource
+    getUser: () => Promise<AuthenticatedUserShape>
+    getConfig: () => Promise<Partial<Cypress.ResolvedConfigOptions & Cypress.ResolvedConfigOptions>>
   }): Promise<CyPromptManager> {
     const cyPromptSession = await postCyPromptSession({
       projectId,
@@ -127,6 +135,8 @@ export class CyPromptLifecycleManager {
         isRetryableError,
         asyncRetry,
       },
+      getUser,
+      config: await getConfig(),
     })
 
     debug('cy prompt is ready')

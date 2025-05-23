@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-
+import type { AuthenticatedUserShape } from '@packages/data-context/src/data/coreDataShape'
 import type ProtocolMapping from 'devtools-protocol/types/protocol-mapping.d'
 import type { Router } from 'express'
 import type { AxiosInstance } from 'axios'
@@ -34,6 +34,8 @@ export interface CyPromptServerOptions {
   cyPromptPath: string
   projectSlug?: string
   cloudApi: CyPromptCloudApi
+  getUser(): Promise<Partial<AuthenticatedUserShape>>
+  config: Partial<Cypress.ResolvedConfigOptions & Cypress.ResolvedConfigOptions>
 }
 
 export interface CyPromptCDPClient {

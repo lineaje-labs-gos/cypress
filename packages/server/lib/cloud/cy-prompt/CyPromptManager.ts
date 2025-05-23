@@ -1,17 +1,13 @@
-import type { CyPromptManagerShape, CyPromptStatus, CyPromptServerDefaultShape, CyPromptServerShape, CyPromptCloudApi } from '@packages/types'
-import type { CDPClient } from '@packages/types/src/cy-prompt/cy-prompt-server-types'
+import type { CyPromptManagerShape, CyPromptStatus, CyPromptServerDefaultShape, CyPromptServerShape } from '@packages/types'
+import type { CyPromptCDPClient, CyPromptServerOptions } from '@packages/types/src/cy-prompt/cy-prompt-server-types'
 import type { Router } from 'express'
 import Debug from 'debug'
 import { requireScript } from '../require_script'
 
 interface CyPromptServer { default: CyPromptServerDefaultShape }
 
-interface SetupOptions {
+interface SetupOptions extends CyPromptServerOptions {
   script: string
-  cyPromptPath: string
-  cyPromptHash?: string
-  projectSlug?: string
-  cloudApi: CyPromptCloudApi
 }
 
 const debug = Debug('cypress:server:cy-prompt')
@@ -20,7 +16,7 @@ export class CyPromptManager implements CyPromptManagerShape {
   status: CyPromptStatus = 'NOT_INITIALIZED'
   private _cyPromptServer: CyPromptServerShape | undefined
 
-  async setup ({ script, cyPromptPath, cyPromptHash, projectSlug, cloudApi }: SetupOptions): Promise<void> {
+  async setup ({ script, cyPromptPath, cyPromptHash, projectSlug, cloudApi, getUser, config }: SetupOptions): Promise<void> {
     const { createCyPromptServer } = requireScript<CyPromptServer>(script).default
 
     this._cyPromptServer = await createCyPromptServer({
@@ -28,6 +24,8 @@ export class CyPromptManager implements CyPromptManagerShape {
       cyPromptPath,
       projectSlug,
       cloudApi,
+      getUser,
+      config,
     })
 
     this.status = 'INITIALIZED'
@@ -45,7 +43,7 @@ export class CyPromptManager implements CyPromptManagerShape {
     }
   }
 
-  connectToBrowser (cdpClient: CDPClient): void {
+  connectToBrowser (cdpClient: CyPromptCDPClient): void {
     if (this._cyPromptServer) {
       return this.invokeSync('connectToBrowser', { isEssential: true }, cdpClient)
     }
