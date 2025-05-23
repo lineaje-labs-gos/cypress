@@ -97,7 +97,7 @@ export class CyPromptLifecycleManager {
     projectId: string
     cloudDataSource: CloudDataSource
     getUser: () => Promise<AuthenticatedUserShape>
-    getConfig: () => Promise<Partial<Cypress.ResolvedConfigOptions & Cypress.ResolvedConfigOptions>>
+    getConfig: () => Promise<Partial<Cypress.RuntimeConfigOptions & Cypress.ResolvedConfigOptions>>
   }): Promise<CyPromptManager> {
     const cyPromptSession = await postCyPromptSession({
       projectId,

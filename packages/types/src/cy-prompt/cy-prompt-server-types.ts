@@ -35,7 +35,7 @@ export interface CyPromptServerOptions {
   projectSlug?: string
   cloudApi: CyPromptCloudApi
   getUser(): Promise<Partial<AuthenticatedUserShape>>
-  config: Partial<Cypress.ResolvedConfigOptions & Cypress.ResolvedConfigOptions>
+  config: Partial<Cypress.RuntimeConfigOptions & Cypress.ResolvedConfigOptions>
 }
 
 export interface CyPromptCDPClient {
