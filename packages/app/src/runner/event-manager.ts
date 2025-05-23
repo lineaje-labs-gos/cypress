@@ -441,7 +441,6 @@ export class EventManager {
     }
 
     Cypress = this.Cypress = this.$CypressDriver.create(config)
-    Cypress.backend('prompt:reset', config.spec).catch(() => {})
     this.localBus.emit('cypress:created', Cypress)
 
     // expose Cypress globally
@@ -466,6 +465,8 @@ export class EventManager {
     }
 
     this._addListeners()
+
+    Cypress.backend('prompt:reset', config.spec).catch(() => {})
   }
 
   isBrowserFamily (family: string) {
