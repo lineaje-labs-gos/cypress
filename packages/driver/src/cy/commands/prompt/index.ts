@@ -5,7 +5,7 @@ interface CyPromptDriver { default: CyPromptDriverDefaultShape }
 
 let initializedCyPrompt: CyPromptDriverDefaultShape | null = null
 const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress): Promise<CyPromptDriverDefaultShape> => {
-  const { success } = await Cypress.backend('wait:for:cy:prompt:ready')
+  const { success } = await Cypress.promptBackend('wait:for:cy:prompt:ready')
 
   if (!success) {
     throw new Error('CyPromptDriver not found')

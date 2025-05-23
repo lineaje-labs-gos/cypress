@@ -12,6 +12,7 @@ declare namespace Cypress {
       toSpecBridge: (origin: string, event: string, data?: any, responseEvent?: string) => void
       userInvocationStack?: string
     }
+    promptBackend: (eventName: string, ...args: any[]) => Promise<{ success: boolean }>
   }
 
   interface Actions {

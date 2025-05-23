@@ -765,6 +765,14 @@ class $Cypress {
   }
 
   backend (eventName, ...args) {
+    return this.backendBase('backend:request', eventName, ...args)
+  }
+
+  promptBackend (eventName, ...args) {
+    return this.backendBase('prompt:backend:request', eventName, ...args)
+  }
+
+  private backendBase (baseEventName, eventName, ...args) {
     return new Promise((resolve, reject) => {
       const fn = function (reply) {
         const e = reply.error
@@ -787,7 +795,7 @@ class $Cypress {
         return resolve(reply.response)
       }
 
-      return this.emit('backend:request', eventName, ...args, fn)
+      return this.emit(baseEventName, eventName, ...args, fn)
     })
   }
 

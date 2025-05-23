@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 export interface CypressInternal extends Cypress.Cypress {
-  backend: (eventName: string, ...args: any[]) => Promise<any>
+  promptBackend: (eventName: string, ...args: any[]) => Promise<any>
 }
 
 export interface CyPromptOptions {
