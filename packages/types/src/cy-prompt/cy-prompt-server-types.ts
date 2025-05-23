@@ -1,5 +1,9 @@
+// Note: This file is owned by the cloud delivered
+// cy prompt bundle. It is downloaded and copied here.
+// It should not be modified directly here.
+
 /// <reference types="cypress" />
-import type { AuthenticatedUserShape } from '@packages/data-context/src/data/coreDataShape'
+
 import type ProtocolMapping from 'devtools-protocol/types/protocol-mapping.d'
 import type { Router } from 'express'
 import type { AxiosInstance } from 'axios'
@@ -14,6 +18,13 @@ interface RetryOptions {
   retryDelay?: (attempt: number) => number
   shouldRetry?: (err?: unknown) => boolean
   onRetry?: (delay: number, err: unknown) => void
+}
+
+export interface CyPromptAuthenticatedUserShape {
+  id?: string //Cloud user id
+  name?: string
+  email?: string
+  authToken?: string
 }
 
 export interface CyPromptCloudApi {
@@ -34,7 +45,7 @@ export interface CyPromptServerOptions {
   cyPromptPath: string
   projectSlug?: string
   cloudApi: CyPromptCloudApi
-  getUser(): Promise<Partial<AuthenticatedUserShape>>
+  getUser(): Promise<Partial<CyPromptAuthenticatedUserShape>>
   config: Partial<Cypress.RuntimeConfigOptions & Cypress.ResolvedConfigOptions>
 }
 

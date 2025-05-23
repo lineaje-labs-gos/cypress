@@ -19,7 +19,7 @@ import { webpackReporter, webpackRunner } from './tasks/gulpWebpack'
 import { e2eTestScaffold, e2eTestScaffoldWatch } from './tasks/gulpE2ETestScaffold'
 import dedent from 'dedent'
 import { ensureCloudValidations, syncCloudValidations } from './tasks/gulpSyncValidations'
-import { downloadStudioTypes } from './tasks/gulpCloudDeliveredTypes'
+import { downloadStudioTypes, downloadPromptTypes } from './tasks/gulpCloudDeliveredTypes'
 
 if (process.env.CYPRESS_INTERNAL_VITE_DEV) {
   process.env.CYPRESS_INTERNAL_VITE_APP_PORT ??= '3333'
@@ -61,6 +61,9 @@ gulp.task(
     webpackReporter,
     webpackRunner,
     gulp.series(
+      gulp.parallel(
+        downloadPromptTypes,
+      ),
       makePathMap,
       // Before dev, fetch the latest "remote" schema from Cypress Cloud
       syncRemoteGraphQL,
@@ -257,6 +260,7 @@ gulp.task(openCypressApp)
 gulp.task(openCypressLaunchpad)
 
 gulp.task(downloadStudioTypes)
+gulp.task(downloadPromptTypes)
 
 // If we want to run individually, for debugging/testing
 gulp.task('cyOpenLaunchpadOnly', cyOpenLaunchpad)
