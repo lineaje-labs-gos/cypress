@@ -36,7 +36,7 @@ export interface CyPromptServerOptions {
   cloudApi: CyPromptCloudApi
 }
 
-export interface CDPClient {
+export interface CyPromptCDPClient {
   send<T extends Extract<keyof Commands, string>>(
     command: T,
     params?: Command<T>['paramsType'][0]
@@ -50,7 +50,7 @@ export interface CDPClient {
 export interface CyPromptServerShape {
   initializeRoutes(router: Router): void
   handleBackendRequest: (eventName: string, ...args: any[]) => Promise<any>
-  connectToBrowser: (cdpClient: CDPClient) => void
+  connectToBrowser: (cdpClient: CyPromptCDPClient) => void
 }
 
 export interface CyPromptServerDefaultShape {
