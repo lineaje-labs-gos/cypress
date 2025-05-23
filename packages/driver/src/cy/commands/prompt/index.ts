@@ -34,7 +34,7 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress): Promise<CyProm
   return module.default
 }
 
-const getCloud = async (): Promise<CyPromptDriverDefaultShape | Error> => {
+const getCloud = async (Cypress: Cypress.Cypress): Promise<CyPromptDriverDefaultShape | Error> => {
   try {
     let cloud = initializedCyPrompt
 
@@ -58,7 +58,7 @@ const isError = (value: unknown): value is Error => {
 
 export default (Commands, Cypress, cy) => {
   if (Cypress.config('experimentalPromptCommand')) {
-    const cloud = getCloud()
+    const cloud = getCloud(Cypress)
 
     Commands.addAll({
       prompt (text: string | string[], options = {}) {
