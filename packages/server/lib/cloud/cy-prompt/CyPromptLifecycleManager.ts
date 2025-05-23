@@ -16,6 +16,7 @@ import chokidar from 'chokidar'
 const debug = Debug('cypress:server:cy-prompt-lifecycle-manager')
 
 export class CyPromptLifecycleManager {
+  private static watcher: chokidar.FSWatcher | null = null
   private cyPromptManagerPromise?: Promise<CyPromptManager | null>
   private cyPromptManager?: CyPromptManager
   private listeners: ((cyPromptManager: CyPromptManager) => void)[] = []
@@ -42,11 +43,13 @@ export class CyPromptLifecycleManager {
       data.cyPromptLifecycleManager = this
     })
 
+    const getUser = () => ctx._apis.authApi.getUser()
+    const getConfig = () => ctx.project.getConfig()
     const cyPromptManagerPromise = this.createCyPromptManager({
       projectId,
       cloudDataSource,
-      getUser: () => ctx._apis.authApi.getUser(),
-      getConfig: () => ctx.project.getConfig(),
+      getUser,
+      getConfig,
     }).catch(async (error) => {
       debug('Error during cy prompt manager setup: %o', error)
 
@@ -77,6 +80,29 @@ export class CyPromptLifecycleManager {
     })
 
     this.cyPromptManagerPromise = cyPromptManagerPromise
+
+    // If the cy prompt is local, we need to watch for changes to the cy prompt
+    // and reload the cy prompt manager on file changes
+    if (process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
+      // Close the watcher if it already exists
+      if (CyPromptLifecycleManager.watcher) {
+        CyPromptLifecycleManager.watcher.close()
+      }
+
+      // Watch for changes to the cy prompt
+      CyPromptLifecycleManager.watcher = chokidar.watch(path.join(process.env.CYPRESS_LOCAL_CY_PROMPT_PATH, 'server', 'index.js'), {
+        awaitWriteFinish: true,
+      }).on('change', () => {
+        this.createCyPromptManager({
+          projectId,
+          cloudDataSource,
+          getUser,
+          getConfig,
+        }).catch((error) => {
+          debug('Error during reload of cy prompt manager: %o', error)
+        })
+      })
+    }
   }
 
   async getCyPrompt () {
@@ -150,21 +176,6 @@ export class CyPromptLifecycleManager {
     debug('cy prompt is ready')
     this.cyPromptManager = cyPromptManager
 
-    if (process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
-      chokidar.watch(serverFilePath, {
-        awaitWriteFinish: true,
-      }).on('change', () => {
-        this.createCyPromptManager({
-          projectId,
-          cloudDataSource,
-          getUser,
-          getConfig,
-        }).catch((error) => {
-          debug('Error during reload of cy prompt manager: %o', error)
-        })
-      })
-    }
-
     this.callRegisteredListeners()
 
     return cyPromptManager
@@ -198,6 +209,12 @@ export class CyPromptLifecycleManager {
     if (this.cyPromptManager) {
       debug('cy prompt ready - calling listener immediately')
       listener(this.cyPromptManager)
+
+      // If the cy prompt is local, we need to register the listener as well
+      // since the cy prompt manager will be reloaded on file changes
+      if (process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
+        this.listeners.push(listener)
+      }
     } else {
       debug('cy prompt not ready - registering cy prompt ready listener')
       this.listeners.push(listener)
