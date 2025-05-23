@@ -128,6 +128,8 @@ export const createCommonRoutes = ({
 
     router.use('/', cyPromptRouter)
     getCtx().coreData.cyPromptLifecycleManager?.registerCyPromptReadyListener((cyPrompt) => {
+      // Remove existing routes prior to registering new ones
+      cyPromptRouter.stack = []
       cyPrompt.initializeRoutes(cyPromptRouter)
     })
   }

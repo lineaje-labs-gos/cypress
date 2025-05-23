@@ -11,6 +11,7 @@ import os from 'os'
 import { readFile } from 'fs-extra'
 import { ensureCyPromptBundle } from './ensure_cy_prompt_bundle'
 import type { AuthenticatedUserShape } from '@packages/data-context/src/data'
+import chokidar from 'chokidar'
 
 const debug = Debug('cypress:server:cy-prompt-lifecycle-manager')
 
@@ -99,22 +100,29 @@ export class CyPromptLifecycleManager {
     getUser: () => Promise<AuthenticatedUserShape>
     getConfig: () => Promise<Partial<Cypress.RuntimeConfigOptions & Cypress.ResolvedConfigOptions>>
   }): Promise<CyPromptManager> {
-    const cyPromptSession = await postCyPromptSession({
-      projectId,
-    })
+    let cyPromptPath: string
+    let cyPromptHash: string
 
-    // The cy prompt hash is the last part of the cy prompt URL, after the last slash and before the extension
-    const cyPromptHash = cyPromptSession.cyPromptUrl.split('/').pop()?.split('.')[0]
-    const cyPromptPath = path.join(os.tmpdir(), 'cypress', 'cy-prompt', cyPromptHash)
-    const bundlePath = path.join(cyPromptPath, 'bundle.tar')
+    if (!process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
+      const cyPromptSession = await postCyPromptSession({
+        projectId,
+      })
+
+      // The cy prompt hash is the last part of the cy prompt URL, after the last slash and before the extension
+      cyPromptHash = cyPromptSession.cyPromptUrl.split('/').pop()?.split('.')[0]
+      cyPromptPath = path.join(os.tmpdir(), 'cypress', 'cy-prompt', cyPromptHash)
+
+      await ensureCyPromptBundle({
+        cyPromptPath,
+        cyPromptUrl: cyPromptSession.cyPromptUrl,
+        projectId,
+      })
+    } else {
+      cyPromptPath = process.env.CYPRESS_LOCAL_CY_PROMPT_PATH
+      cyPromptHash = 'local'
+    }
+
     const serverFilePath = path.join(cyPromptPath, 'server', 'index.js')
-
-    await ensureCyPromptBundle({
-      cyPromptUrl: cyPromptSession.cyPromptUrl,
-      projectId,
-      cyPromptPath,
-      bundlePath,
-    })
 
     const script = await readFile(serverFilePath, 'utf8')
     const cyPromptManager = new CyPromptManager()
@@ -142,6 +150,21 @@ export class CyPromptLifecycleManager {
     debug('cy prompt is ready')
     this.cyPromptManager = cyPromptManager
 
+    if (process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
+      chokidar.watch(serverFilePath, {
+        awaitWriteFinish: true,
+      }).on('change', () => {
+        this.createCyPromptManager({
+          projectId,
+          cloudDataSource,
+          getUser,
+          getConfig,
+        }).catch((error) => {
+          debug('Error during reload of cy prompt manager: %o', error)
+        })
+      })
+    }
+
     this.callRegisteredListeners()
 
     return cyPromptManager
@@ -159,7 +182,11 @@ export class CyPromptLifecycleManager {
       listener(cyPromptManager)
     })
 
-    this.listeners = []
+    // Don't clear listeners if the cy prompt is local since we
+    // will be reloading the cy prompt manager on file changes
+    if (!process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
+      this.listeners = []
+    }
   }
 
   /**
