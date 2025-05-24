@@ -105,6 +105,20 @@
         margin-left: 0;
       }
     }
+
+    .eject-prompt {
+      text-transform: none;
+      color: $gray-400;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      cursor: pointer;
+
+      &:hover,
+      &:focus {
+        color: $gray-50;
+      }
+    }
   }
 
   .command-number-column {
