@@ -532,6 +532,16 @@ const Command: React.FC<CommandProps> = observer(({ model, aliasesWithDuplicates
               <CommandControls model={model} commandName={commandName} events={events} />
             </div>
           </FlashOnClick>
+          {commandName === 'prompt' && (
+            <div
+              className='eject-prompt'
+              onClick={() => {
+                events.emit('prompt:eject', model.testId, model.id)
+              }}
+            >
+              <span>Eject Code</span>
+            </div>
+          )}
         </div>
         <Progress model={model} />
         {model.hasChildren && model.isOpen && (

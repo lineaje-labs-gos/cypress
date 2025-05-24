@@ -1954,6 +1954,22 @@ export default {
         return
       },
 
+      getEjectionLogRegistry (testId, logId) {
+        if (_skipCollectingLogs) return
+
+        const test = getTestById(testId)
+
+        if (!test) return
+
+        const logAttrs = _.find(test.commands || [], (log) => log.id === logId)
+
+        if (logAttrs) {
+          return logAttrs.renderProps.ejectionLogRegistry
+        }
+
+        return
+      },
+
       getSnapshotPropsForLog (testId, logId) {
         if (_skipCollectingLogs) return
 

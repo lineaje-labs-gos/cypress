@@ -336,6 +336,35 @@ export class EventManager {
       this._studioCopyToClipboard(cb)
     })
 
+    this.reporterBus.on('prompt:eject', (testId, logId) => {
+      const log = Cypress.runner.getEjectionLogRegistry(testId, logId)
+
+      const codeModalId = `__cy-prompt-code-modal__`
+      const toRender = Cypress._.template(`
+        <div id="${codeModalId}" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; font-family: 'Helvetica Neue', sans-serif;">
+          <div style="background: #1e1e1e; color: white; border-radius: 8px; width: 80%; max-width: 800px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #2f2f2f; border-bottom: 1px solid #444;">
+            <h2 style="margin: 0; font-size: 16px; color: #f8f8f2;"><%= title || 'Code Sample' %></h2>
+            <button onclick="document.getElementById('${codeModalId}').remove()" style="background: transparent; color: #bbb; border: none; font-size: 18px; cursor: pointer;">×</button>
+            </div>
+            <div style="position: relative;">
+            <pre style="margin: 0; padding: 16px; overflow-x: auto;"><code class="language-<%= language %>"><%= code %></code></pre>
+            <button onclick="navigator.clipboard.writeText(\`<%= Cypress._.escape(code).replace(/\`/g, '\\\`') %>\`); document.getElementById('${codeModalId}').remove()" style="position: absolute; top: 12px; right: 12px; background: #00bfa5; border: none; padding: 6px 12px; border-radius: 4px; color: white; font-size: 12px; cursor: pointer;">Copy</button>
+            </div>
+          </div>
+        </div>
+      `)
+
+      window.document.body.insertAdjacentHTML(
+        'beforeend',
+        toRender({
+          code: log ?? '',
+          title: 'cy.prompt ejection',
+          language: 'JavaScript',
+        }),
+      )
+    })
+
     this.localBus.on('studio:copy:to:clipboard', (cb) => {
       this._studioCopyToClipboard(cb)
     })
