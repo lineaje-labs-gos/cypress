@@ -16,6 +16,7 @@ import chokidar from 'chokidar'
 const debug = Debug('cypress:server:cy-prompt-lifecycle-manager')
 
 export class CyPromptLifecycleManager {
+  private static hashLoadingMap: Map<string, Promise<void>> = new Map()
   private static watcher: chokidar.FSWatcher | null = null
   private cyPromptManagerPromise?: Promise<CyPromptManager | null>
   private cyPromptManager?: CyPromptManager
@@ -138,11 +139,19 @@ export class CyPromptLifecycleManager {
       cyPromptHash = cyPromptSession.cyPromptUrl.split('/').pop()?.split('.')[0]
       cyPromptPath = path.join(os.tmpdir(), 'cypress', 'cy-prompt', cyPromptHash)
 
-      await ensureCyPromptBundle({
-        cyPromptPath,
-        cyPromptUrl: cyPromptSession.cyPromptUrl,
-        projectId,
-      })
+      let hashLoadingPromise = CyPromptLifecycleManager.hashLoadingMap.get(cyPromptHash)
+
+      if (!hashLoadingPromise) {
+        hashLoadingPromise = ensureCyPromptBundle({
+          cyPromptPath,
+          cyPromptUrl: cyPromptSession.cyPromptUrl,
+          projectId,
+        })
+
+        CyPromptLifecycleManager.hashLoadingMap.set(cyPromptHash, hashLoadingPromise)
+      }
+
+      await hashLoadingPromise
     } else {
       cyPromptPath = process.env.CYPRESS_LOCAL_CY_PROMPT_PATH
       cyPromptHash = 'local'
