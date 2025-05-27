@@ -602,7 +602,10 @@ export default (Commands, Cypress, cy, state, config) => {
 
           cy.once('window:load', resolve)
 
-          return $utils.locReload(forceReload, state('window'))
+          // Since webkit doesn't have an automation client and doesn't support cy.origin(), we need to use the legacy method to reload the page
+          return Cypress.isBrowser('webkit') ? $utils.locReload(forceReload, state('window')) : Cypress.automation('reload:aut:frame', {
+            forceReload,
+          })
         })
       }
 
@@ -616,10 +619,6 @@ export default (Commands, Cypress, cy, state, config) => {
           cleanup()
         }
 
-        // Make sure the reload command can communicate with the AUT.
-        // if we failed for any other reason, we need to display the correct error to the user.
-        Cypress.ensure.commandCanCommunicateWithAUT(cy)
-
         return null
       })
     },
@@ -631,8 +630,6 @@ export default (Commands, Cypress, cy, state, config) => {
       })
 
       options._log = Cypress.log({ timeout: options.timeout, hidden: options.log === false })
-
-      const win = state('window')
 
       const goNumber = (num) => {
         if (num === 0) {
@@ -670,15 +667,16 @@ export default (Commands, Cypress, cy, state, config) => {
 
             knownCommandCausedInstability = true
 
-            win.history.go(num)
-
             // need to set the attributes of 'go'
             // consoleProps here with win
             // make sure we resolve our go function
             // with the remove window (just like cy.visit)
             const retWin = () => state('window')
 
-            return Promise
+            // Since webkit doesn't have an automation client and doesn't support cy.origin(), we need to use the legacy method to navigate the history
+            Cypress.isBrowser('webkit') ? state('window').history.go(num) : Cypress.automation('navigate:aut:history', { historyNumber: num })
+
+            Promise
             .delay(100)
             .then(() => {
               knownCommandCausedInstability = false
@@ -703,9 +701,6 @@ export default (Commands, Cypress, cy, state, config) => {
           if (typeof cleanup === 'function') {
             cleanup()
           }
-
-          // Make sure the go command can communicate with the AUT.
-          Cypress.ensure.commandCanCommunicateWithAUT(cy)
 
           return null
         })

@@ -27,6 +27,15 @@ const viewports = {
 
 const validOrientations = ['landscape', 'portrait']
 
+class TitleNotYetAvailableError extends Error {
+  constructor () {
+    const message = 'document.title is not yet available'
+
+    super(message)
+    this.name = 'TitleNotYetAvailableError'
+  }
+}
+
 type CurrentViewport = Pick<Cypress.Config, 'viewportWidth' | 'viewportHeight'>
 
 // NOTE: this is outside the function because its 'global' state to the
@@ -89,18 +98,71 @@ export default (Commands, Cypress, cy, state) => {
   }
 
   Commands.addQuery('title', function title (options: Partial<Cypress.Loggable & Cypress.Timeoutable> = {}) {
-    // Make sure the window command can communicate with the AUT.
-    // otherwise, it yields an empty string
-    Cypress.ensure.commandCanCommunicateWithAUT(cy)
-    this.set('timeout', options.timeout)
+    // Since webkit doesn't have an automation client and doesn't support cy.origin(), we need to use the legacy method to get the title
+    if (Cypress.isBrowser('webkit')) {
+      this.set('timeout', options.timeout)
+
+      return () => (state('document')?.title || '')
+    }
+
+    const timeout = options.timeout ?? Cypress.config('defaultCommandTimeout') as number
+
+    this.set('timeout', timeout)
+
     Cypress.log({ timeout: options.timeout, hidden: options.log === false })
 
-    return () => (state('document')?.title || '')
+    let documentTitle: any = null
+    let automationPromise: Promise<void> | null = null
+    // need to set a valid type on this
+    let mostRecentError = new TitleNotYetAvailableError()
+
+    const getTitleFromAutomation = () => {
+      if (automationPromise) {
+        return automationPromise
+      }
+
+      documentTitle = null
+
+      automationPromise = Cypress.automation('get:aut:title', {})
+      .timeout(timeout)
+      .then((returnedDocumentTitle) => {
+        documentTitle = returnedDocumentTitle
+      })
+      .catch((err) => {
+        mostRecentError.name = err.name
+        mostRecentError.message = err.message
+      })
+      .catch((err) => mostRecentError = err)
+      // Pass or fail, we always clear the automationPromise, so future retries know there's no live request to the server.
+      .finally(() => automationPromise = null)
+
+      return automationPromise
+    }
+
+    this.set('onFail', (err, timedOut) => {
+      // if we are actively retrying or the assertion failed, we want to retry
+      if (err.name === 'TitleNotYetAvailableError' || err.name === 'AssertionError') {
+        // tslint:disable-next-line no-floating-promises
+        getTitleFromAutomation()
+      } else {
+        throw err
+      }
+    })
+
+    return () => {
+      if (documentTitle !== null) {
+        return documentTitle
+      }
+
+      // tslint:disable-next-line no-floating-promises
+      getTitleFromAutomation()
+
+      throw mostRecentError
+    }
   })
 
   Commands.addQuery('window', function windowFn (options: Partial<Cypress.Loggable & Cypress.Timeoutable> = {}) {
     // Make sure the window command can communicate with the AUT.
-    Cypress.ensure.commandCanCommunicateWithAUT(cy)
     this.set('timeout', options.timeout)
     Cypress.log({
       hidden: options.log === false,

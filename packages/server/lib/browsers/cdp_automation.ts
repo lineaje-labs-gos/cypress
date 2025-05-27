@@ -15,6 +15,10 @@ import type { Automation } from '../automation'
 import { cookieMatches, CyCookie, CyCookieFilter } from '../automation/util'
 import { DEFAULT_NETWORK_ENABLE_OPTIONS, CriClient } from './cri-client'
 import { cdpKeyPress } from '../automation/commands/key_press'
+import { cdpGetUrl } from '../automation/commands/get_url'
+import { cdpReloadFrame } from '../automation/commands/reload_frame'
+import { cdpNavigateHistory } from '../automation/commands/navigate_history'
+import { cdpGetFrameTitle } from '../automation/commands/get_frame_title'
 
 export type CdpCommand = keyof ProtocolMapping.Commands
 
@@ -447,21 +451,33 @@ export class CdpAutomation implements CDPClient, AutomationMiddleware {
 
     // the request could come in while in the middle of getting the frame tree,
     // which is asynchronous, so wait for it to be fetched
-    if (this.gettingFrameTree) {
-      debugVerbose('awaiting frame tree')
-
-      await this.gettingFrameTree
-    }
-
-    const frame = _.find(this.frameTree?.childFrames || [], ({ frame }) => {
-      return frame?.name?.startsWith('Your project:')
-    }) as HasFrame | undefined
+    const frame = await this._getAutFrame()
 
     if (frame) {
-      return frame.frame.id === frameId
+      return frame.id === frameId
     }
 
     return false
+  }
+
+  private _getAutFrame = async () => {
+    try {
+      if (this.gettingFrameTree) {
+        debugVerbose('awaiting frame tree')
+
+        await this.gettingFrameTree
+      }
+
+      const frame = _.find(this.frameTree?.childFrames || [], (item: HasFrame) => {
+        return item.frame?.name?.startsWith('Your project:')
+      }) as HasFrame | undefined
+
+      return frame?.frame
+    } catch (err) {
+      debugVerbose('failed to get aut frame:', err.stack)
+
+      return undefined
+    }
   }
 
   _handlePausedRequests = async (client: CriClient) => {
@@ -611,6 +627,32 @@ export class CdpAutomation implements CDPClient, AutomationMiddleware {
         }
 
         return cdpKeyPress(data, this.sendDebuggerCommandFn, this.executionContexts, (await this.send('Page.getFrameTree')).frameTree)
+      case 'get:aut:url':
+      {
+        const frame = await this._getAutFrame()
+
+        return cdpGetUrl(this.sendDebuggerCommandFn, this.executionContexts, frame!)
+      }
+      case 'reload:aut:frame':
+      {
+        const frame = await this._getAutFrame()
+
+        await cdpReloadFrame(this.sendDebuggerCommandFn, this.executionContexts, frame!, data.forceReload)
+
+        return
+      }
+      case 'navigate:aut:history':
+      {
+        const frame = await this._getAutFrame()
+
+        return cdpNavigateHistory(this.sendDebuggerCommandFn, this.executionContexts, frame!, data.historyNumber!)
+      }
+      case 'get:aut:title':
+      {
+        const frame = await this._getAutFrame()
+
+        return cdpGetFrameTitle(this.sendDebuggerCommandFn, this.executionContexts, frame!)
+      }
       default:
         throw new Error(`No automation handler registered for: '${message}'`)
     }
