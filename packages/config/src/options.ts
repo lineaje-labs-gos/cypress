@@ -260,6 +260,12 @@ const driverConfigOptions: Array<DriverConfigOption> = [
     isExperimental: true,
     requireRestartOnChange: 'browser',
   }, {
+    name: 'experimentalPromptCommand',
+    defaultValue: false,
+    validation: validate.isBoolean,
+    isExperimental: true,
+    requireRestartOnChange: 'server',
+  }, {
     name: 'experimentalWebKitSupport',
     defaultValue: false,
     validation: validate.isBoolean,

@@ -7,6 +7,7 @@ export const baseConfig: Cypress.ConfigOptions = {
   experimentalStudio: true,
   experimentalMemoryManagement: true,
   experimentalWebKitSupport: true,
+  experimentalPromptCommand: true,
   hosts: {
     'foobar.com': '127.0.0.1',
     '*.foobar.com': '127.0.0.1',

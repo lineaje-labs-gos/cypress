@@ -1,15 +1,15 @@
-import { sinon } from '../spec_helper'
+import { sinon } from '../../spec_helper'
 import { expect } from 'chai'
-import { StudioManager } from '../../lib/cloud/studio'
-import { StudioLifecycleManager } from '../../lib/StudioLifecycleManager'
+import { StudioManager } from '../../../lib/cloud/studio'
+import { StudioLifecycleManager } from '../../../lib/cloud/StudioLifecycleManager'
 import type { DataContext } from '@packages/data-context'
-import type { Cfg } from '../../lib/project-base'
+import type { Cfg } from '../../../lib/project-base'
 import type { CloudDataSource } from '@packages/data-context/src/sources'
-import * as getAndInitializeStudioManagerModule from '../../lib/cloud/api/studio/get_and_initialize_studio_manager'
-import * as reportStudioErrorPath from '../../lib/cloud/api/studio/report_studio_error'
-import ProtocolManager from '../../lib/cloud/protocol'
-const api = require('../../lib/cloud/api').default
-import * as postStudioSessionModule from '../../lib/cloud/api/studio/post_studio_session'
+import * as getAndInitializeStudioManagerModule from '../../../lib/cloud/api/studio/get_and_initialize_studio_manager'
+import * as reportStudioErrorPath from '../../../lib/cloud/api/studio/report_studio_error'
+import ProtocolManager from '../../../lib/cloud/protocol'
+const api = require('../../../lib/cloud/api').default
+import * as postStudioSessionModule from '../../../lib/cloud/api/studio/post_studio_session'
 
 // Helper to wait for next tick in event loop
 const nextTick = () => new Promise((resolve) => process.nextTick(resolve))

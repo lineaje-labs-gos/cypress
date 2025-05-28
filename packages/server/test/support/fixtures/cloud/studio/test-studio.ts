@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import type { StudioServerShape, StudioServerDefaultShape } from '@packages/types'
+import type { StudioServerShape, StudioServerDefaultShape, StudioEvent } from '@packages/types'
 import type { Router } from 'express'
 import type { Socket } from '@packages/socket'
 

@@ -24,11 +24,12 @@ import { ServerBase } from './server-base'
 import type Protocol from 'devtools-protocol'
 import type { ServiceWorkerClientEvent } from '@packages/proxy/lib/http/util/service-worker-manager'
 import { v4 } from 'uuid'
-import { StudioLifecycleManager } from './StudioLifecycleManager'
+import { StudioLifecycleManager } from './cloud/StudioLifecycleManager'
 import { reportStudioError } from './cloud/api/studio/report_studio_error'
 import { CloudRequest } from './cloud/api/cloud_request'
 import { isRetryableError } from './cloud/network/is_retryable_error'
 import { asyncRetry } from './util/async_retry'
+import { CyPromptLifecycleManager } from './cloud/cy-prompt/CyPromptLifecycleManager'
 
 export interface Cfg extends ReceivedCypressOptions {
   projectId?: string
@@ -156,6 +157,15 @@ export class ProjectBase extends EE {
     process.chdir(this.projectRoot)
 
     this._server = new ServerBase(cfg)
+    if (cfg.projectId && cfg.experimentalPromptCommand) {
+      const cyPromptLifecycleManager = new CyPromptLifecycleManager()
+
+      cyPromptLifecycleManager.initializeCyPromptManager({
+        projectId: cfg.projectId,
+        cloudDataSource: this.ctx.cloud,
+        ctx: this.ctx,
+      })
+    }
 
     if (!cfg.isTextTerminal) {
       const studioLifecycleManager = new StudioLifecycleManager()

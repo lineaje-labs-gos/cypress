@@ -7,15 +7,15 @@ import { agent } from '@packages/network'
 const pkg = require('@packages/root')
 const routes = require('../../routes') as typeof import('../../routes')
 
-interface PostStudioSessionOptions {
+interface PostCyPromptSessionOptions {
   projectId?: string
 }
 
 const _delay = linearDelay(500)
 
-export const postStudioSession = async ({ projectId }: PostStudioSessionOptions) => {
+export const postCyPromptSession = async ({ projectId }: PostCyPromptSessionOptions) => {
   return await (asyncRetry(async () => {
-    const response = await fetch(routes.apiRoutes.studioSession(), {
+    const response = await fetch(routes.apiRoutes.cyPromptSession(), {
       // @ts-expect-error - this is supported
       agent,
       method: 'POST',
@@ -24,18 +24,17 @@ export const postStudioSession = async ({ projectId }: PostStudioSessionOptions)
         'x-os-name': os.platform(),
         'x-cypress-version': pkg.version,
       },
-      body: JSON.stringify({ projectSlug: projectId, studioMountVersion: 1, protocolMountVersion: 2 }),
+      body: JSON.stringify({ projectSlug: projectId, cyPromptMountVersion: 1 }),
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to create studio session: ${response.statusText}`)
+      throw new Error(`Failed to create cy-prompt session: ${response.statusText}`)
     }
 
     const data = await response.json()
 
     return {
-      studioUrl: data.studioUrl,
-      protocolUrl: data.protocolUrl,
+      cyPromptUrl: data.cyPromptUrl,
     }
   }, {
     maxAttempts: 3,

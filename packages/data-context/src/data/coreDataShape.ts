@@ -1,4 +1,4 @@
-import { FoundBrowser, Editor, AllowedState, AllModeOptions, TestingType, BrowserStatus, PACKAGE_MANAGERS, AuthStateName, MIGRATION_STEPS, MigrationStep, StudioLifecycleManagerShape } from '@packages/types'
+import { FoundBrowser, Editor, AllowedState, AllModeOptions, TestingType, BrowserStatus, PACKAGE_MANAGERS, AuthStateName, MIGRATION_STEPS, MigrationStep, StudioLifecycleManagerShape, CyPromptLifecycleManagerShape } from '@packages/types'
 import { WizardBundler, CT_FRAMEWORKS, resolveComponentFrameworkDefinition, ErroredFramework } from '@packages/scaffold-config'
 import type { NexusGenObjects } from '@packages/graphql/src/gen/nxs.gen'
 // tslint:disable-next-line no-implicit-dependencies - electron dep needs to be defined
@@ -165,6 +165,7 @@ export interface CoreDataShape {
   eventCollectorSource: EventCollectorSource | null
   didBrowserPreviouslyHaveUnexpectedExit: boolean
   studioLifecycleManager?: StudioLifecycleManagerShape
+  cyPromptLifecycleManager?: CyPromptLifecycleManagerShape
 }
 
 /**

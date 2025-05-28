@@ -1827,6 +1827,11 @@ declare namespace Cypress {
     prevUntil<E extends Node = HTMLElement>(element: E | JQuery<E>, filter?: string, options?: Partial<Loggable & Timeoutable>): Chainable<JQuery<E>>
 
     /**
+     * TODO: add docs
+     */
+    prompt(message: string, options?: Partial<Loggable & Timeoutable>): Chainable<Subject>
+
+    /**
      * Read a file and yield its contents.
      *
      * @see https://on.cypress.io/readfile
@@ -3158,6 +3163,11 @@ declare namespace Cypress {
      * @default false
      */
     experimentalStudio: boolean
+    /**
+     * Enables the prompt command feature.
+     * @default false
+     */
+    experimentalPromptCommand: boolean
     /**
      * Adds support for testing in the WebKit browser engine used by Safari. See https://on.cypress.io/webkit-experiment for more information.
      * @default false
