@@ -495,6 +495,10 @@ export class SocketBase {
           debug('backend:request %o', { eventName, args })
 
           const backendRequest = () => {
+            if (eventName.startsWith('cy:prompt:')) {
+              return cyPrompt?.handleBackendRequest(eventName, ...args)
+            }
+
             switch (eventName) {
               case 'preserve:run:state':
                 runState = args[0]
@@ -572,6 +576,12 @@ export class SocketBase {
                 })
               case 'close:extra:targets':
                 return options.closeExtraTargets()
+              case 'wait:for:cy:prompt:ready':
+                return getCtx().coreData.cyPromptLifecycleManager?.getCyPrompt().then((cyPrompt) => {
+                  return {
+                    success: cyPrompt && cyPrompt.status === 'INITIALIZED',
+                  }
+                })
               default:
                 throw new Error(`You requested a backend event we cannot handle: ${eventName}`)
             }
