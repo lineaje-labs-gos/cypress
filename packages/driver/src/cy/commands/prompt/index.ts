@@ -11,6 +11,8 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress): Promise<CyProm
     throw new Error('CyPromptDriver not found')
   }
 
+  // Once the cy prompt bundle is downloaded and ready,
+  // we can initialize it via the module federation runtime
   init({
     remotes: [{
       alias: 'cy-prompt',
@@ -23,6 +25,8 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress): Promise<CyProm
     name: 'driver',
   })
 
+  // This cy-prompt.js file and any subsequent files are
+  // served from the cy prompt bundle.
   const module = await loadRemote<CyPromptDriver>('cy-prompt')
 
   if (!module?.default) {
