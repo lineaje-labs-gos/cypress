@@ -74,6 +74,8 @@
     "@cypress/sinon-chai": "2.9.1",
     "@cypress/svelte": "0.0.0-development",
     "@cypress/vue": "0.0.0-development",
+    "@cypress/webpack-batteries-included-preprocessor": "0.0.0-development",
+    "@cypress/webpack-preprocessor": "0.0.0-development",
     "@packages/root": "0.0.0-development",
     "@types/bluebird": "3.5.33",
     "@types/chai": "4.2.15",
@@ -114,7 +116,9 @@
     "vue",
     "react",
     "angular",
-    "svelte"
+    "svelte",
+    "webpack-preprocessor",
+    "webpack-batteries-included-preprocessor"
   ],
   "bin": {
     "cypress": "bin/cypress"
@@ -156,6 +160,13 @@
       "types": "./svelte/dist/index.d.ts",
       "import": "./svelte/dist/cypress-svelte.esm-bundler.js",
       "require": "./svelte/dist/cypress-svelte.cjs.js"
+    },
+    "./webpack-preprocessor": {
+      "types": "./webpack-preprocessor/dist",
+      "require": "./webpack-preprocessor/dist"
+    },
+    "./webpack-batteries-included-preprocessor": {
+      "require": "./webpack-batteries-included-preprocessor/undefined"
     }
   },
   "workspaces": {

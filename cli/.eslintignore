@@ -14,3 +14,5 @@ package.json
 /vue
 /svelte
 /mount-utils
+/webpack-preprocessor
+/webpack-batteries-included-preprocessor

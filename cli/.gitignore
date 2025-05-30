@@ -20,3 +20,5 @@ react*
 mount-utils
 angular
 svelte
+webpack-preprocessor
+webpack-batteries-included-preprocessor

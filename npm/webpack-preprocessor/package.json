@@ -6,6 +6,7 @@
   "main": "dist",
   "scripts": {
     "build": "rimraf dist && tsc || echo 'built, with errors'",
+    "postbuild": "node ../../scripts/sync-exported-npm-with-cli.js",
     "check-ts": "tsc --noEmit",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "secure": "nsp check",

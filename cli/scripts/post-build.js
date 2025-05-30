@@ -12,6 +12,8 @@ const npmModulesToCopy = [
   'vue',
   'angular',
   'svelte',
+  'webpack-preprocessor',
+  'webpack-batteries-included-preprocessor',
 ]
 
 npmModulesToCopy.forEach((folder) => {
