@@ -11,7 +11,7 @@ describe('Studio Cloud', () => {
     })
   })
 
-  it('loads the studio UI correctly when studio bundle is taking too long to load', () => {
+  it('loads the legacy studio UI correctly when studio bundle is taking too long to load', () => {
     loadProjectAndRunSpec({ enableCloudStudio: false })
 
     cy.window().then(() => {
@@ -93,7 +93,8 @@ describe('Studio Cloud', () => {
 
   it('hides selector playground and studio controls when studio beta is available', () => {
     launchStudio({ enableCloudStudio: true })
-    cy.get('[data-cy="studio-header-studio-button"]').click()
+
+    cy.findByTestId('studio-panel').should('be.visible')
 
     cy.get('[data-cy="playground-activator"]').should('not.exist')
     cy.get('[data-cy="studio-toolbar"]').should('not.exist')
@@ -101,6 +102,9 @@ describe('Studio Cloud', () => {
 
   it('closes studio panel when clicking studio button (from the cloud)', () => {
     launchStudio({ enableCloudStudio: true })
+
+    cy.findByTestId('studio-panel').should('be.visible')
+    cy.get('[data-cy="loading-studio-panel"]').should('not.exist')
 
     cy.get('[data-cy="studio-header-studio-button"]').click()
 
@@ -128,6 +132,13 @@ describe('Studio Cloud', () => {
       body: { enabled: true },
     })
 
+    // this endpoint gets called twice, so we need to mock it twice
+    cy.mockNodeCloudRequest({
+      url: '/studio/testgen/n69px6/enabled',
+      method: 'get',
+      body: { enabled: true },
+    })
+
     const aiOutput = 'cy.get(\'button\').should(\'have.text\', \'Increment\')'
 
     cy.mockNodeCloudStreamingRequest({
@@ -137,13 +148,16 @@ describe('Studio Cloud', () => {
     })
 
     cy.mockStudioFullSnapshot({
-      id: 1,
-      nodeType: 1,
-      nodeName: 'div',
-      localName: 'div',
-      nodeValue: 'div',
-      children: [],
-      shadowRoots: [],
+      fullSnapshot: {
+        id: 1,
+        nodeType: 1,
+        nodeName: 'div',
+        localName: 'div',
+        nodeValue: 'div',
+        children: [],
+        shadowRoots: [],
+      },
+      url: 'http://localhost:3000/cypress/e2e/index.html',
     })
 
     const deferred = pDefer()
@@ -182,10 +196,35 @@ describe('Studio Cloud', () => {
     cy.findByTestId('studio-panel')
     cy.get('[data-cy="hook-name-studio commands"]')
 
+    // make sure studio is not loading
+    cy.get('[data-cy="loading-studio-panel"]').should('not.exist')
+
     // Verify that AI is enabled
     cy.get('[data-cy="ai-status-text"]').should('contain.text', 'Enabled')
 
     // Verify that the AI output is correct
     cy.get('[data-cy="recommendation-editor"]').should('contain', aiOutput)
+  })
+
+  it('does not exit studio mode if the spec is changed on the file system', () => {
+    launchStudio({ enableCloudStudio: true })
+
+    cy.findByTestId('studio-panel').should('be.visible')
+
+    // update the spec on the file system to force a rerun through watched:file:changed
+    cy.withCtx(async (ctx) => {
+      await ctx.actions.file.writeFileInProject('cypress/e2e/spec.cy.js', `
+describe('studio functionality', () => {
+  it('visits a basic html page', () => {
+    // new comment
+    cy.visit('cypress/e2e/index.html')
+  })
+})`)
+    })
+
+    cy.waitForSpecToFinish()
+
+    // verify studio is still open
+    cy.findByTestId('studio-panel').should('be.visible')
   })
 })

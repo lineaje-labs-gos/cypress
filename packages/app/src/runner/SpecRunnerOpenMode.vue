@@ -26,9 +26,11 @@
       :max-total-width="windowWidth - collapsedNavBarWidth"
       :initial-panel1-width="specsListWidthPreferences"
       :initial-panel2-width="reporterWidthPreferences"
+      :initial-panel4-width="studioWidthPreferences"
       :min-panel1-width="minWidths.specsList"
       :min-panel2-width="minWidths.reporter"
       :min-panel3-width="minWidths.aut"
+      :min-panel4-width="minWidths.studio"
       :show-panel1="runnerUiStore.isSpecsListOpen && !screenshotStore.isScreenshotting"
       :show-panel2="!screenshotStore.isScreenshotting && !hideCommandLog"
       :show-panel4="shouldShowStudioPanel"
@@ -103,6 +105,7 @@
             :can-access-studio-a-i="studioStore.canAccessStudioAI"
             :on-studio-panel-close="handleStudioPanelClose"
             :event-manager="eventManager"
+            :studio-status="studioStatus"
           />
         </HideDuringScreenshot>
       </template>
@@ -111,7 +114,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { REPORTER_ID, RUNNER_ID } from './utils'
 import InlineSpecList from '../specs/InlineSpecList.vue'
 import { getAutIframeModel, getEventManager } from '.'
@@ -126,7 +129,7 @@ import ScreenshotHelperPixels from './screenshot/ScreenshotHelperPixels.vue'
 import { useScreenshotStore } from '../store/screenshot-store'
 import ChooseExternalEditorModal from '@packages/frontend-shared/src/gql-components/ChooseExternalEditorModal.vue'
 import { useMutation, gql } from '@urql/vue'
-import { SpecRunnerOpenMode_OpenFileInIdeDocument } from '../generated/graphql'
+import { SpecRunnerOpenMode_OpenFileInIdeDocument, StudioStatus_ChangeDocument } from '../generated/graphql'
 import type { SpecRunnerFragment } from '../generated/graphql'
 import { usePreferences } from '../composables/usePreferences'
 import ScriptError from './ScriptError.vue'
@@ -141,12 +144,14 @@ import StudioInstructionsModal from './studio/StudioInstructionsModal.vue'
 import StudioSaveModal from './studio/StudioSaveModal.vue'
 import { useStudioStore } from '../store/studio-store'
 import StudioPanel from '../studio/StudioPanel.vue'
+import { useSubscription } from '../graphql'
 
 const {
   preferredMinimumPanelWidth,
   absoluteAutMinimum,
   absoluteSpecListMinimum,
   absoluteReporterMinimum,
+  absoluteStudioMinimum,
   collapsedNavBarWidth,
 } = runnerConstants
 
@@ -167,9 +172,7 @@ fragment SpecRunner_Preferences on Query {
 
 gql`
 fragment SpecRunner_Studio on Query {
-  studio {
-    status
-  }
+  cloudStudioRequested
 }
 `
 
@@ -198,6 +201,15 @@ fragment SpecRunner on Query {
 gql`
 mutation SpecRunnerOpenMode_OpenFileInIDE ($input: FileDetailsInput!) {
   openFileInIDE (input: $input)
+}
+`
+
+gql`
+subscription StudioStatus_Change {
+  studioStatusChange {
+    status
+    canAccessStudioAI
+  }
 }
 `
 
@@ -244,20 +256,32 @@ const isSpecsListOpenPreferences = computed(() => {
   return props.gql.localSettings.preferences.isSpecsListOpen ?? false
 })
 
-const studioStatus = computed(() => {
-  return props.gql.studio?.status
+// Initialize with null and wait for subscription to update
+const studioStatus = ref<string | null>(null)
+
+useSubscription({ query: StudioStatus_ChangeDocument }, (_, data) => {
+  if (data?.studioStatusChange) {
+    studioStatus.value = data.studioStatusChange.status
+    studioStore.setCanAccessStudioAI(data.studioStatusChange.canAccessStudioAI)
+  }
+
+  return data
+})
+
+const cloudStudioRequested = computed(() => {
+  return props.gql.cloudStudioRequested
 })
 
 const studioBetaAvailable = computed(() => {
-  return studioStatus.value === 'ENABLED' && !!props.gql.studio
+  return !!cloudStudioRequested.value
 })
 
 const shouldShowStudioButton = computed(() => {
-  return studioStatus.value === 'ENABLED' && !!props.gql.studio && !studioStore.isOpen
+  return !!cloudStudioRequested.value && !studioStore.isOpen
 })
 
 const shouldShowStudioPanel = computed(() => {
-  return studioStatus.value === 'ENABLED' && (studioStore.isLoading || studioStore.isActive)
+  return !!cloudStudioRequested.value && (studioStore.isLoading || studioStore.isActive) && !screenshotStore.isScreenshotting
 })
 
 const hideCommandLog = runnerUiStore.hideCommandLog
@@ -309,6 +333,7 @@ const minWidths = computed(() => {
     aut: getMinimum(absoluteAutMinimum, doesContentFit),
     specsList: getMinimum(absoluteSpecListMinimum, doesContentFit),
     reporter: getMinimum(absoluteReporterMinimum, doesContentFit),
+    studio: absoluteStudioMinimum,
   }
 })
 
