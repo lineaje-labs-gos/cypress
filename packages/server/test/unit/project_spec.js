@@ -454,6 +454,8 @@ This option will not have an effect in Some-other-name. Tests that rely on web s
         this.config.projectId = 'abc123'
         this.config.experimentalPromptCommand = true
 
+        sinon.stub(CyPromptLifecycleManager.prototype, 'initializeCyPromptManager')
+
         return this.project.open()
         .then(() => {
           expect(CyPromptLifecycleManager.prototype.initializeCyPromptManager).to.be.calledWith({
@@ -468,6 +470,8 @@ This option will not have an effect in Some-other-name. Tests that rely on web s
         this.config.projectId = 'abc123'
         this.config.experimentalPromptCommand = false
 
+        sinon.stub(CyPromptLifecycleManager.prototype, 'initializeCyPromptManager')
+
         return this.project.open()
         .then(() => {
           expect(CyPromptLifecycleManager.prototype.initializeCyPromptManager).not.to.be.called
@@ -477,6 +481,8 @@ This option will not have an effect in Some-other-name. Tests that rely on web s
       it('does not initialize cy prompt lifecycle manager if projectId is not set', function () {
         this.config.projectId = undefined
         this.config.experimentalPromptCommand = true
+
+        sinon.stub(CyPromptLifecycleManager.prototype, 'initializeCyPromptManager')
 
         return this.project.open()
         .then(() => {
