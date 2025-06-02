@@ -14,11 +14,10 @@ const savedState = require(`../../lib/saved_state`)
 const runEvents = require(`../../lib/plugins/run_events`)
 const system = require(`../../lib/util/system`)
 const { getCtx } = require(`../../lib/makeDataContext`)
-const studio = require('../../lib/cloud/api/studio/get_and_initialize_studio_manager')
 const browsers = require('../../lib/browsers')
 const { CyPromptLifecycleManager } = require('../../lib/cloud/cy-prompt/CyPromptLifecycleManager')
-const { StudioLifecycleManager } = require('../../lib/cloud/StudioLifecycleManager')
-const { StudioManager } = require('../../lib/cloud/studio')
+const { StudioLifecycleManager } = require('../../lib/cloud/studio/StudioLifecycleManager')
+const { StudioManager } = require('../../lib/cloud/studio/studio')
 
 let ctx
 
@@ -47,10 +46,6 @@ describe('lib/project-base', () => {
       status: 'INITIALIZED',
       destroy: () => Promise.resolve(),
     }
-
-    sinon.stub(studio, 'getAndInitializeStudioManager').resolves(this.testStudioManager)
-
-    CyPromptLifecycleManager.prototype.initializeCyPromptManager = sinon.stub()
 
     await ctx.actions.project.setCurrentProjectAndTestingTypeForTestSetup(this.todosPath)
     this.config = await ctx.project.getConfig()
