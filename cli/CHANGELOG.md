@@ -1,7 +1,23 @@
 <!-- See the ../guides/writing-the-cypress-changelog.md for details on writing the changelog. -->
+## 14.4.1
+
+_Released 6/3/2025_
+
+**Bugfixes:**
+
+- Fixed an issue where `cy.session()` may fail internally if navigating to `about:blank` takes longer than the `defaultCommandTimeout`. Addresses [#29496](https://github.com/cypress-io/cypress/issues/29496).
+
+**Misc:**
+
+- The design of commands that display as grouped (such as `.within()` and `cy.session()`) has been updated to provide better clarity when collapsing groups. Addressed in [#31739](https://github.com/cypress-io/cypress/pull/31739).
+
+**Dependency Updates:**
+
+- Updated `@sinonjs/fake-timers` from `10.3.0` to `11.3.1`. Addressed in [#31746](https://github.com/cypress-io/cypress/pull/31746).
+
 ## 14.4.0
 
-_Released 5/20/2025 (PENDING)_
+_Released 5/20/2025_
 
 **Features:**
 
