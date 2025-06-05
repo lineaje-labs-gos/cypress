@@ -56,23 +56,24 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input
     font-style: italic;
   }
 
-  button {
-    background: $black;
-    border: none;
-    border-radius: 2px;
-    color: $gray-200;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.4;
-    padding: 10px 16px;
-    text-align: center;
-    touch-action: manipulation;
-    vertical-align: middle;
-    white-space: nowrap;
-    user-select: none;
-  }
+  // TODO: check the impact of removing this
+  // button {
+  //   background: $black;
+  //   border: none;
+  //   border-radius: 2px;
+  //   color: $gray-200;
+  //   cursor: pointer;
+  //   display: inline-block;
+  //   font-size: 14px;
+  //   font-weight: 500;
+  //   line-height: 1.4;
+  //   padding: 10px 16px;
+  //   text-align: center;
+  //   touch-action: manipulation;
+  //   vertical-align: middle;
+  //   white-space: nowrap;
+  //   user-select: none;
+  // }
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: 300;

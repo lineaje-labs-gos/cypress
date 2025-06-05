@@ -4,15 +4,18 @@ import React, { ReactElement } from 'react'
 import type { StatsStore } from '../header/stats-store'
 import { formatDuration, getFilenameParts } from '../lib/util'
 import FileNameOpener from '../lib/file-name-opener'
+import { RunnablesStore } from './runnables-store'
+import { DebugDismiss } from '../header/DebugDismiss'
 
 const renderRunnableHeader = (children: ReactElement) => <div className="runnable-header" data-cy="runnable-header">{children}</div>
 
 interface RunnableHeaderProps {
   spec: Cypress.Cypress['spec']
   statsStore: StatsStore
+  runnablesStore: RunnablesStore
 }
 
-const RunnableHeader: React.FC<RunnableHeaderProps> = observer(({ spec, statsStore }) => {
+const RunnableHeader: React.FC<RunnableHeaderProps> = observer(({ spec, statsStore, runnablesStore }) => {
   const relativeSpecPath = spec.relative
 
   if (spec.relative === '__all') {
@@ -48,7 +51,8 @@ const RunnableHeader: React.FC<RunnableHeaderProps> = observer(({ spec, statsSto
 
   return renderRunnableHeader(
     <>
-      <FileNameOpener fileDetails={fileDetails} hasIcon />
+      <FileNameOpener fileDetails={fileDetails} />
+      {runnablesStore.testFilter && runnablesStore.totalTests > 0 && <DebugDismiss matched={runnablesStore.totalTests} total={runnablesStore.totalUnfilteredTests} />}
       {Boolean(statsStore.duration) && (
         <span className='duration' data-cy="spec-duration">{formatDuration(statsStore.duration)}</span>
       )}
