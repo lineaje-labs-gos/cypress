@@ -13,7 +13,7 @@ declare global {
 }
 
 let initializedModule: CyPromptDriverDefaultShape | null = null
-const initializeModule = async (Cypress: Cypress.Cypress, cy: Cypress.Cypress['cy']): Promise<CyPromptDriverDefaultShape> => {
+const initializeModule = async (Cypress: Cypress.Cypress): Promise<CyPromptDriverDefaultShape> => {
   // Wait for the cy prompt bundle to be downloaded and ready
   const { success } = await Cypress.backend('wait:for:cy:prompt:ready')
 
@@ -48,45 +48,64 @@ const initializeModule = async (Cypress: Cypress.Cypress, cy: Cypress.Cypress['c
   return initializedModule
 }
 
-const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress, cy: Cypress.Cypress['cy']) => {
-  let cloudModule = initializedModule
+const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress, cy: Cypress.Cypress['cy']): Promise<ReturnType<CyPromptDriverDefaultShape['createCyPrompt']> | Error> => {
+  try {
+    let cloudModule = initializedModule
 
-  if (!cloudModule) {
-    cloudModule = await initializeModule(Cypress, cy)
+    if (!cloudModule) {
+      cloudModule = await initializeModule(Cypress)
+    }
+
+    return await cloudModule.createCyPrompt({
+      Cypress: Cypress as CypressInternal,
+      cy,
+      eventManager: window.getEventManager ? window.getEventManager() : undefined,
+    })
+  } catch (error) {
+    return error
   }
-
-  return cloudModule.createCyPrompt({
-    Cypress: Cypress as CypressInternal,
-    cy,
-    eventManager: window.getEventManager ? window.getEventManager() : undefined,
-  })
 }
 
 export default (Commands, Cypress, cy) => {
   if (Cypress.config('experimentalPromptCommand')) {
-    let initializeCloudCyPromptPromise: Promise<ReturnType<CyPromptDriverDefaultShape['createCyPrompt']>> | undefined
+    let initializeCloudCyPromptPromise: Promise<ReturnType<CyPromptDriverDefaultShape['createCyPrompt']> | Error> | undefined
 
     if (Cypress.browser.family === 'chromium' || Cypress.browser.name === 'electron') {
       initializeCloudCyPromptPromise = initializeCloudCyPrompt(Cypress, cy)
     }
 
+    const prompt = async (message: string, options: object = {}) => {
+      if (!initializeCloudCyPromptPromise) {
+        // TODO: (cy.prompt) We will look into supporting other browsers (and testing them)
+        // as this is rolled out
+        throw new Error('`cy.prompt()` is not supported in this browser.')
+      }
+
+      try {
+        const bundleResult = await initializeCloudCyPromptPromise
+
+        if (bundleResult instanceof Error) {
+          throw bundleResult
+        }
+
+        const cyPrompt = bundleResult
+
+        return await cyPrompt(message, options)
+      } catch (error) {
+        // TODO: handle this better
+        throw new Error(`CyPromptDriver not found: ${error}`)
+      }
+    }
+
+    // For testing purposes, we can reset the prompt command initialization
+    // by calling the __reset method.
+    prompt.__reset = () => {
+      initializedModule = null
+      initializeCloudCyPromptPromise = initializeCloudCyPrompt(Cypress, cy)
+    }
+
     Commands.addAll({
-      async prompt (message: string, options: object = {}) {
-        if (!initializeCloudCyPromptPromise) {
-          // TODO: (cy.prompt) We will look into supporting other browsers (and testing them)
-          // as this is rolled out
-          throw new Error('`cy.prompt()` is not supported in this browser.')
-        }
-
-        try {
-          const cyPrompt = await initializeCloudCyPromptPromise
-
-          return await cyPrompt(message, options)
-        } catch (error) {
-          // TODO: handle this better
-          throw new Error(`CyPromptDriver not found: ${error}`)
-        }
-      },
+      prompt,
     })
   }
 }
