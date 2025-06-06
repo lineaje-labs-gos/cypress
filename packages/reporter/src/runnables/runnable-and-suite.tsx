@@ -6,13 +6,13 @@ import React, { MouseEvent, useCallback } from 'react'
 import appState, { AppState } from '../lib/app-state'
 import events, { Events } from '../lib/events'
 import Test from '../test/test'
-import Collapsible from '../collapsible/collapsible'
+import Collapsible, { CollapsibleHeaderComponentProps } from '../collapsible/collapsible'
 
 import type SuiteModel from './suite-model'
 import type TestModel from '../test/test-model'
 
 import { LaunchStudioIcon } from '../components/LaunchStudioIcon'
-import { IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped } from '@cypress-design/react-icon'
+import { IconChevronDownMedium, IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped } from '@cypress-design/react-icon'
 
 interface SuiteProps {
   eventManager?: Events
@@ -29,27 +29,31 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     eventManager.emit('studio:init:suite', model.id)
   }, [eventManager, model.id])
 
-  const getHeaderIcon = () => {
+  const getHeaderIcon = (isHovered: boolean) => {
+    if (isHovered) {
+      return <IconChevronDownMedium strokeColor='gray-500' />
+    }
+
     switch (model.state) {
       case 'active':
-        return <IconObjectStackRunning fillColor='gray-900' strokeColor='gray-500'/>
+        return <IconObjectStackRunning fillColor='gray-900' strokeColor='gray-500' />
       case 'passed':
         return <IconObjectStackPassed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='jade-400' />
       // TODO: secondary stroke color not working
       case 'failed':
-        return <IconObjectStackFailed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='red-400'/>
+        return <IconObjectStackFailed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='red-400' />
       case 'pending':
-        return <IconObjectStackSkipped fillColor='gray-900' strokeColor='gray-500'/>
+        return <IconObjectStackSkipped fillColor='gray-900' strokeColor='gray-500' />
       case 'processing':
-        return <IconObjectStackQueued fillColor='gray-900' strokeColor='gray-500'/>
+        return <IconObjectStackQueued fillColor='gray-900' strokeColor='gray-500' />
       default:
         return <></>
     }
   }
 
-  const _header = () => (
+  const HeaderComponent = ({ isHovered }: CollapsibleHeaderComponentProps) => (
     <div className='runnable-and-suite-header'>
-      {getHeaderIcon()}
+      {getHeaderIcon(isHovered)}
       <span className='runnable-title'>{model.title}</span>
       {(studioEnabled && !appState.studioActive) && (
         <span className='runnable-controls'>
@@ -64,7 +68,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
 
   return (
     <Collapsible
-      header={_header()}
+      HeaderComponent={HeaderComponent}
       headerClass='runnable-wrapper'
       headerStyle={{}}
       hideExpander
