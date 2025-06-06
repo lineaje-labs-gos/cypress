@@ -12,6 +12,7 @@ import type SuiteModel from './suite-model'
 import type TestModel from '../test/test-model'
 
 import { LaunchStudioIcon } from '../components/LaunchStudioIcon'
+import { IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped } from '@cypress-design/react-icon'
 
 interface SuiteProps {
   eventManager?: Events
@@ -28,8 +29,27 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     eventManager.emit('studio:init:suite', model.id)
   }, [eventManager, model.id])
 
+  const getHeaderIcon = () => {
+    switch (model.state) {
+      case 'active':
+        return <IconObjectStackRunning fillColor='gray-900' strokeColor='gray-500'/>
+      case 'passed':
+        return <IconObjectStackPassed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='jade-400' />
+      // TODO: secondary stroke color not working
+      case 'failed':
+        return <IconObjectStackFailed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='red-400'/>
+      case 'pending':
+        return <IconObjectStackSkipped fillColor='gray-900' strokeColor='gray-500'/>
+      case 'processing':
+        return <IconObjectStackQueued fillColor='gray-900' strokeColor='gray-500'/>
+      default:
+        return <></>
+    }
+  }
+
   const _header = () => (
-    <>
+    <div className='runnable-and-suite-header'>
+      {getHeaderIcon()}
       <span className='runnable-title'>{model.title}</span>
       {(studioEnabled && !appState.studioActive) && (
         <span className='runnable-controls'>
@@ -39,14 +59,15 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
           />
         </span>
       )}
-    </>
+    </div>
   )
 
   return (
     <Collapsible
       header={_header()}
       headerClass='runnable-wrapper'
-      headerStyle={{ }}
+      headerStyle={{}}
+      hideExpander
       contentClass='runnables-region'
       isOpen
     >
