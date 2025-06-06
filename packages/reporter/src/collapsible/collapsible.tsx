@@ -4,11 +4,16 @@ import { onEnterOrSpace } from '../lib/util'
 import ChevronIcon from '@packages/frontend-shared/src/assets/icons/chevron-down-small_x8.svg'
 import DocumentBlankIcon from '@packages/frontend-shared/src/assets/icons/document-blank_x16.svg'
 
+export interface CollapsibleHeaderComponentProps {
+  isHovered: boolean
+}
+
 interface CollapsibleProps {
   isOpen?: boolean
   headerClass?: string
   headerStyle?: CSSProperties
   header?: ReactNode
+  HeaderComponent?: React.FunctionComponent<{ isHovered: boolean }>
   headerExtras?: ReactNode
   containerRef?: RefObject<HTMLDivElement>
   contentClass?: string
@@ -17,8 +22,9 @@ interface CollapsibleProps {
   onOpenStateChangeRequested?: (isOpen: boolean) => void
 }
 
-const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false, header, headerClass = '', headerStyle = {}, headerExtras, contentClass = '', hideExpander = false, containerRef = null, onOpenStateChangeRequested, children }) => {
+const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false, header, headerClass = '', headerStyle = {}, headerExtras, contentClass = '', hideExpander = false, containerRef = null, onOpenStateChangeRequested, children, HeaderComponent }) => {
   const [isOpenState, setIsOpenState] = useState(isOpenAsProp)
+  const [isHovered, setIsHovered] = useState(false)
 
   const toggleOpenState = useCallback((e?: MouseEvent) => {
     e?.stopPropagation()
@@ -39,6 +45,8 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false,
           className='collapsible-header'
           onClick={toggleOpenState}
           onKeyUp={onEnterOrSpace(toggleOpenState)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           role='button'
           tabIndex={0}
         >
@@ -50,7 +58,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false,
             {!hideExpander && headerClass === 'hook-header' && <ChevronIcon className='collapsible-indicator gray-400 ' />}
             {!hideExpander && headerClass !== 'hook-header' && <DocumentBlankIcon className='collapsible-indicator gray-400' />}
             <span className='collapsible-header-text'>
-              {header}
+              {HeaderComponent ? <HeaderComponent isHovered={isHovered} /> : header}
             </span>
           </div>
         </div>
