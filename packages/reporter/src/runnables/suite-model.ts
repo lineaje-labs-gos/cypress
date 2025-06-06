@@ -25,10 +25,15 @@ export default class Suite extends Runnable {
       _anyChildrenFailed: computed,
       _allChildrenPassedOrPending: computed,
       _allChildrenPending: computed,
+      _anyChildrenRunning: computed,
     })
   }
 
   get state (): TestState {
+    if (this._anyChildrenRunning) {
+      return 'active'
+    }
+
     if (this._anyChildrenFailed) {
       return 'failed'
     }
@@ -50,6 +55,12 @@ export default class Suite extends Runnable {
 
   get hasRetried (): boolean {
     return _.some(this.children, (v) => v.hasRetried)
+  }
+
+  get _anyChildrenRunning () {
+    return _.some(this._childStates, (state) => {
+      return state === 'active'
+    })
   }
 
   get _anyChildrenFailed () {
