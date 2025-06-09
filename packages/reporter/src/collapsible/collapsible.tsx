@@ -6,6 +6,7 @@ import DocumentBlankIcon from '@packages/frontend-shared/src/assets/icons/docume
 
 export interface CollapsibleHeaderComponentProps {
   isHovered: boolean
+  isFocused: boolean
 }
 
 interface CollapsibleProps {
@@ -13,7 +14,7 @@ interface CollapsibleProps {
   headerClass?: string
   headerStyle?: CSSProperties
   header?: ReactNode
-  HeaderComponent?: React.FunctionComponent<{ isHovered: boolean }>
+  HeaderComponent?: React.FunctionComponent<CollapsibleHeaderComponentProps>
   headerExtras?: ReactNode
   containerRef?: RefObject<HTMLDivElement>
   contentClass?: string
@@ -25,6 +26,7 @@ interface CollapsibleProps {
 const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false, header, headerClass = '', headerStyle = {}, headerExtras, contentClass = '', hideExpander = false, containerRef = null, onOpenStateChangeRequested, children, HeaderComponent }) => {
   const [isOpenState, setIsOpenState] = useState(isOpenAsProp)
   const [isHovered, setIsHovered] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
 
   const toggleOpenState = useCallback((e?: MouseEvent) => {
     e?.stopPropagation()
@@ -47,6 +49,12 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false,
           onKeyUp={onEnterOrSpace(toggleOpenState)}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          onFocus={() => {
+            setIsFocused(true)
+          }}
+          onBlur={() => {
+            setIsFocused(false)
+          }}
           role='button'
           tabIndex={0}
         >
@@ -58,7 +66,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false,
             {!hideExpander && headerClass === 'hook-header' && <ChevronIcon className='collapsible-indicator gray-400 ' />}
             {!hideExpander && headerClass !== 'hook-header' && <DocumentBlankIcon className='collapsible-indicator gray-400' />}
             <span className='collapsible-header-text'>
-              {HeaderComponent ? <HeaderComponent isHovered={isHovered} /> : header}
+              {HeaderComponent ? <HeaderComponent isHovered={isHovered} isFocused={isFocused} /> : header}
             </span>
           </div>
         </div>

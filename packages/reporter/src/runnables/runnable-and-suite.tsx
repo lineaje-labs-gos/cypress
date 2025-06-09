@@ -29,9 +29,9 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     eventManager.emit('studio:init:suite', model.id)
   }, [eventManager, model.id])
 
-  const getHeaderIcon = useCallback((isHovered: boolean) => {
-    if (isHovered) {
-      return <IconChevronDownMedium strokeColor='gray-500' />
+  const getHeaderIcon = useCallback((isHovered: boolean, isFocused: boolean) => {
+    if (isHovered || isFocused) {
+      return <IconChevronDownMedium className='header-collapsible-indicator' strokeColor='gray-700' />
     }
 
     switch (model.state) {
@@ -50,12 +50,12 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     }
   }, [model.state])
 
-  const HeaderComponent = ({ isHovered }: CollapsibleHeaderComponentProps) => {
+  const HeaderComponent = ({ isHovered, isFocused }: CollapsibleHeaderComponentProps) => {
     return (
-      <div className='runnable-and-suite-header'>
-        {getHeaderIcon(isHovered)}
+      <div className='runnable-and-suite-header' tabIndex={-1}>
+        {getHeaderIcon(isHovered, isFocused)}
         <span className='runnable-title'>{model.title}</span>
-        {(studioEnabled && !appState.studioActive) && (
+        {(studioEnabled && !appState.studioActive && (isHovered || isFocused)) && (
           <Button size='20' onClick={_launchStudio} variant='outline-dark' className='launch-studio-button'>
             <IconActionAddMedium strokeColor='gray-500' />
             New Test
