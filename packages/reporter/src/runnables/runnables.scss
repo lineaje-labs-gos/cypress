@@ -106,11 +106,6 @@
         .collapsible-header-inner {
           padding: 8px 16px;
           background-color: $gray-1100;
-          &:hover {
-            background-color: $gray-900;
-            cursor: pointer;
-          }
-
           &:focus {
             outline: 0;
           }
@@ -242,17 +237,17 @@
           flex-grow: 1;
         }
 
-        .runnable-controls-studio {
+        .launch-studio-button {
+          color: $gray-300;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
           opacity: 0;
         }
-
+        
         &:hover {
-          .runnable-controls-studio {
-            opacity: 0.5;
-
-            &:hover {
-              opacity: 1;
-            }
+          .launch-studio-button {
+            opacity: 1;
           }
         }
       }

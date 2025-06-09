@@ -11,8 +11,8 @@ import Collapsible, { CollapsibleHeaderComponentProps } from '../collapsible/col
 import type SuiteModel from './suite-model'
 import type TestModel from '../test/test-model'
 
-import { LaunchStudioIcon } from '../components/LaunchStudioIcon'
-import { IconChevronDownMedium, IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped } from '@cypress-design/react-icon'
+import { IconActionAddMedium, IconChevronDownMedium, IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped } from '@cypress-design/react-icon'
+import Button from '@cypress-design/react-button'
 
 interface SuiteProps {
   eventManager?: Events
@@ -56,12 +56,10 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
         {getHeaderIcon(isHovered)}
         <span className='runnable-title'>{model.title}</span>
         {(studioEnabled && !appState.studioActive) && (
-          <span className='runnable-controls'>
-            <LaunchStudioIcon
-              title='Add New Test'
-              onClick={_launchStudio}
-            />
-          </span>
+          <Button size='20' onClick={_launchStudio} variant='outline-dark' className='launch-studio-button'>
+            <IconActionAddMedium strokeColor='gray-500' />
+            New Test
+          </Button>
         )}
       </div>
     )
