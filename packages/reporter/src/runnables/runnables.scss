@@ -222,7 +222,14 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        width: 100%
+        width: 100%;
+
+
+        .icon-dark-secondary-red-400 {
+          :nth-child(4) {
+            stroke: $red-400;
+          }
+        }
       }
 
       .collapsible-header-inner {
