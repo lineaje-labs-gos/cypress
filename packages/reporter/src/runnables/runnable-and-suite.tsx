@@ -50,40 +50,48 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     }
   }, [model.state])
 
-  const HeaderComponent = ({ isHovered }: CollapsibleHeaderComponentProps) => (
-    <div className='runnable-and-suite-header'>
-      {getHeaderIcon(isHovered)}
-      <span className='runnable-title'>{model.title}</span>
-      {(studioEnabled && !appState.studioActive) && (
-        <span className='runnable-controls'>
-          <LaunchStudioIcon
-            title='Add New Test'
-            onClick={_launchStudio}
-          />
-        </span>
-      )}
-    </div>
-  )
+  const HeaderComponent = ({ isHovered }: CollapsibleHeaderComponentProps) => {
+    return (
+      <div className='runnable-and-suite-header'>
+        {getHeaderIcon(isHovered)}
+        <span className='runnable-title'>{model.title}</span>
+        {(studioEnabled && !appState.studioActive) && (
+          <span className='runnable-controls'>
+            <LaunchStudioIcon
+              title='Add New Test'
+              onClick={_launchStudio}
+            />
+          </span>
+        )}
+      </div>
+    )
+  }
+
+  let runnablesList = <ul className='runnables'>
+    {_.map(model.children, (runnable) => {
+      return (<Runnable
+        key={runnable.id}
+        model={runnable}
+        studioEnabled={studioEnabled}
+        canSaveStudioLogs={canSaveStudioLogs}
+      />)
+    })}
+  </ul>
 
   return (
-    <Collapsible
-      HeaderComponent={HeaderComponent}
-      headerClass='runnable-wrapper'
-      headerStyle={{}}
-      hideExpander
-      contentClass='runnables-region'
-      isOpen
-    >
-      <ul className='runnables'>
-        {_.map(model.children, (runnable) =>
-          (<Runnable
-            key={runnable.id}
-            model={runnable}
-            studioEnabled={studioEnabled}
-            canSaveStudioLogs={canSaveStudioLogs}
-          />))}
-      </ul>
-    </Collapsible>
+    // we don't want to show the collapsible if there are no tests in the suite
+    model.children && !model.children.some((c) => c.type === 'test') ? runnablesList : (
+      <Collapsible
+        HeaderComponent={HeaderComponent}
+        headerClass='runnable-wrapper'
+        headerStyle={{}}
+        hideExpander
+        contentClass='runnables-region'
+        isOpen
+      >
+        {runnablesList}
+      </Collapsible>
+    )
   )
 })
 
