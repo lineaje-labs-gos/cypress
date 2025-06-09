@@ -29,7 +29,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     eventManager.emit('studio:init:suite', model.id)
   }, [eventManager, model.id])
 
-  const getHeaderIcon = (isHovered: boolean) => {
+  const getHeaderIcon = useCallback((isHovered: boolean) => {
     if (isHovered) {
       return <IconChevronDownMedium strokeColor='gray-500' />
     }
@@ -39,7 +39,6 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
         return <IconObjectStackRunning fillColor='gray-900' strokeColor='gray-500' />
       case 'passed':
         return <IconObjectStackPassed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='jade-400' />
-      // TODO: secondary stroke color not working
       case 'failed':
         return <IconObjectStackFailed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='red-400' />
       case 'pending':
@@ -49,7 +48,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
       default:
         return <></>
     }
-  }
+  }, [model.state])
 
   const HeaderComponent = ({ isHovered }: CollapsibleHeaderComponentProps) => (
     <div className='runnable-and-suite-header'>
