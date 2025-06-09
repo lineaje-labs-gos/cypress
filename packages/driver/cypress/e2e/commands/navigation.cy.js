@@ -17,7 +17,7 @@ describe('src/cy/commands/navigation', () => {
 
       cy.stub(Cypress, 'automation').withArgs('reload:aut:frame', { forceReload: false }).resolves()
 
-      cy.reload({ timeout: 1 })
+      cy.reload({ timeout: 1000 })
     })
 
     it('can pass forceReload + options', () => {
@@ -27,7 +27,7 @@ describe('src/cy/commands/navigation', () => {
 
       cy.stub(Cypress, 'automation').withArgs('reload:aut:frame', { forceReload: true }).resolves()
 
-      cy.reload(true, { timeout: 1 })
+      cy.reload(true, { timeout: 1000 })
     })
 
     it('returns the window object', () => {
