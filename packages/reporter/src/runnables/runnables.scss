@@ -96,16 +96,39 @@
       padding: 0;
 
       .collapsible-header {
-        &:focus {
+        height: 36px;
+
+        &:focus-visible {
+          outline: 0;
+
           .collapsible-header-inner {
-            background-color: $gray-1000;
+            background-color: $gray-900;
+            outline: 0;
             cursor: pointer;
+
+            .runnable-title {
+            color: $indigo-300;
+            }
+          }
+
+          .header-collapsible-indicator {
+            path {
+              stroke: $indigo-300;
+            }
+          }
+
+          .launch-studio-button {
+            border-color: $gray-900;
+            background-color: $gray-900;
           }
         }
 
         .collapsible-header-inner {
           padding: 8px 16px;
           background-color: $gray-1100;
+          display: inline-flex;
+          align-items: center;
+
           &:focus {
             outline: 0;
           }
@@ -242,13 +265,6 @@
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          opacity: 0;
-        }
-        
-        &:hover {
-          .launch-studio-button {
-            opacity: 1;
-          }
         }
       }
     }
@@ -314,10 +330,6 @@
     font-size: 14px;
     min-width: $reporter-contents-min-width;
     white-space: pre-line;
-
-    &:focus {
-      outline: 1px dotted $gray-400;
-    }
   }
 
   .runnable-wrapper > .collapsible-header {
@@ -325,11 +337,6 @@
     position: relative;
     display: inline-flex;
     width: 100%;
-
-    &:focus {
-      outline: 1px dotted $gray-400;
-      outline-offset: 3px;
-    }
   }
 
   .wrap>.runnables {
