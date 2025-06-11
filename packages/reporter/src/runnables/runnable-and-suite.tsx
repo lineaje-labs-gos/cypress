@@ -52,8 +52,10 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
 
   const HeaderComponent = ({ isHovered, isFocused }: CollapsibleHeaderComponentProps) => {
     return (
-      <div className='runnable-and-suite-header' tabIndex={-1}>
-        {getHeaderIcon(isHovered, isFocused)}
+      <>
+        <div className='runnable-and-suite-header-icon'>
+          {getHeaderIcon(isHovered, isFocused)}
+        </div>
         <span className='runnable-title'>{model.title}</span>
         {(studioEnabled && !appState.studioActive && (isHovered || isFocused)) && (
           <Button size='20' onClick={_launchStudio} variant='outline-dark' className='launch-studio-button'>
@@ -61,7 +63,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
             New Test
           </Button>
         )}
-      </div>
+      </>
     )
   }
 
