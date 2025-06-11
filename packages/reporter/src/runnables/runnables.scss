@@ -1,4 +1,17 @@
-.fa { &:not(.fa-spin) { animation: none; } }
+@mixin dotted-line {
+  content: "";
+  position: absolute;
+  left: 5.4%;
+  top: 75%;
+  height: 25%;
+  border-left: 1px dotted $gray-800;
+}
+
+.fa {
+  &:not(.fa-spin) {
+    animation: none;
+  }
+}
 
 .reporter {
   min-height: 0; // needed for firefox or else scrolling gets funky
@@ -10,14 +23,14 @@
   }
 
   .wrap {
-    border-bottom: 1px solid $gray-900;
-    margin-bottom: 40px;
     padding-left: 0;
     width: 100%;
   }
 
   .runnables {
     padding-left: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .no-tests {
@@ -107,7 +120,7 @@
             cursor: pointer;
 
             .runnable-title {
-            color: $indigo-300;
+              color: $indigo-300;
             }
           }
 
@@ -125,7 +138,6 @@
 
         .collapsible-header-inner {
           padding: 8px 16px;
-          background-color: $gray-1100;
           display: inline-flex;
           align-items: center;
 
@@ -151,12 +163,14 @@
         visibility: visible !important;
       }
 
-      .hooks-container, .runnable-err-wrapper {
+      .hooks-container,
+      .runnable-err-wrapper {
         border-color: $gray-500;
       }
     }
 
-    .runnable-state,.attempt-state {
+    .runnable-state,
+    .attempt-state {
       display: inline-block;
       line-height: 18px;
       margin-right: 5px;
@@ -175,17 +189,14 @@
       }
     }
 
-    &> div > .runnable-wrapper {
+    & > div > .runnable-wrapper {
       border: 1px solid $gray-950;
       border-radius: 4px;
       border-left: 4px solid transparent;
-      margin-top: 2px;
-      margin-bottom: 2px;
     }
 
     &.runnable-failed > div > .runnable-wrapper,
     &.runnable-failed > div > .runnable-instruments {
-      
       border-left: 4px solid $fail;
     }
 
@@ -222,7 +233,11 @@
       border-left: 4px solid $gray-500;
     }
     &.suite.runnable {
-      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    &.suite.runnable:first-child {
+      margin-top: 4px;
     }
 
     &.suite > div > .runnable-wrapper {
@@ -230,36 +245,30 @@
       margin: 0;
       border-radius: 0;
       background-color: $gray-1100;
-      
+
+      .collapsible-header-inner {
+        background-color: $gray-1100;
+      }
+
       .runnable-title {
         color: $gray-400;
         font-size: 14px;
       }
 
-      .runnable-and-suite-header{
+      .runnable-and-suite-header-icon {
+        position: relative;
         display: flex;
         align-items: center;
-        gap: 8px;
-        width: 100%;
+        justify-content: center;
+      }
 
-
-        .icon-dark-secondary-red-400 {
-          :nth-child(4) {
-            stroke: $red-400;
-          }
+      .icon-dark-secondary-red-400 {
+        :nth-child(4) {
+          stroke: $red-400;
         }
       }
 
       .collapsible-header-inner {
-        .collapsible-header-text {
-          display: flex;
-          width: 100%;
-        }
-
-        .runnable-title {
-          flex-grow: 1;
-        }
-
         .launch-studio-button {
           color: $gray-300;
           display: inline-flex;
@@ -269,11 +278,58 @@
       }
     }
 
+    &.suite > .collapsible {
+      &.is-open > .runnable-wrapper > .collapsible-header > .collapsible-header-inner {
+        position: relative;
+
+        &::before {
+          @include dotted-line;
+        }
+      }
+    }
+
+    &.test {
+      .collapsible {
+        display: flex;
+        flex-direction: column;
+
+        .runnable-wrapper {
+          &:hover {
+            border-top: 1px solid $gray-900;
+            border-bottom: 1px solid $gray-900;
+            border-right: 1px solid $gray-900;
+
+            .collapsible-header-inner {
+              background-color: $gray-1100;
+            }
+          }
+
+          .collapsible-header {
+            &:focus-visible {
+              border-top: 1px solid $gray-800;
+              border-bottom: 1px solid $gray-800;
+              border-right: 1px solid $gray-800;
+
+              .collapsible-header-inner {
+                background-color: $gray-900;
+              }
+            }
+          }
+
+          .collapsible-header-inner {
+            background-color: $gray-1000;
+            width: 100%;
+          }
+        }
+      }
+    }
+
     &.test.runnable-passed.runnable-studio {
       .studio-controls {
         display: flex;
 
-        .studio-save, .studio-copy {
+        .studio-save,
+        .studio-copy {
           display: block;
         }
       }
@@ -301,8 +357,6 @@
 
     .runnable-state-icon {
       flex-shrink: 0;
-      margin-right: 5px;
-      margin-top: 4px;
 
       &.fa-spin {
         .icon-light {
@@ -339,8 +393,8 @@
     width: 100%;
   }
 
-  .wrap>.runnables {
-    padding: 4px;
+  .wrap > .runnables {
+    padding: 0 8px;
   }
 
   .suite > div .runnable-wrapper,
@@ -351,7 +405,6 @@
   }
 
   .runnable-controls {
-
     label {
       padding: 2px 4px;
     }
@@ -380,33 +433,41 @@
     }
   }
 
-  .test.runnable-failed .runnable-controls .runnable-controls-status {
-    visibility: visible;
+  // don't show the dotted line on the last test
+  // since sometimes tests are contained within a collapsible with other collapsibles
+  :nth-last-child(1 of .test) {
+    &::before {
+      content: none !important;
+    }
   }
 
-  .test .collapsible {
-    display: flex;
-    flex-direction: column;
+  .runnable .test:not(.is-open) {
+    position: relative;
+    padding-bottom: 4px;
 
-    .runnable-wrapper .collapsible-header-inner {
-      width: 100%;
-
-      .collapsible-header-text {
-        display: flex;
-        width: 100%;
-
-        .runnable-title {
-          flex-grow: 1;
-          padding-right: 10px;
-        }
-      }
+    &::before {
+      @include dotted-line;
     }
+  }
+
+  .test.runnable-failed .runnable-controls .runnable-controls-status {
+    visibility: visible;
   }
 
   .collapsible-header {
     display: flex;
   }
 
+  .collapsible-header-text {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    align-items: center;
+
+    .runnable-title {
+      flex-grow: 1;
+    }
+  }
 
   .studio-controls {
     display: none;
@@ -447,7 +508,8 @@
         font-size: 16px;
         padding: 4px 10px 2px;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background-color: $indigo-100;
         }
 
@@ -487,7 +549,7 @@
 
   .runnable-loading {
     font-family: $font-system;
-  
+
     .runnable-loading-animation {
       display: flex;
       margin: 3.5rem auto 1.5rem;
@@ -504,32 +566,35 @@
       }
 
       div:nth-child(1) {
-        animation-delay:0.1s;
+        animation-delay: 0.1s;
         background: $jade-400;
       }
 
       div:nth-child(2) {
-        animation-delay:0.2s;
+        animation-delay: 0.2s;
         background: $indigo-400;
       }
 
       div:nth-child(3) {
-        animation-delay:0.3s;
+        animation-delay: 0.3s;
         background: $red-400;
       }
 
       div:nth-child(4) {
-        animation-delay:0.4s;
+        animation-delay: 0.4s;
         background: $orange-400;
       }
 
       div:nth-child(5) {
-        animation-delay:0.5s;
+        animation-delay: 0.5s;
         background: $gray-400;
       }
 
       @keyframes scaling {
-        0%, 20%, 80%, 100% {
+        0%,
+        20%,
+        80%,
+        100% {
           opacity: 100%;
           transform: scale(0.5);
         }
