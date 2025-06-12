@@ -598,6 +598,10 @@ commands:
         # latest can also be used here
         default: *firefox-stable-version
     steps:
+      - run:
+          name: Update APT
+          command: |
+            sudo apt-get update
       - when:
           condition:
             not:
