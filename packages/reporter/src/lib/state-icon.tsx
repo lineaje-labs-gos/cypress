@@ -3,12 +3,8 @@ import { observer } from 'mobx-react'
 import React from 'react'
 
 import type { TestState } from '@packages/types'
-import FailedIcon from '@packages/frontend-shared/src/assets/icons/status-failed_x12.svg'
-import PassedIcon from '@packages/frontend-shared/src/assets/icons/status-passed_x12.svg'
-import PendingIcon from '@packages/frontend-shared/src/assets/icons/status-pending_x12.svg'
-import RunningIcon from '@packages/frontend-shared/src/assets/icons/status-running_x12.svg'
 import WandIcon from '@packages/frontend-shared/src/assets/icons/object-magic-wand-dark-mode_x16.svg'
-import { IconStatusQueuedOutline, IconStatusSkippedOutline } from '@cypress-design/react-icon'
+import { IconStatusFailedSimple, IconStatusPassedSimple, IconStatusQueuedOutline, IconStatusRunningOutline, IconStatusSkippedOutline } from '@cypress-design/react-icon'
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   state: TestState
@@ -20,13 +16,13 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
 
   if (state === 'active') {
     return (
-      <RunningIcon {...rest} className={cs('fa-spin', rest.className)} />
+      <IconStatusRunningOutline size='16' fillColor='gray-700' strokeColor='indigo-400' />
     )
   }
 
   if (state === 'failed') {
     return (
-      <FailedIcon {...rest} />
+      <IconStatusFailedSimple size='16' strokeColor='red-400' />
     )
   }
 
@@ -38,7 +34,7 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
     }
 
     return (
-      <PassedIcon {...rest} />
+      <IconStatusPassedSimple size='16' strokeColor='jade-400' />
     )
   }
 
@@ -49,6 +45,7 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
     )
   }
 
+  // processing is really queued
   if (state === 'processing') {
     return (
       <IconStatusQueuedOutline
@@ -57,8 +54,11 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
     )
   }
 
+  // TODO mabel i need to double check if it's this icon or the queued one
   return (
-    <PendingIcon />
+    <IconStatusQueuedOutline
+      size='16'
+      strokeColor="gray-700" />
   )
 })
 
