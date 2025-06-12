@@ -601,7 +601,14 @@ commands:
       - run:
           name: Update APT
           command: |
-            sudo apt-get update
+            if [[ $PLATFORM == 'linux' ]]; then
+              # on Arm, CI runs as non-root, on x64 CI runs as root but there is no sudo binary
+              if [[ `whoami` == 'root' ]]; then
+                apt-get update
+              else
+                sudo apt-get update
+              fi
+            fi
       - when:
           condition:
             not:
