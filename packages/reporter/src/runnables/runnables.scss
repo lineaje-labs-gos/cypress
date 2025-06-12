@@ -413,12 +413,6 @@
     .runnable-state-icon {
       flex-shrink: 0;
 
-      &.fa-spin {
-        .icon-light {
-          stroke: $gray-800;
-        }
-      }
-
       &.wand-icon {
         .icon-light {
           fill: $purple-300;
@@ -510,7 +504,14 @@
     gap: 8px;
     align-items: center;
 
+    svg {
+      flex-shrink: 0;
+    }
+
     .runnable-title {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
       flex-grow: 1;
     }
   }
