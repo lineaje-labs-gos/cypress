@@ -105,6 +105,7 @@
     padding-left: 0;
 
     .runnable-wrapper {
+      border-radius: 4px;
       border-left: 4px solid transparent;
       padding: 0;
 
@@ -140,13 +141,12 @@
           padding: 8px 16px;
           display: inline-flex;
           align-items: center;
+          height: 100%;
+          width: 100%;
 
           &:focus {
             outline: 0;
           }
-
-          height: 100%;
-          width: 100%;
         }
       }
       .runnable-controls-studio {
@@ -189,10 +189,9 @@
       }
     }
 
-    & > div > .runnable-wrapper {
-      border: 1px solid $gray-950;
-      border-radius: 4px;
-      border-left: 4px solid transparent;
+    &.runnable-processing > div > .runnable-wrapper,
+    &.runnable-processing > div > .runnable-instruments {
+      border-left: 4px solid $gray-700;
     }
 
     &.runnable-failed > div > .runnable-wrapper,
@@ -289,15 +288,41 @@
     }
 
     &.test {
+      > .collapsible {
+        &.is-open {
+          border-radius: 4px;
+          border: 3px solid #43486159;
+          background-color: $reporter-section-background;
+        }
+      }
+
       .collapsible {
         display: flex;
         flex-direction: column;
 
+        &.is-open {
+          .runnable-wrapper {
+            border-bottom-left-radius: 0;
+
+            .collapsible-header {
+              border: 1px solid $gray-800;
+            }
+
+            .collapsible-header-inner {
+              background-color: $reporter-section-background;
+            }
+          }
+        }
+
         .runnable-wrapper {
+          background-color: $gray-1000;
+
           &:hover {
-            border-top: 1px solid $gray-900;
-            border-bottom: 1px solid $gray-900;
-            border-right: 1px solid $gray-900;
+            .collapsible-header {
+              border-top: 1px solid $gray-900;
+              border-bottom: 1px solid $gray-900;
+              border-right: 1px solid $gray-900;
+            }
 
             .collapsible-header-inner {
               background-color: $gray-1100;
@@ -305,6 +330,11 @@
           }
 
           .collapsible-header {
+            border: 1px solid $gray-950;
+            border-radius: 4px;
+            border-bottom-left-radius: 0;
+            border-top-left-radius: 0;
+
             &:focus-visible {
               border-top: 1px solid $gray-800;
               border-bottom: 1px solid $gray-800;
@@ -322,6 +352,31 @@
           }
         }
       }
+      .runnable-commands-region {
+        .hooks-container {
+          display: flex;
+          gap: 4px;
+          flex-direction: column;
+          width: 100%;
+        }
+      }
+
+      &.runnable-active > .collapsible {
+        > .runnable-wrapper,
+        > .runnable-instruments {
+          border-left: 4px solid $indigo-400;
+        }
+      }
+    }
+
+    // TODO come back to these dumb dotted lines
+    &:not(.is-open) {
+      position: relative;
+      margin-bottom: 4px;
+
+      // &::before {
+      //   @include dotted-line;
+      // }
     }
 
     &.test.runnable-passed.runnable-studio {
@@ -375,7 +430,7 @@
 
   .runnable-instruments {
     border-left: 4px solid transparent;
-    padding-bottom: 5px;
+    padding-top: 8px;
   }
 
   .runnable-title {
@@ -438,15 +493,6 @@
   :nth-last-child(1 of .test) {
     &::before {
       content: none !important;
-    }
-  }
-
-  .runnable .test:not(.is-open) {
-    position: relative;
-    padding-bottom: 4px;
-
-    &::before {
-      @include dotted-line;
     }
   }
 
@@ -589,6 +635,13 @@
         animation-delay: 0.5s;
         background: $gray-400;
       }
+
+      // @for $i from 1 through 5 {
+      //   &:nth-child(#{$i}) {
+      //     animation-delay: #{$i * 0.1}s;
+      //     background: nth(($jade-400, $indigo-400, $red-400, $orange-400, $gray-400), $i);
+      //   }
+      // }
 
       @keyframes scaling {
         0%,

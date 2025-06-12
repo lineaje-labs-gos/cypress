@@ -10,18 +10,18 @@
   }
 
   .attempt-item {
-    margin-bottom: 7px;
-
     > .collapsible {
       position: relative;
-      margin-right: 16px;
+
       .collapsible-header-inner {
         outline: none;
+        display: flex;
+        align-items: center;
       }
 
       &:before {
         border-left: 1px solid $gray-900;
-        content: '';
+        content: "";
         left: 9px;
         position: absolute;
         top: 22px;
@@ -47,24 +47,28 @@
       }
     }
 
-  .open-close-indicator {
-    svg {
-      margin-right: 3px;
+    .open-close-indicator {
+      svg {
+        margin-right: 3px;
 
-      &.collapse-icon {
-        display: none;
+        &.collapse-icon {
+          display: none;
+        }
+
+        &.expand-icon {
+          display: block;
+        }
       }
+    }
 
-      &.expand-icon {
-        display: block;
+    .attempt-content {
+      display: flex;
+
+      > div {
+        width: 100%;
       }
     }
   }
-
-  .attempt-content {
-    padding-left: 5px;
-  }
-}
 
   .attempt-state-failed {
     .attempt-name:after {
@@ -77,7 +81,6 @@
     }
   }
 
-
   .attempt-name {
     display: flex;
     justify-content: flex-end;
@@ -86,7 +89,7 @@
 
     &:before {
       border-top: 1px solid $gray-900;
-      content: '';
+      content: "";
       left: 15px;
       position: absolute;
       right: 0;
@@ -95,7 +98,7 @@
 
     &:after {
       color: $gray-600;
-      content: '•';
+      content: "•";
       left: 7px;
       position: absolute;
       top: 4px;
@@ -105,7 +108,7 @@
       align-items: center;
       border: 1px solid $gray-900;
       border-radius: 7px;
-      box-shadow: 0 1px 1px 0 rgba($white, 0.20);
+      box-shadow: 0 1px 1px 0 rgba($white, 0.2);
       display: flex;
       font-size: 12px;
       padding: 2px 5px;

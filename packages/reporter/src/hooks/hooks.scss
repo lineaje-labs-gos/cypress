@@ -1,7 +1,7 @@
 .reporter {
   .hooks-container {
     .hook-item {
-      margin-bottom: 5px;
+      // margin-bottom: 5px;
 
       &:last-of-type {
         margin-bottom: 0;
@@ -29,7 +29,7 @@
         flex-grow: 1;
         font-size: 12px;
         cursor: pointer;
-        padding: 4px 0;
+        padding: 6px 0 6px 8px;
 
         &:focus {
           outline: none;
