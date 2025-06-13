@@ -4,11 +4,12 @@ import React from 'react'
 
 import type { TestState } from '@packages/types'
 import WandIcon from '@packages/frontend-shared/src/assets/icons/object-magic-wand-dark-mode_x16.svg'
-import { IconStatusFailedSimple, IconStatusPassedSimple, IconStatusQueuedOutline, IconStatusRunningOutline, IconStatusSkippedOutline } from '@cypress-design/react-icon'
+import { IconStatusFailedSimple, IconStatusPassedSimple, IconStatusQueuedOutline, IconStatusQueuedSimple, IconStatusRunningOutline, IconStatusRunningSimple, IconStatusSkippedOutline, IconStatusSkippedSimple } from '@cypress-design/react-icon'
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   state: TestState
   isStudio?: boolean
+  iconSize?: '8' | '12' | '16'
 }
 
 const StateIcon: React.FC<Props> = observer((props: Props) => {
@@ -16,13 +17,15 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
 
   if (state === 'active') {
     return (
-      <IconStatusRunningOutline size='16' fillColor='gray-700' strokeColor='indigo-400' />
+      props.iconSize === '8' ?
+        <IconStatusRunningSimple fillColor='gray-700' strokeColor='indigo-400' /> :
+        <IconStatusRunningOutline size={props.iconSize || '16'} fillColor='gray-700' strokeColor='indigo-400' />
     )
   }
 
   if (state === 'failed') {
     return (
-      <IconStatusFailedSimple size='16' strokeColor='red-400' />
+      <IconStatusFailedSimple size={props.iconSize || '16'} strokeColor='red-400' />
     )
   }
 
@@ -34,31 +37,37 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
     }
 
     return (
-      <IconStatusPassedSimple size='16' strokeColor='jade-400' />
+      <IconStatusPassedSimple size={props.iconSize || '16'} strokeColor='jade-400' />
     )
   }
 
   // pending is really skipped
   if (state === 'pending') {
     return (
-      <IconStatusSkippedOutline size='16' strokeColor='gray-700' />
+      props.iconSize === '8' ?
+        <IconStatusSkippedSimple strokeColor='gray-700' /> :
+        <IconStatusSkippedOutline size={props.iconSize || '16'} strokeColor='gray-700' />
     )
   }
 
   // processing is really queued
   if (state === 'processing') {
     return (
-      <IconStatusQueuedOutline
-        size='16'
-        strokeColor="gray-700" />
+      props.iconSize === '8' ?
+        <IconStatusQueuedSimple strokeColor='gray-700' /> :
+        <IconStatusQueuedOutline
+          size={props.iconSize || '16'}
+          strokeColor="gray-700" />
     )
   }
 
   // TODO mabel i need to double check if it's this icon or the queued one
   return (
-    <IconStatusQueuedOutline
-      size='16'
-      strokeColor="gray-700" />
+    props.iconSize === '8' ?
+      <IconStatusQueuedSimple strokeColor='gray-700' /> :
+      <IconStatusQueuedOutline
+        size={props.iconSize || '16'}
+        strokeColor="gray-700" />
   )
 })
 
