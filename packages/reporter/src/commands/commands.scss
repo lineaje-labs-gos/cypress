@@ -64,7 +64,8 @@
   }
 
   .command-wrapper {
-    // border-left: 2px solid $reporter-section-background;
+    border-left: 2px solid $reporter-section-background;
+    border-radius: 4px;
     color: $gray-500;
     display: flex;
     min-height: 28px;
@@ -203,10 +204,11 @@
   // TODO mabel check these states
   // Command State Styles
   .command-state-passed {
-    // border-left: 2px solid $reporter-section-background;
+    border-left: 2px solid $reporter-section-background;
 
     &.command-is-interactive:hover {
-      // border-left: 2px solid $gray-900;
+      border-left: 2px solid $gray-900;
+      border-radius: 0 4px 4px 0;
     }
 
     &:not(.command-is-event) .command-number {
@@ -222,8 +224,10 @@
     }
   }
 
+  // pending is running in this case
   .command-state-pending {
-    // border-left: 2px solid $indigo-800;
+    border-left: 2px solid $indigo-800;
+    border-radius: 0 4px 4px 0;
     background-color: $gray-900;
     cursor: default;
     color: $indigo-200;
@@ -270,7 +274,8 @@
     color: $warn-text;
 
     &:not(.command-type-system) {
-      // border-left: $warn-border;
+      border-left: $warn-border;
+      border-radius: 0 4px 4px 0;
     }
 
     .command-number-column,
@@ -294,7 +299,8 @@
     color: $err-header-text;
 
     &:not(.command-type-system) {
-      // border-left: $err-border;
+      border-left: $err-border;
+      border-radius: 0 4px 4px 0;
       background-color: $err-header-background;
 
       &.command-is-interactive:hover {
@@ -515,7 +521,8 @@
 
   .command-is-pinned {
     background: $indigo-1000;
-    // border-left: 2px solid $pinned;
+    border-left: 2px solid $pinned;
+    border-radius: 0 4px 4px 0;
 
     &,
     &:hover {
@@ -524,7 +531,8 @@
 
     &:hover {
       background: $indigo-900;
-      // border-left: 2px solid $pinned;
+      border-left: 2px solid $pinned;
+      border-radius: 0 4px 4px 0;
     }
   }
 
@@ -536,6 +544,6 @@
     box-shadow: inset 0 1px 1px rgba($white, 0.05);
     min-height: 28px;
     padding: 9px;
-    margin: 8px 0; 
+    margin: 8px 0;
   }
 }
