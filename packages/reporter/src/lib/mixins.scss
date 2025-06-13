@@ -36,8 +36,11 @@
   height: 28px; // because some numbers are empty
   padding-top: 4px;
   padding-bottom: 4px;
-  text-align: center;
   width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }
 
 @mixin command-info-padding {
