@@ -48,13 +48,25 @@ describe('tests', () => {
   })
 
   it('includes the state as a class', () => {
-    cy.contains('suite 1')
-    .closest('.runnable')
-    .should('have.class', 'runnable-failed')
+    cy.get('.suite').first().within((el) => {
+      cy.wrap(el).contains('suite 1')
+      cy.get('.test').eq(0).should('have.class', 'runnable-passed')
+      cy.get('.test').eq(1).should('have.class', 'runnable-failed')
+    })
 
-    cy.contains('suite 2')
-    .closest('.runnable')
-    .should('have.class', 'runnable-passed')
+    cy.get('.suite').eq(1).within((el) => {
+      cy.wrap(el).contains('suite 1 > nested suite 1')
+      cy.get('.test').eq(0).should('have.class', 'runnable-pending')
+      cy.get('.test').eq(1).should('have.class', 'runnable-active')
+    })
+
+    cy.get('.suite').eq(2).within((el) => {
+      cy.wrap(el).contains('suite 2')
+      cy.get('.test').eq(0).should('have.class', 'runnable-passed')
+      cy.get('.test').eq(1).should('have.class', 'runnable-passed')
+      cy.get('.test').eq(2).should('have.class', 'runnable-passed')
+      .should('have.class', 'runnable-retried')
+    })
   })
 
   describe('expand and collapse', () => {
@@ -356,7 +368,7 @@ describe('studio controls', () => {
           cy.contains('nested suite 1')
           .parents('.collapsible').first()
           .contains('test 1').click()
-          .parents('.collapsible').first()
+          .parents('.collapsible').first().scrollIntoView()
           .find('.studio-controls').as('pendingControls')
           .should('be.visible')
 
