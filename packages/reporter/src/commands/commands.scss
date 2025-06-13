@@ -25,7 +25,7 @@
 
   .command-is-studio {
     cursor: auto;
-    
+
     &.command-type-parent .commands-controls .studio-command-remove {
       display: block;
       padding-left: 5px;
@@ -97,12 +97,12 @@
     .alias-container {
       margin-left: 0;
       white-space: nowrap;
-  
+
       > * {
         display: inline-block;
         margin-left: 2px;
       }
-    
+
       > *:first-child {
         margin-left: 0;
       }
@@ -110,15 +110,14 @@
   }
 
   .command-number-column {
-    // @include gutter-alignment;
-    padding: 4px 24px 4px 4px;
+    @include gutter-alignment;
     color: $gray-500;
   }
 
   // when no children, add padding to act as the .command-expander-column's width
   // to prevent adding another element to the page
   .command-number-column + span.command-pin-target {
-    // margin-left: $gutter-margin;
+    margin-left: 24px;
   }
 
   .command-pin-target.command-group {
@@ -133,20 +132,19 @@
   }
 
   .command-group-no-children {
-    padding-left: 15px; 
+    padding-left: 15px;
   }
 
   .command-wrapper-text-group {
     padding-left: 15px;
     width: 100%;
-
   }
 
   .command-wrapper-text-group-parent {
     padding-left: 5px;
   }
 
-  .nested-group-expander {   
+  .nested-group-expander {
     .command-expander {
       position: relative;
       margin-left: -16px !important; // Adjust this value to center the caret on the border
@@ -183,7 +181,7 @@
       }
 
       .fa-circle.command-message-indicator-bad {
-        color: $red-500
+        color: $red-500;
       }
 
       .fa-circle.command-message-indicator-pending {
@@ -215,7 +213,7 @@
     &:not(.command-is-event) .command-number {
       color: $gray-700;
     }
-  
+
     &:not(.command-is-event, .command-type-system) .command-method {
       color: $gray-200;
     }
@@ -238,7 +236,7 @@
       .fa-circle {
         line-height: 18px;
         display: inline-block;
-  
+
         .icon-light {
           stroke: $gray-800;
         }
@@ -437,7 +435,7 @@
     padding-top: 4px;
 
     svg {
-      color: rgba($gray-600, .25);
+      color: rgba($gray-600, 0.25);
       color: $gray-600;
       vertical-align: text-top;
     }
@@ -456,7 +454,7 @@
       display: inline-block;
       margin-left: 2px;
     }
-  
+
     > *:first-child {
       margin-left: 0;
     }
@@ -470,8 +468,6 @@
     color: $pinned;
     font-size: 12px;
     line-height: 1;
-    margin-top: -1px;
-    margin-left: 12px;
     outline: none;
     text-align: right;
     width: 15px;
@@ -503,15 +499,11 @@
 
   .command-expander-column {
     @extend %command-expander-base;
-    padding: 4px 5px 4px 11px;
-    width: 25px;
-
-    .command-expander {
-      margin-top: 5px;
-    }
+    height: 28px;
+    width: 24px;
+    justify-content: center;
+    align-items: center;
   }
-
- 
 
   .command-expander-column-group {
     @extend %command-expander-base;
@@ -551,4 +543,3 @@
     padding: 9px;
   }
 }
-
