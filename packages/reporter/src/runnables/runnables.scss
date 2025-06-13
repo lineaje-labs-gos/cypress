@@ -1,7 +1,7 @@
 @mixin dotted-line {
   content: "";
   position: absolute;
-  left: 5.4%;
+  left: 4%;
   top: 75%;
   height: 25%;
   border-left: 1px dotted $gray-800;
@@ -136,7 +136,7 @@
         }
 
         .collapsible-header-inner {
-          padding: 8px 16px;
+          padding: 8px 6px;
           display: inline-flex;
           align-items: center;
           height: 100%;
@@ -305,7 +305,7 @@
             border-bottom-left-radius: 0;
 
             .collapsible-header {
-              border: 1px solid $gray-800;
+              border: 1px solid $gray-900;
             }
 
             .collapsible-header-inner {
@@ -353,6 +353,8 @@
         }
       }
       .runnable-commands-region {
+        margin: 0 8px;
+
         .hooks-container {
           display: flex;
           gap: 4px;
@@ -424,7 +426,7 @@
 
   .runnable-instruments {
     border-left: 4px solid transparent;
-    padding-top: 8px;
+
   }
 
   .runnable-title {

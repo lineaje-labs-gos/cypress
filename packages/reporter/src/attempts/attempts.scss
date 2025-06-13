@@ -4,9 +4,38 @@
       display: none;
     }
 
-    &.has-multiple-attempts .attempt-item > .collapsible > .collapsible-header-wrapper {
-      display: flex;
+    &.has-multiple-attempts .attempt-item {
+      > .collapsible > .collapsible-header-wrapper {
+        display: flex;
+      }
+
+      &:not(:first-child) {
+        > .collapsible .attempt-name:before {
+          border-left: 1px dotted $gray-800;
+          content: "";
+          left: 13px;
+          position: absolute;
+          top: 0;
+          height: 8px;
+          z-index: 1;
+        }
+      }
+      > .collapsible .attempt-name {
+        &:after {
+          border-left: 1px dotted $gray-800;
+          content: "";
+          left: 13px;
+          position: absolute;
+          bottom: 0;
+          height: 8px;
+          z-index: 1;
+        }
+      }
     }
+  }
+
+  .attempt-error-region {
+    margin: 0 8px;
   }
 
   .attempt-item {
@@ -17,25 +46,17 @@
         outline: none;
         display: flex;
         align-items: center;
+        width: 100%;
       }
 
-      &:before {
-        border-left: 1px solid $gray-900;
-        content: "";
-        left: 9px;
-        position: absolute;
-        top: 22px;
-        height: 15px;
-      }
-
-      &.is-open:before {
-        display: none;
-      }
+      // &.is-open:before {
+      //   display: none;
+      // }
     }
 
-    &:last-child > .collapsible:before {
-      display: none;
-    }
+    // &:last-child > .collapsible:before {
+    //   display: none;
+    // }
 
     > .is-open .open-close-indicator {
       svg.collapse-icon {
@@ -68,57 +89,37 @@
         width: 100%;
       }
     }
-  }
 
-  .attempt-state-failed {
-    .attempt-name:after {
-      color: $fail;
-    }
-  }
-  .attempt-state-passed {
-    .attempt-name:after {
-      color: $pass;
+    &:not(:last-child) .attempt-name {
+      border-bottom: 1px solid $gray-900;
     }
   }
 
   .attempt-name {
     display: flex;
-    justify-content: flex-end;
     position: relative;
     width: 100%;
 
-    &:before {
-      border-top: 1px solid $gray-900;
-      content: "";
-      left: 15px;
-      position: absolute;
-      right: 0;
-      top: 13px;
-    }
-
-    &:after {
-      color: $gray-600;
-      content: "•";
-      left: 7px;
-      position: absolute;
-      top: 4px;
+    .collapsible-header {
+      width: 100%;
     }
 
     .attempt-tag {
+      display: inline-flex;
       align-items: center;
-      border: 1px solid $gray-900;
-      border-radius: 7px;
-      box-shadow: 0 1px 1px 0 rgba($white, 0.2);
-      display: flex;
-      font-size: 12px;
-      padding: 2px 5px;
+      font-size: 14px;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 10px;
       position: relative;
-      background-color: $black;
       user-select: none;
       cursor: pointer;
 
       &:hover {
         background-color: $gray-1100;
+      }
+      .attempt-tag-text {
+        flex-grow: 1;
       }
     }
 
