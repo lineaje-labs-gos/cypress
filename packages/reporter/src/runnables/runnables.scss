@@ -178,10 +178,11 @@
     }
 
     &.suite .collapsible-indicator {
-      margin-left: 2px;
-      // .icon-dark {
-      //   stroke: $gray-400;
-      // }
+      flex-shrink: 0;
+
+      .icon-dark {
+        stroke: $gray-400;
+      }
       .icon-light {
         fill: $gray-400;
       }

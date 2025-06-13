@@ -25,7 +25,8 @@
       .collapsible-header {
         text-transform: uppercase;
         color: $gray-400;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
         flex-grow: 1;
         font-size: 12px;
         cursor: pointer;
@@ -37,6 +38,11 @@
 
         > .collapsible-header-inner:focus {
           outline: 0;
+        }
+
+        .collapsible-header-inner {
+          display: flex;
+          align-items: center;
         }
       }
 
