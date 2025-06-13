@@ -237,6 +237,10 @@ const events: Events = {
     localBus.on('studio:copy:to:clipboard', (cb) => {
       runner.emit('studio:copy:to:clipboard', cb)
     })
+
+    localBus.on('prompt:get-code', (testId, commandId) => {
+      runner.emit('prompt:get-code', testId, commandId)
+    })
   },
 
   emit (event, ...args) {

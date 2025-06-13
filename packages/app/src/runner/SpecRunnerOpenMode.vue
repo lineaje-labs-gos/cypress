@@ -1,4 +1,9 @@
 <template>
+  <PromptGetCodeModal
+    v-if="promptStore.getCodeModalIsOpen"
+    :open="promptStore.getCodeModalIsOpen"
+    @close="promptStore.closeGetCodeModal"
+  />
   <StudioInstructionsModal
     v-if="studioStore.instructionModalIsOpen"
     :open="studioStore.instructionModalIsOpen"
@@ -145,6 +150,8 @@ import StudioSaveModal from './studio/StudioSaveModal.vue'
 import { useStudioStore } from '../store/studio-store'
 import StudioPanel from '../studio/StudioPanel.vue'
 import { useSubscription } from '../graphql'
+import PromptGetCodeModal from '../prompt/PromptGetCodeModal.vue'
+import { usePromptStore } from '../store/prompt-store'
 
 const {
   preferredMinimumPanelWidth,
@@ -235,6 +242,7 @@ const {
 } = useEventManager()
 
 const studioStore = useStudioStore()
+const promptStore = usePromptStore()
 
 const handleStudioPanelClose = () => {
   eventManager.emit('studio:cancel', undefined)

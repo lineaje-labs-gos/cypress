@@ -547,5 +547,26 @@
     min-height: 28px;
     padding: 9px;
   }
+
+  .command-prompt-get-code {
+    color: $gray-200;
+    border: 1px solid $gray-500;
+    border-radius: 3px;
+    padding: 4px 4px;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  
+  .command-prompt-get-code-indicator {
+    color: $gray-200;
+    margin-right: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+  }
 }
 

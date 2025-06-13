@@ -2,6 +2,7 @@ import { init, loadRemote } from '@module-federation/runtime'
 import type { CypressInternal, CyPromptDriverDefaultShape } from './prompt-driver-types'
 import type Emitter from 'component-emitter'
 import $errUtils from '../../../cypress/error_utils'
+import $stackUtils from '../../../cypress/stack_utils'
 
 interface CyPromptDriver { default: CyPromptDriverDefaultShape }
 
@@ -47,7 +48,7 @@ const initializeModule = async (Cypress: Cypress.Cypress): Promise<CyPromptDrive
       type: 'module',
       name: 'cy-prompt',
       entryGlobalName: 'cy-prompt',
-      entry: '/__cypress-cy-prompt/cy-prompt.js',
+      entry: '/__cypress-cy-prompt/driver/cy-prompt.js',
       shareScope: 'default',
     }],
     name: 'driver',
@@ -79,6 +80,7 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress, cy: Cypress.Cyp
       Cypress: Cypress as CypressInternal,
       cy,
       eventManager: window.getEventManager ? window.getEventManager() : undefined,
+      getSourceStack: $stackUtils.getSourceStack,
     })
   } catch (error) {
     return error
@@ -93,7 +95,7 @@ export default (Commands, Cypress, cy) => {
       initializeCloudCyPromptPromise = initializeCloudCyPrompt(Cypress, cy)
     }
 
-    const prompt = async (message: string, options: object = {}) => {
+    const prompt = async (text: string, options: object = {}) => {
       if (Cypress.testingType === 'component') {
         $errUtils.throwErrByPath('prompt.promptTestingTypeError')
 
@@ -117,7 +119,13 @@ export default (Commands, Cypress, cy) => {
 
         const cyPrompt = bundleResult
 
-        return await cyPrompt(message, options)
+        const promptCmd = cy.state('current')
+
+        return await cyPrompt({
+          text,
+          commandOptions: options,
+          promptCmd,
+        })
       } catch (error) {
         // TODO: Check error that the user is logged in / record key
 
