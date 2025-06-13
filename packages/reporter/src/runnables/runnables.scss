@@ -110,8 +110,6 @@
       padding: 0;
 
       .collapsible-header {
-        height: 36px;
-
         &:focus-visible {
           outline: 0;
 
@@ -273,6 +271,7 @@
           display: inline-flex;
           align-items: center;
           gap: 4px;
+          flex-shrink: 0;
         }
       }
     }
@@ -431,7 +430,6 @@
     color: $white;
     font-family: $font-system;
     font-size: 14px;
-    min-width: $reporter-contents-min-width;
     white-space: pre-line;
   }
 
@@ -444,13 +442,6 @@
 
   .wrap > .runnables {
     padding: 0 8px;
-  }
-
-  .suite > div .runnable-wrapper,
-  .test .runnable-wrapper > .collapsible-header {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 
   .runnable-controls {
@@ -509,9 +500,6 @@
     }
 
     .runnable-title {
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
       flex-grow: 1;
     }
   }
