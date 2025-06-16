@@ -1,7 +1,7 @@
 @mixin dotted-line {
   content: "";
   position: absolute;
-  left: 4%;
+  left: 12px;
   top: 75%;
   height: 25%;
   border-left: 1px dotted $gray-800;
@@ -136,7 +136,7 @@
         }
 
         .collapsible-header-inner {
-          padding: 8px 6px;
+          padding: 8px 4px;
           display: inline-flex;
           align-items: center;
           height: 100%;
@@ -274,6 +274,26 @@
           align-items: center;
           gap: 4px;
           flex-shrink: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+          opacity: 0;
+          background: inherit;
+
+          &.should-show {
+            opacity: 1;
+
+            &:before {
+              content: '';
+              position: absolute;
+              width: 20px;
+              left: -21px;
+              top: 0;
+              height: 100%;
+              opacity: 0.5;
+              background: inherit;
+            }
+          }
         }
       }
     }
@@ -286,6 +306,10 @@
           @include dotted-line;
         }
       }
+    }
+
+    .runnable-dotted-line {
+      @include dotted-line;
     }
 
     &.test {
@@ -498,6 +522,8 @@
     width: 100%;
     gap: 8px;
     align-items: center;
+    position: relative;
+    background: inherit;
 
     svg {
       flex-shrink: 0;
