@@ -60,7 +60,7 @@ $color-transition: color 150ms ease-out;
     border-radius: 4px;
     display: flex;
     flex-wrap: wrap;
-    height: 24px;
+    min-height: 24px;
     justify-content: space-between;
 
     li {
