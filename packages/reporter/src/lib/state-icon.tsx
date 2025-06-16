@@ -18,7 +18,7 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
   if (state === 'active') {
     return (
       props.iconSize === '8' ?
-        <IconStatusRunningSimple fillColor='gray-700' strokeColor='indigo-400' /> :
+        <IconStatusRunningSimple size='8' fillColor='gray-700' strokeColor='indigo-400' /> :
         <IconStatusRunningOutline size={props.iconSize || '16'} fillColor='gray-700' strokeColor='indigo-400' />
     )
   }
@@ -45,7 +45,7 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
   if (state === 'pending') {
     return (
       props.iconSize === '8' ?
-        <IconStatusSkippedSimple strokeColor='gray-700' /> :
+        <IconStatusSkippedSimple size='8' strokeColor='gray-700' /> :
         <IconStatusSkippedOutline size={props.iconSize || '16'} strokeColor='gray-700' />
     )
   }
@@ -54,7 +54,7 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
   if (state === 'processing') {
     return (
       props.iconSize === '8' ?
-        <IconStatusQueuedSimple strokeColor='gray-700' /> :
+        <IconStatusQueuedSimple size='8' strokeColor='gray-700' /> :
         <IconStatusQueuedOutline
           size={props.iconSize || '16'}
           strokeColor="gray-700" />
@@ -64,7 +64,7 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
   // TODO mabel i need to double check if it's this icon or the queued one
   return (
     props.iconSize === '8' ?
-      <IconStatusQueuedSimple strokeColor='gray-700' /> :
+      <IconStatusQueuedSimple size='8' strokeColor='gray-700' /> :
       <IconStatusQueuedOutline
         size={props.iconSize || '16'}
         strokeColor="gray-700" />

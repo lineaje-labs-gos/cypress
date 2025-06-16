@@ -58,7 +58,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
         </div>
         <span className='runnable-title'>{model.title}</span>
         {(studioEnabled && !appState.studioActive && (isHovered || isFocused)) && (
-          <Button size='20' onClick={_launchStudio} variant='outline-dark' className='launch-studio-button'>
+          <Button data-cy='launch-studio-button' size='20' onClick={_launchStudio} variant='outline-dark' className='launch-studio-button'>
             <IconActionAddMedium strokeColor='gray-500' />
             New Test
           </Button>
