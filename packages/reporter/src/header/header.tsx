@@ -28,6 +28,7 @@ const Header: React.FC<ReporterHeaderProps> = observer(({ appState, events = def
       <Tooltip placement='bottom' title={<p>{appState.isSpecsListOpen ? 'Collapse' : 'Expand'} Specs List <span className='kbd'>F</span></p>} wrapperClassName='toggle-specs-wrapper' className='cy-tooltip'>
         <div>
           <Button
+            data-cy='toggle-specs-button'
             size='32'
             className='toggle-specs-button'
             variant='outline-dark'
