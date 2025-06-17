@@ -51,7 +51,7 @@ $color-transition: color 150ms ease-out;
     width: 100%;
     justify-content: space-between;
     padding: 20px 16px;
-    border: 1px solid #2E3247;
+    border: 1px solid $gray-900;
     border-left: none;
   }
 
@@ -133,16 +133,52 @@ $color-transition: color 150ms ease-out;
     align-items: center;
     flex: 1;
 
-
-    >*:first-child {
+    .runnable-header-file-name {
+      display: inline-flex;
+      align-items: center;
       flex: 1;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      position: relative;
+      background: $gray-1100;
+
+      .open-in-ide-button {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        right: 0;
+        gap: 4px;
+        color: $gray-300;
+        background: inherit;
+        display: flex;
+        align-items: center;
+
+        &:before {
+          content: "";
+          position: absolute;
+          width: 22px;
+          left: -23px;
+          top: 0;
+          height: 100%;
+          opacity: 0.5;
+          background: inherit;
+        }
+
+        &:focus-visible {
+          opacity: 1;
+        }
+      }
+
+      &:hover {
+        .open-in-ide-button {
+          opacity: 1;
+        }
+      }
     }
 
-    span>span>a>svg {
+    span > span > a > svg {
       margin-bottom: -2px;
       margin-right: 8px;
     }
