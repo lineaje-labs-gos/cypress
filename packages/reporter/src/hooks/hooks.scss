@@ -1,13 +1,5 @@
 .reporter {
   .hooks-container {
-    .hook-item {
-      // margin-bottom: 5px;
-
-      &:last-of-type {
-        margin-bottom: 0;
-      }
-    }
-
     .hook-header {
       font-family: $font-system;
       display: flex;

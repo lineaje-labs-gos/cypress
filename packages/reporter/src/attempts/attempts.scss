@@ -35,7 +35,7 @@
   }
 
   .attempt-error-region {
-    margin: 0 8px;
+    margin: 0 8.5px;
   }
 
   .attempt-item {
@@ -84,6 +84,7 @@
 
     .attempt-content {
       display: flex;
+      margin-bottom: 6px;
 
       > div {
         width: 100%;
