@@ -54,7 +54,7 @@ describe('suites', () => {
   it('includes the state as a class', () => {
     cy.contains('suite 1')
     .closest('.runnable')
-    .should('have.class', 'runnable-active')
+    .should('have.class', 'runnable-failed')
 
     cy.contains('suite 1 > nested suite 1')
     .closest('.runnable')
@@ -160,8 +160,9 @@ describe('suites', () => {
       cy.stub(runner, 'emit')
 
       cy.contains('suite 1').parents('.collapsible-header')
-      .realHover()
-      .get('[data-cy="launch-studio-button"]').click()
+      .realHover().within(() => {
+        cy.get('[data-cy="launch-studio-button"]').click()
+      })
 
       cy.wrap(runner.emit).should('be.calledWith', 'studio:init:suite', 'r2')
     })
