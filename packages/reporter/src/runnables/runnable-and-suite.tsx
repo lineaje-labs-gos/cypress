@@ -13,6 +13,11 @@ import type TestModel from '../test/test-model'
 
 import { IconActionAddMedium, IconChevronDownMedium, IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped } from '@cypress-design/react-icon'
 import Button from '@cypress-design/react-button'
+import { RunnableArray } from './runnables-store'
+
+export const getLastTestIndex = (runnables: RunnableArray) => {
+  return [...runnables].reverse().findIndex((item) => item.type === 'test')
+}
 
 interface SuiteProps {
   eventManager?: Events
@@ -69,13 +74,16 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     )
   }
 
+  const lastTestIndex = getLastTestIndex(model.children)
+
   let runnablesList = <ul className='runnables'>
-    {_.map(model.children, (runnable) => {
+    {_.map(model.children, (runnable, index) => {
       return (<Runnable
         key={runnable.id}
         model={runnable}
         studioEnabled={studioEnabled}
         canSaveStudioLogs={canSaveStudioLogs}
+        isLastTest={lastTestIndex === index}
       />)
     })}
   </ul>
@@ -104,14 +112,15 @@ export interface RunnableProps {
   model: TestModel | SuiteModel
   studioEnabled: boolean
   canSaveStudioLogs: boolean
+  isLastTest: boolean
 }
 
 // NOTE: some of the driver tests dig into the React instance for this component
 // in order to mess with its internal state. converting it to a functional
 // component breaks that, so it needs to stay a Class-based component or
 // else the driver tests need to be refactored to support it being functional
-const Runnable: React.FC<RunnableProps> = observer(({ appState: appStateProps = appState, model, studioEnabled, canSaveStudioLogs }) => {
-  return (
+const Runnable: React.FC<RunnableProps> = observer(({ appState: appStateProps = appState, model, studioEnabled, canSaveStudioLogs, isLastTest }) => {
+  return (<>
     <li
       className={cs(`${model.type} runnable runnable-${model.state}`, {
         'runnable-retried': model.hasRetried,
@@ -126,6 +135,8 @@ const Runnable: React.FC<RunnableProps> = observer(({ appState: appStateProps = 
           canSaveStudioLogs={canSaveStudioLogs}
         />}
     </li>
+    {model.type === 'test' && !isLastTest && <div className='runnable-dotted-line' />}
+  </>
   )
 })
 

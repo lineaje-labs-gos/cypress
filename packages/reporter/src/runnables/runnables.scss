@@ -285,7 +285,7 @@
             opacity: 1;
 
             &:before {
-              content: '';
+              content: "";
               position: absolute;
               width: 20px;
               left: -21px;
@@ -307,10 +307,6 @@
           @include dotted-line;
         }
       }
-    }
-
-    .runnable-dotted-line {
-      @include dotted-line;
     }
 
     &.test {
@@ -397,16 +393,6 @@
       }
     }
 
-    // TODO come back to these dumb dotted lines
-    &:not(.is-open) {
-      position: relative;
-      margin-bottom: 4px;
-
-      // &::before {
-      //   @include dotted-line;
-      // }
-    }
-
     &.test.runnable-passed.runnable-studio {
       .studio-controls {
         display: flex;
@@ -450,9 +436,14 @@
     }
   }
 
+  .runnable-dotted-line {
+    margin-left: 14px;
+    height: 4px;
+    border-left: 1px dotted $gray-800;
+  }
+
   .runnable-instruments {
     border-left: 4px solid transparent;
-
   }
 
   .runnable-title {

@@ -5,7 +5,7 @@ import React, { MouseEvent, useCallback, useEffect, useRef } from 'react'
 
 import events, { Events } from '../lib/events'
 import { RunnablesError, RunnablesErrorModel } from './runnable-error'
-import Runnable from './runnable-and-suite'
+import Runnable, { getLastTestIndex } from './runnable-and-suite'
 import type { RunnablesStore, RunnableArray } from './runnables-store'
 import type { StatsStore } from '../header/stats-store'
 import type { Scroller, UserScrollCallback } from '../lib/scroller'
@@ -90,19 +90,24 @@ interface RunnablesListProps {
   canSaveStudioLogs: boolean
 }
 
-const RunnablesList: React.FC<RunnablesListProps> = observer(({ runnables, studioEnabled, canSaveStudioLogs }: RunnablesListProps) => (
-  <div className='wrap'>
-    <ul className='runnables'>
-      {_.map(runnables, (runnable) =>
-        (<Runnable
-          key={runnable.id}
-          model={runnable}
-          canSaveStudioLogs={canSaveStudioLogs}
-          studioEnabled={studioEnabled}
-        />))}
-    </ul>
-  </div>
-))
+const RunnablesList: React.FC<RunnablesListProps> = observer(({ runnables, studioEnabled, canSaveStudioLogs }: RunnablesListProps) => {
+  const lastTestIndex = getLastTestIndex(runnables)
+
+  return (
+    <div className='wrap'>
+      <ul className='runnables'>
+        {_.map(runnables, (runnable, index) =>
+          (<Runnable
+            key={runnable.id}
+            model={runnable}
+            canSaveStudioLogs={canSaveStudioLogs}
+            studioEnabled={studioEnabled}
+            isLastTest={lastTestIndex === index}
+          />))}
+      </ul>
+    </div>
+  )
+})
 
 RunnablesList.displayName = 'RunnablesList'
 
