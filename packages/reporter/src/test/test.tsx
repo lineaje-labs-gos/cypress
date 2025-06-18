@@ -161,15 +161,14 @@ const Test: React.FC<TestProps> = observer(({ model, events: eventsProps = event
       containerRef={containerRef}
       header={_header()}
       headerClass='runnable-wrapper'
-      headerStyle={{ }}
       contentClass='runnable-instruments'
       isOpen={model.isOpen}
       onOpenStateChangeRequested={(isOpen: boolean) => model.setIsOpen(isOpen)}
       hideExpander
     >
-      <div style={{ }}>
+      <div>
         <Attempts studioActive={appStateProps.studioActive} test={model} scrollIntoView={() => _scrollIntoView()} />
-        {appStateProps.studioActive && <StudioControls canSaveStudioLogs={canSaveStudioLogs}/>}
+        {appStateProps.studioActive && <StudioControls canSaveStudioLogs={canSaveStudioLogs} />}
       </div>
     </Collapsible>
   )

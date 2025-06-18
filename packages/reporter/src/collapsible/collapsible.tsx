@@ -59,12 +59,12 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false,
           tabIndex={0}
         >
           <div
-            className='collapsible-header-inner gray-400'
+            className='collapsible-header-inner'
             style={headerStyle}
             tabIndex={-1}
           >
-            {!hideExpander && headerClass === 'hook-header' && <ChevronIcon className='collapsible-indicator gray-400 ' />}
-            {!hideExpander && headerClass !== 'hook-header' && <DocumentBlankIcon className='collapsible-indicator gray-400' />}
+            {!hideExpander && headerClass === 'hook-header' && <ChevronIcon className='collapsible-indicator' />}
+            {!hideExpander && headerClass !== 'hook-header' && <DocumentBlankIcon className='collapsible-indicator' />}
             <span className='collapsible-header-text'>
               {HeaderComponent ? <HeaderComponent isHovered={isHovered} isFocused={isFocused} /> : header}
             </span>
