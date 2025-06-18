@@ -20,64 +20,70 @@ export default class Suite extends Runnable {
     makeObservable(this, {
       children: observable,
       state: computed,
-      _childStates: computed,
+      _testChildStates: computed,
       hasRetried: computed,
-      _anyChildrenFailed: computed,
-      _allChildrenPassedOrPending: computed,
-      _allChildrenPending: computed,
-      _anyChildrenRunning: computed,
+      _anyTestChildrenFailed: computed,
+      _allTestChildrenPassedOrPending: computed,
+      _allTestChildrenPending: computed,
+      _anyTestChildrenRunning: computed,
     })
   }
 
   get state (): TestState {
-    if (this._anyChildrenRunning) {
+    if (this._anyTestChildrenRunning) {
       return 'active'
     }
 
-    if (this._anyChildrenFailed) {
+    if (this._anyTestChildrenFailed) {
       return 'failed'
     }
 
-    if (this._allChildrenPending) {
+    if (this._allTestChildrenPending) {
       return 'pending'
     }
 
-    if (this._allChildrenPassedOrPending) {
+    if (this._allTestChildrenPassedOrPending) {
       return 'passed'
     }
 
     return 'processing'
   }
 
-  get _childStates () {
-    return _.map(this.children, 'state')
+  get _testChildStates () {
+    /**
+     * since we're displaying a collapsible for each suite whether it's a nested suite or not,
+     * we only want to consider the test children of the current suite and not the state of any suite children
+     */
+    const testChildren = this.children.filter((child) => child.type === 'test')
+
+    return _.map(testChildren, 'state')
   }
 
   get hasRetried (): boolean {
     return _.some(this.children, (v) => v.hasRetried)
   }
 
-  get _anyChildrenRunning () {
-    return _.some(this._childStates, (state) => {
+  get _anyTestChildrenRunning () {
+    return _.some(this._testChildStates, (state) => {
       return state === 'active'
     })
   }
 
-  get _anyChildrenFailed () {
-    return _.some(this._childStates, (state) => {
+  get _anyTestChildrenFailed () {
+    return _.some(this._testChildStates, (state) => {
       return state === 'failed'
     })
   }
 
-  get _allChildrenPassedOrPending () {
-    return !this._childStates.length || _.every(this._childStates, (state) => {
+  get _allTestChildrenPassedOrPending () {
+    return !this._testChildStates.length || _.every(this._testChildStates, (state) => {
       return state === 'passed' || state === 'pending'
     })
   }
 
-  get _allChildrenPending () {
-    return !!this._childStates.length
-            && _.every(this._childStates, (state) => {
+  get _allTestChildrenPending () {
+    return !!this._testChildStates.length
+            && _.every(this._testChildStates, (state) => {
               return state === 'pending'
             })
   }
