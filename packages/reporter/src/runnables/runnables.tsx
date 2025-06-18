@@ -5,7 +5,7 @@ import React, { MouseEvent, useCallback, useEffect, useRef } from 'react'
 
 import events, { Events } from '../lib/events'
 import { RunnablesError, RunnablesErrorModel } from './runnable-error'
-import Runnable, { getLastTestIndex } from './runnable-and-suite'
+import Runnable, { shouldShowConnectionDots } from './runnable-and-suite'
 import type { RunnablesStore, RunnableArray } from './runnables-store'
 import type { StatsStore } from '../header/stats-store'
 import type { Scroller, UserScrollCallback } from '../lib/scroller'
@@ -91,8 +91,6 @@ interface RunnablesListProps {
 }
 
 const RunnablesList: React.FC<RunnablesListProps> = observer(({ runnables, studioEnabled, canSaveStudioLogs }: RunnablesListProps) => {
-  const lastTestIndex = getLastTestIndex(runnables)
-
   return (
     <div className='wrap'>
       <ul className='runnables'>
@@ -102,7 +100,7 @@ const RunnablesList: React.FC<RunnablesListProps> = observer(({ runnables, studi
             model={runnable}
             canSaveStudioLogs={canSaveStudioLogs}
             studioEnabled={studioEnabled}
-            isLastTest={lastTestIndex === index}
+            shouldShowConnectingDots={shouldShowConnectionDots(runnables, runnable, index)}
           />))}
       </ul>
     </div>
