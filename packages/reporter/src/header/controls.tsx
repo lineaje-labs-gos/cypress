@@ -10,8 +10,7 @@ import type { AppState } from '../lib/app-state'
 
 import ChevronDownIcon from '@packages/frontend-shared/src/assets/icons/chevron-down-small_x16.svg'
 import ChevronUpIcon from '@packages/frontend-shared/src/assets/icons/chevron-up-small_x16.svg'
-import StopIcon from '@packages/frontend-shared/src/assets/icons/action-stop_x16.svg'
-import { IconActionNext, IconActionPlayLarge, IconActionRestart } from '@cypress-design/react-icon'
+import { IconActionNext, IconActionPlayLarge, IconActionRestart, IconActionStopCircle } from '@cypress-design/react-icon'
 
 const iconStrokeColor = 'gray-500'
 
@@ -59,7 +58,7 @@ const Controls: React.FC<Props> = observer(({ events = defaultEvents, appState }
         {ifThen(appState.isRunning && !appState.isPaused, (
           <Tooltip placement='bottom' title={<p>Stop Running <span className='kbd'>S</span></p>} className='cy-tooltip' visible={appState.studioActive ? false : null}>
             <button aria-label='Stop' className='stop' onClick={emit('stop')} disabled={appState.studioActive}>
-              <StopIcon />
+              <IconActionStopCircle size='16' strokeColor={iconStrokeColor} />
             </button>
           </Tooltip>
         ))}
