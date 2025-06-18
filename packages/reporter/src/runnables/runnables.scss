@@ -1,10 +1,11 @@
 @mixin dotted-line {
   content: "";
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 75%;
   height: 25%;
   border-left: 1px dotted $gray-800;
+  z-index: 1;
 }
 
 .fa {
