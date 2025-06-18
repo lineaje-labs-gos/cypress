@@ -50,9 +50,13 @@ $color-transition: color 150ms ease-out;
     display: inline-flex;
     width: 100%;
     justify-content: space-between;
-    padding: 20px 16px;
+    align-items: center;
+    padding: 0 16px;
     border: 1px solid $gray-900;
     border-left: none;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 64px;
   }
 
   .stats {
@@ -84,19 +88,52 @@ $color-transition: color 150ms ease-out;
     }
   }
 
-  .controls {
-    align-items: center;
-    border: 1px solid $gray-900;
-    border-radius: 4px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    height: 24px;
+  @mixin control-container-styles($size) {
+    height: $size;
 
     .testing-preferences-toggle {
-      border-left: none;
-      color: $gray-700;
-      margin-left: 0;
+      height: $size;
+      width: $size;
+    }
+
+    .controls {
+      height: $size;
+
+      span button {
+        width: $size;
+      }
+    }
+  }
+
+  .controls-container-studio {
+    // TODO: change this to 32px for the studio redesign
+    @include control-container-styles(24px);
+  }
+
+  .controls-container {
+    @include control-container-styles(24px);
+  }
+
+  .controls-container,
+  .controls-container-studio {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap;
+
+    span {
+      height: 100%;
+    }
+
+    .testing-preferences-toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: $gray-500;
+      border: 1px solid $gray-900;
+      border-radius: 4px;
 
       &.open {
         background-color: $gray-900;
@@ -104,19 +141,36 @@ $color-transition: color 150ms ease-out;
       }
     }
 
-    span {
-      height: 100%;
+    .controls {
+      align-items: center;
+      border: 1px solid $gray-900;
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
 
-      button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        color: $gray-400;
-        width: 31px;
-        padding: 0px;
-        border-left: 1px solid $gray-900;
-        margin-left: -1px;
+      span {
+        button {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+          color: $gray-400;
+          padding: 0px;
+          border-left: 1px solid $gray-900;
+          margin-left: -1px;
+        }
+
+        &:first-child {
+          button {
+            border-left: none;
+          }
+        }
+
+        &:last-child {
+          button {
+            border-right: none;
+          }
+        }
       }
     }
   }
