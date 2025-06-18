@@ -11,7 +11,7 @@ import Collapsible, { CollapsibleHeaderComponentProps } from '../collapsible/col
 import type SuiteModel from './suite-model'
 import type TestModel from '../test/test-model'
 
-import { IconActionAddMedium, IconChevronDownMedium, IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped } from '@cypress-design/react-icon'
+import { IconActionAddMedium, IconChevronDownMedium, IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped, WindiColor } from '@cypress-design/react-icon'
 import Button from '@cypress-design/react-button'
 import { RunnableArray } from './runnables-store'
 
@@ -25,6 +25,11 @@ interface SuiteProps {
   model: SuiteModel
   studioEnabled: boolean
   canSaveStudioLogs: boolean
+}
+
+const headerIconDefaultProps = {
+  fillColor: 'gray-900' as WindiColor,
+  strokeColor: 'gray-500' as WindiColor,
 }
 
 const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, studioEnabled, canSaveStudioLogs }: SuiteProps) => {
@@ -42,15 +47,15 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
 
     switch (model.state) {
       case 'active':
-        return <IconObjectStackRunning fillColor='gray-900' strokeColor='gray-500' />
+        return <IconObjectStackRunning {...headerIconDefaultProps} />
       case 'passed':
-        return <IconObjectStackPassed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='jade-400' />
+        return <IconObjectStackPassed {...headerIconDefaultProps} secondaryStrokeColor='jade-400' />
       case 'failed':
-        return <IconObjectStackFailed fillColor='gray-900' strokeColor='gray-500' secondaryStrokeColor='red-400' />
+        return <IconObjectStackFailed {...headerIconDefaultProps} secondaryStrokeColor='red-400' />
       case 'pending':
-        return <IconObjectStackSkipped fillColor='gray-900' strokeColor='gray-500' />
+        return <IconObjectStackSkipped {...headerIconDefaultProps} />
       case 'processing':
-        return <IconObjectStackQueued fillColor='gray-900' strokeColor='gray-500' />
+        return <IconObjectStackQueued {...headerIconDefaultProps} />
       default:
         return <></>
     }
