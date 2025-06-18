@@ -1,7 +1,7 @@
 @mixin dotted-line {
   content: "";
   position: absolute;
-  left: 14px;
+  left: 16px;
   top: 75%;
   height: 25%;
   border-left: 1px dotted $gray-800;
@@ -137,7 +137,6 @@
         }
 
         .collapsible-header-inner {
-          padding: 8px 8px 8px 6px;
           display: inline-flex;
           align-items: center;
           height: 100%;
@@ -247,6 +246,7 @@
       background-color: $gray-1100;
 
       .collapsible-header-inner {
+        padding: 8px;
         background-color: $gray-1100;
       }
 
@@ -315,6 +315,10 @@
           border-radius: 4px;
           border: 3px solid #43486159;
           background-color: $reporter-section-background;
+        }
+
+        .collapsible-header-inner {
+          padding: 8px 8px 8px 4px;
         }
       }
 
@@ -437,7 +441,7 @@
   }
 
   .runnable-dotted-line {
-    margin-left: 14px;
+    margin-left: 16px;
     height: 4px;
     border-left: 1px dotted $gray-800;
   }
