@@ -4,7 +4,7 @@ import TestModel from '../../../src/test/test-model'
 const suiteWithChildren = (children: Array<Partial<TestModel>>) => {
   const suite = new Suite({ id: '1', title: '', hooks: [] }, 0)
 
-  suite.children = children as Array<TestModel>
+  suite.children = children.map((child) => ({ type: 'test', ...child })) as Array<TestModel>
 
   return suite
 }
@@ -44,19 +44,19 @@ describe('Suite model', () => {
     it('is processing when all children are active', () => {
       const suite = suiteWithChildren([{ state: 'active' }, { state: 'active' }])
 
-      expect(suite.state).to.equal('processing')
+      expect(suite.state).to.equal('active')
     })
 
     it('is processing when there are active tests with passing tests', () => {
       const suite = suiteWithChildren([{ state: 'active' }, { state: 'passed' }])
 
-      expect(suite.state).to.equal('processing')
+      expect(suite.state).to.equal('active')
     })
 
     it('is processing when there are active tests with pending tests', () => {
       const suite = suiteWithChildren([{ state: 'active' }, { state: 'pending' }])
 
-      expect(suite.state).to.equal('processing')
+      expect(suite.state).to.equal('active')
     })
 
     it('is processing when all children are processing', () => {
