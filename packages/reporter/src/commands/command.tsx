@@ -331,7 +331,7 @@ const CommandDetails: React.FC<CommandDetailsProps> = observer(({ model, groupId
         {model.event && model.type !== 'system' ? `(${displayName(model)})` : displayName(model)}
       </span>
     </span>
-    {!!groupId && model.type === 'system' && model.state === 'failed' && <StateIcon aria-hidden state={model.state} iconSize='12' />}
+    {!!groupId && model.type === 'system' && model.state === 'failed' && <StateIcon data-cy='failed-icon-indicator' aria-hidden state={model.state} iconSize='12' />}
     {model.referencesAlias ?
       <AliasesReferences model={model} aliasesWithDuplicates={aliasesWithDuplicates} />
       : <Message model={model} />
