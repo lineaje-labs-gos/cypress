@@ -152,7 +152,7 @@ describe('suites', () => {
       cy.contains('nested suite 1')
       .closest('.runnable-wrapper')
       .realHover()
-      .get('[data-cy="launch-studio-button"]')
+      .get('[data-cy="create-new-test-button"]')
       .should('be.visible')
     })
 
@@ -161,7 +161,7 @@ describe('suites', () => {
 
       cy.contains('suite 1').parents('.collapsible-header')
       .realHover().within(() => {
-        cy.get('[data-cy="launch-studio-button"]').click()
+        cy.get('[data-cy="create-new-test-button"]').click()
       })
 
       cy.wrap(runner.emit).should('be.calledWith', 'studio:init:suite', 'r2')
