@@ -451,6 +451,7 @@ $status-border-width: 2px;
 
   .runnable-instruments {
     border-left: $status-border-width solid transparent;
+    border-radius: 0 4px;
   }
 
   .runnable-title {
