@@ -207,7 +207,7 @@
 
     &.command-is-interactive:hover {
       border-left: 2px solid $gray-900;
-      border-radius: 0 4px 4px 0;
+      border-radius: 0;
     }
 
     &:not(.command-is-event) .command-number {
@@ -226,7 +226,7 @@
   // pending is running in this case
   .command-state-pending {
     border-left: 2px solid $indigo-800;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0;
     background-color: $gray-900;
     cursor: default;
     color: $indigo-200;
