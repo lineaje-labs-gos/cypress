@@ -22,7 +22,10 @@
         flex-grow: 1;
         font-size: 12px;
         cursor: pointer;
-        padding: 6px 0 6px 2px;
+
+        .collapsible-header-inner {
+          padding: 6px 0 6px 2px;
+        }
 
         &:focus {
           outline: none;
@@ -48,7 +51,8 @@
         display: none;
         padding: 4px;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background-color: rgba($gray-700, 0.2);
           outline: none;
           text-decoration: none;
