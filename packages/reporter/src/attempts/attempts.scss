@@ -1,4 +1,20 @@
 .reporter {
+  // Mixin for dotted border line
+  @mixin dotted-border-line($position: "top") {
+    border-left: 1px dotted $gray-800;
+    content: "";
+    left: 16px;
+    position: absolute;
+    height: 8px;
+    z-index: 1;
+
+    @if $position == "top" {
+      top: 0;
+    } @else if $position == "bottom" {
+      bottom: 0;
+    }
+  }
+
   .attempts {
     border-right: 1px solid $gray-800;
     border-bottom: 1px solid $gray-800;
@@ -15,24 +31,12 @@
 
       &:not(:first-child) {
         > .collapsible .attempt-name:before {
-          border-left: 1px dotted $gray-800;
-          content: "";
-          left: 12px;
-          position: absolute;
-          top: 0;
-          height: 8px;
-          z-index: 1;
+          @include dotted-border-line("top");
         }
       }
       > .collapsible .attempt-name {
         &:after {
-          border-left: 1px dotted $gray-800;
-          content: "";
-          left: 12px;
-          position: absolute;
-          bottom: 0;
-          height: 8px;
-          z-index: 1;
+          @include dotted-border-line("bottom");
         }
       }
     }
@@ -46,11 +50,14 @@
     > .collapsible {
       position: relative;
 
-      .collapsible-header-inner {
-        outline: none;
-        display: flex;
-        align-items: center;
-        width: 100%;
+      > .attempt-name > .collapsible-header {
+        .collapsible-header-inner {
+          outline: none;
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding: 0;
+        }
       }
     }
 
@@ -107,7 +114,7 @@
       font-size: 14px;
       gap: 8px;
       width: 100%;
-      padding: 8px 8px 8px 9px;
+      padding: 8px;
       position: relative;
       user-select: none;
       cursor: pointer;
