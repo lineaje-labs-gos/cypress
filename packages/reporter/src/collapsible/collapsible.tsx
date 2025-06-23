@@ -5,6 +5,7 @@ import ChevronIcon from '@packages/frontend-shared/src/assets/icons/chevron-down
 import DocumentBlankIcon from '@packages/frontend-shared/src/assets/icons/document-blank_x16.svg'
 
 export interface CollapsibleHeaderComponentProps {
+  isOpen: boolean
   isHovered: boolean
   isFocused: boolean
 }
@@ -66,7 +67,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false,
             {!hideExpander && headerClass === 'hook-header' && <ChevronIcon className='collapsible-indicator' />}
             {!hideExpander && headerClass !== 'hook-header' && <DocumentBlankIcon className='collapsible-indicator' />}
             <span className='collapsible-header-text'>
-              {HeaderComponent ? <HeaderComponent isHovered={isHovered} isFocused={isFocused} /> : header}
+              {HeaderComponent ? <HeaderComponent isHovered={isHovered} isFocused={isFocused} isOpen={isOpen} /> : header}
             </span>
           </div>
         </div>

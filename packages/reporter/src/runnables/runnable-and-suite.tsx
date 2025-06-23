@@ -11,7 +11,7 @@ import Collapsible, { CollapsibleHeaderComponentProps } from '../collapsible/col
 import type SuiteModel from './suite-model'
 import type TestModel from '../test/test-model'
 
-import { IconActionAddMedium, IconChevronDownMedium, IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped, WindiColor } from '@cypress-design/react-icon'
+import { IconActionAddMedium, IconChevronDownMedium, IconChevronRightMedium, IconObjectStackFailed, IconObjectStackPassed, IconObjectStackQueued, IconObjectStackRunning, IconObjectStackSkipped, WindiColor } from '@cypress-design/react-icon'
 import Button from '@cypress-design/react-button'
 import { RunnableArray } from './runnables-store'
 
@@ -30,6 +30,7 @@ interface SuiteProps {
 const headerIconDefaultProps = {
   fillColor: 'gray-900' as WindiColor,
   strokeColor: 'gray-500' as WindiColor,
+  className: 'header-icon',
 }
 
 const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, studioEnabled, canSaveStudioLogs }: SuiteProps) => {
@@ -40,32 +41,41 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     eventManager.emit('studio:init:suite', model.id)
   }, [eventManager, model.id])
 
-  const getHeaderIcon = useCallback((isHovered: boolean, isFocused: boolean) => {
-    if (isHovered || isFocused) {
-      return <IconChevronDownMedium className='header-collapsible-indicator' strokeColor='gray-700' />
-    }
+  const getHeaderIcon = useCallback((isOpen: boolean) => {
+    let headerIcon
 
     switch (model.state) {
       case 'active':
-        return <IconObjectStackRunning {...headerIconDefaultProps} />
+        headerIcon = <IconObjectStackRunning {...headerIconDefaultProps} />
+        break
       case 'passed':
-        return <IconObjectStackPassed {...headerIconDefaultProps} secondaryStrokeColor='jade-400' />
+        headerIcon = <IconObjectStackPassed {...headerIconDefaultProps} secondaryStrokeColor='jade-400' />
+        break
       case 'failed':
-        return <IconObjectStackFailed {...headerIconDefaultProps} secondaryStrokeColor='red-400' />
+        headerIcon = <IconObjectStackFailed {...headerIconDefaultProps} secondaryStrokeColor='red-400' />
+        break
       case 'pending':
-        return <IconObjectStackSkipped {...headerIconDefaultProps} />
+        headerIcon = <IconObjectStackSkipped {...headerIconDefaultProps} />
+        break
       case 'processing':
-        return <IconObjectStackQueued {...headerIconDefaultProps} />
+        headerIcon = <IconObjectStackQueued {...headerIconDefaultProps} />
+        break
       default:
-        return <></>
+        headerIcon = <></>
+        break
     }
+
+    return <>
+      {isOpen ? <IconChevronDownMedium className='header-collapsible-indicator' strokeColor='gray-700' /> : <IconChevronRightMedium size='16' className='header-collapsible-indicator' strokeColor='gray-700' />}
+      {headerIcon}
+    </>
   }, [model.state])
 
-  const HeaderComponent = ({ isHovered, isFocused }: CollapsibleHeaderComponentProps) => {
+  const HeaderComponent = ({ isHovered, isFocused, isOpen }: CollapsibleHeaderComponentProps) => {
     return (
       <>
         <div className='runnable-and-suite-header-icon'>
-          {getHeaderIcon(isHovered, isFocused)}
+          {getHeaderIcon(isOpen)}
         </div>
         <span className='runnable-title'>{model.title}</span>
         {(studioEnabled && !appState.studioActive) && (
