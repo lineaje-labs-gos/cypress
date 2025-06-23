@@ -37,7 +37,7 @@ const RunnableHeader: React.FC<RunnableHeaderProps> = observer(({ spec, statsSto
 
     return (
       <>
-        <strong>{specParts[0]}</strong>{specParts[1]}
+        <span className='spec-name'>{specParts[0]}</span><span className='spec-file-extension'>{specParts[1]}</span>
       </>
     )
   }

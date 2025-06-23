@@ -1,5 +1,9 @@
 .reporter {
   .attempts {
+    border-right: 1px solid $gray-800;
+    border-bottom: 1px solid $gray-800;
+    border-radius: 0 0 4px 4px;
+
     .attempt-item > .collapsible > .collapsible-header-wrapper {
       display: none;
     }
