@@ -4,6 +4,7 @@
       font-family: $font-system;
       display: flex;
       width: 100%;
+      align-items: center;
 
       &:hover {
         background-color: $gray-900;
