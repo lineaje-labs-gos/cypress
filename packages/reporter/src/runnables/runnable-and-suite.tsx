@@ -71,7 +71,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     </>
   }, [model.state])
 
-  const HeaderComponent = ({ isHovered, isFocused, isOpen }: CollapsibleHeaderComponentProps) => {
+  const HeaderComponent = ({ isOpen }: CollapsibleHeaderComponentProps) => {
     return (
       <>
         <div className='runnable-and-suite-header-icon'>
@@ -79,9 +79,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
         </div>
         <span className='runnable-title'>{model.title}</span>
         {(studioEnabled && !appState.studioActive) && (
-          <Button data-cy='create-new-test-button' size='20' onClick={_launchStudio} variant='outline-dark' className={cs('launch-studio-button', {
-            'should-show': isHovered || isFocused,
-          })}>
+          <Button data-cy='create-new-test-button' size='20' onClick={_launchStudio} variant='outline-dark' className={cs('launch-studio-button')}>
             <IconActionAddMedium strokeColor='gray-500' />
             New Test
           </Button>
