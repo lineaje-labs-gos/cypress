@@ -186,6 +186,9 @@ describe('src/cypress/runner ui states', { retries: 0, defaultCommandTimeout: 60
     })
 
     it('long error', () => {
+      // The request error includes a datetime, so decrease viewport height
+      // so the snapshot doesn't include the datetime
+      cy.viewport(1000, 1400)
       loadSpec({
         filePath: 'runner/ui-states/errors.cy.js',
         failCount: 2,
