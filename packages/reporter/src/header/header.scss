@@ -1,3 +1,5 @@
+@import "../lib/mixins.scss";
+
 $color-transition: color 150ms ease-out;
 
 .reporter {
@@ -213,30 +215,7 @@ $color-transition: color 150ms ease-out;
       }
 
       .open-in-ide-button {
-        opacity: 0;
-        position: absolute;
-        top: 0;
-        right: 0;
-        gap: 4px;
-        color: $gray-300;
-        background: inherit;
-        display: flex;
-        align-items: center;
-
-        &:before {
-          content: "";
-          position: absolute;
-          width: 22px;
-          left: -23px;
-          top: 0;
-          height: 100%;
-          opacity: 0.5;
-          background: inherit;
-        }
-
-        &:focus-visible {
-          opacity: 1;
-        }
+        @include new-test-button;
       }
 
       &:hover {
