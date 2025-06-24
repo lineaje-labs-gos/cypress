@@ -122,7 +122,11 @@ describe('Studio Cloud', () => {
 
     cy.get('[data-cy="studio-url-prompt"]').should('not.exist')
 
-    cy.percySnapshot()
+    cy.percySnapshot({
+      elementOverrides: {
+        '[data-cy="duration"]': true,
+      },
+    })
   })
 
   it('opens a cloud studio session with AI enabled', () => {
