@@ -1,14 +1,15 @@
+$status-border-width: 2px;
+$open-test-border-padding: 3px;
+
 @mixin dotted-line {
   content: "";
   position: absolute;
   left: 16px;
-  bottom: 0;
-  height: calc(100% - 25px);
+  bottom: -$open-test-border-padding;
+  height: calc(100% - 23px);
   border-left: 1px dotted $gray-800;
   z-index: 1;
 }
-
-$status-border-width: 2px;
 
 .fa {
   &:not(.fa-spin) {
@@ -106,7 +107,7 @@ $status-border-width: 2px;
     background-color: $gray-1100;
     overflow: auto;
     line-height: 18px;
-    padding-left: 0;
+    padding: $open-test-border-padding;
 
     .runnable-wrapper {
       border-radius: 4px;
@@ -316,7 +317,7 @@ $status-border-width: 2px;
         }
       }
 
-      &.is-open > .runnable-wrapper > .collapsible-header {
+      &.is-open > .runnable-wrapper {
         position: relative;
 
         &::before {
@@ -370,7 +371,7 @@ $status-border-width: 2px;
 
         &.is-open {
           border-radius: 4px;
-          border: 3px solid #43486159;
+          box-shadow: 0 0 0 3px #43486159;
           background-color: $reporter-section-background;
 
           .runnable-wrapper {
@@ -455,9 +456,10 @@ $status-border-width: 2px;
   }
 
   .runnable-dotted-line {
-    margin-left: 16px;
-    height: 4px;
-    border-left: 1px dotted $gray-800;
+    height: 6px;
+    border-left: 1px dotted #434861;
+    margin: (-$open-test-border-padding) 0 (-$open-test-border-padding) 16px;
+    z-index: 1;
   }
 
   .runnable-instruments {
@@ -465,11 +467,21 @@ $status-border-width: 2px;
     border-radius: 0 4px;
   }
 
+  @mixin dotted-line {
+    content: "";
+    position: absolute;
+    left: 16px;
+    bottom: -3px;
+    height: calc(100% - 23px);
+    border-left: 1px dotted $gray-800;
+    z-index: 1;
+  }
+
   .runnable-title {
     color: $white;
     font-family: $font-system;
     font-size: 14px;
-    white-space: pre-line;
+    display: flex;
     flex-grow: 1;
   }
 
@@ -481,7 +493,7 @@ $status-border-width: 2px;
   }
 
   .wrap > .runnables {
-    padding: 0 8px;
+    padding: 0 (8px - $open-test-border-padding);
   }
 
   .runnable-controls {
