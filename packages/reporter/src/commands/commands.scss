@@ -248,6 +248,7 @@
 
   .command-state-pending + .command-progress {
     height: 2px;
+    background-color: $gray-900;
 
     span {
       animation-fill-mode: forwards;
