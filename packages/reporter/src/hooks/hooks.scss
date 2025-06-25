@@ -11,7 +11,9 @@
 
         .hook-open-in-ide {
           cursor: pointer;
-          display: block;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
         }
       }
 
@@ -60,8 +62,6 @@
         }
 
         svg {
-          vertical-align: middle;
-
           path:nth-child(2) {
             fill: $gray-800;
           }
