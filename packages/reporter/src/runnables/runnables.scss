@@ -447,6 +447,9 @@ $dotted-line-left-padding: 19px;
       flex-shrink: 0;
 
       &.wand-icon {
+        margin-top: 4px !important;
+        margin-left: 4px;
+
         .icon-light {
           fill: $purple-300;
           stroke: $purple-300;
