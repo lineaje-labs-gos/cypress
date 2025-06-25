@@ -299,7 +299,7 @@
     color: $err-header-text;
 
     &:not(.command-type-system) {
-      border-left: $err-border;
+      border-left: 2px solid transparent;
       border-radius: 0 4px 4px 0;
       background-color: $err-header-background;
 
