@@ -134,7 +134,7 @@ $dotted-line-left-padding: 19px;
         }
 
         &:hover {
-          .launch-studio-button{
+          .launch-studio-button {
             @include new-test-gradient-fade-before(-41px);
           }
         }
@@ -279,6 +279,12 @@ $dotted-line-left-padding: 19px;
         border-radius: 0;
         background-color: $gray-1100;
 
+        .collapsible-header-text {
+          svg {
+            margin-top: 1px;
+          }
+        }
+
         .collapsible-header-inner {
           padding: 8px 11px;
           background-color: $gray-1100;
@@ -342,6 +348,12 @@ $dotted-line-left-padding: 19px;
             border-radius: 4px;
             border-bottom-left-radius: 0;
             border-top-left-radius: 0;
+
+            .collapsible-header-text {
+              svg {
+                margin-top: 1px;
+              }
+            }
 
             &:focus-visible {
               border-top: 1px solid $gray-800;
@@ -542,7 +554,6 @@ $dotted-line-left-padding: 19px;
 
     svg {
       flex-shrink: 0;
-      margin-top: 1px;
     }
   }
 
