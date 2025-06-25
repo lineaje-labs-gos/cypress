@@ -296,7 +296,7 @@ describe('studio controls', () => {
         .realHover()
         .find('.runnable-controls-studio')
         .should('be.visible')
-        .should('have.css', 'opacity', '0.5')
+        .should('have.css', 'opacity', '1')
       })
 
       it('displays studio icon with no transparency and tooltip on hover', { scrollBehavior: false }, () => {
