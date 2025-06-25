@@ -62,7 +62,6 @@ const StateIcon: React.FC<Props> = observer((props: Props) => {
     )
   }
 
-  // TODO mabel i need to double check if it's this icon or the queued one
   return (
     iconSize === '8' ?
       <IconStatusQueuedSimple {...rest} size='8' strokeColor='gray-700' /> :
