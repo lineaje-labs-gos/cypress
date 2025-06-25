@@ -21,31 +21,6 @@ $color-transition: color 150ms ease-out;
     .spacer {
       flex-grow: 2;
     }
-
-    // TODO: check the impact of removing this
-    // button {
-    //   background-color: transparent;
-    //   border-color: transparent;
-    //   border-radius: 0;
-    //   display: inline-block;
-    //   font-weight: 300;
-    //   line-height: 26px;
-    //   outline: 0;
-    //   padding: 0 8px;
-    //   text-align: center;
-
-    //   &:hover {
-    //     background-color: $gray-900;
-    //   }
-
-    //   &[disabled],
-    //   &[disabled]:hover,
-    //   &[disabled]:active {
-    //     background: none;
-    //     box-shadow: none;
-    //     color: $gray-500;
-    //   }
-    // }
   }
 
   .statsAndControls {
