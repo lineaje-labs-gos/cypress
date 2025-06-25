@@ -2708,6 +2708,7 @@ jobs:
     steps:
       - test-binary-against-repo:
           repo: cypress-example-recipes
+          pull_request_id: 921
           command: npm run test:ci:firefox
           browser: firefox
 
@@ -2716,6 +2717,7 @@ jobs:
     steps:
       - test-binary-against-repo:
           repo: cypress-example-recipes
+          pull_request_id: 921
           command: npm run test:ci:chrome
           browser: chrome
 
@@ -2725,6 +2727,7 @@ jobs:
     steps:
       - test-binary-against-repo:
           repo: cypress-example-recipes
+          pull_request_id: 921
           # Split the specs up across 4 different machines to run in parallel
           command: npm run test:ci -- --chunk $CIRCLE_NODE_INDEX --total-chunks
             $CIRCLE_NODE_TOTAL
