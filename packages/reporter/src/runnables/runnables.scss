@@ -221,6 +221,11 @@ $dotted-line-left-padding: 19px;
       }
     }
 
+    &.runnable-pending,
+    &.runnable-processing {
+      pointer-events: none;
+    }
+
     &.runnable-processing > div > .runnable-wrapper,
     &.runnable-processing > div > .runnable-instruments {
       border-left: $status-border-width solid $gray-700;
