@@ -64,7 +64,7 @@
   }
 
   .command-wrapper {
-    border-left: 2px solid $reporter-section-background;
+    border-left: 2px solid transparent;
     border-radius: 4px;
     color: $gray-500;
     display: flex;
