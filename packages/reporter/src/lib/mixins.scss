@@ -54,18 +54,6 @@
   max-width: 18px;
 }
 
-@mixin new-test-gradient-fade-before($left-offset: -41px) {
-  &:before {
-    content: "";
-    position: absolute;
-    width: 40px;
-    left: $left-offset;
-    top: 0;
-    height: 100%;
-    background: linear-gradient(to left, $gray-1100, transparent);
-  }
-}
-
 @mixin new-test-button {
   opacity: 0;
   position: absolute;
@@ -77,17 +65,26 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  z-index: 1;
 
   &:hover,
   &:focus-visible {
     opacity: 1 !important;
-  }
 
-  &:hover {
-    @include new-test-gradient-fade-before(-41px);
+    + .button-hover-shadow {
+      opacity: 1 !important;
+    }
   }
+}
 
-  &:focus-visible {
-    @include new-test-gradient-fade-before(-42px);
-  }
+
+@mixin button-hover-shadow($linear-gradient: linear-gradient(90deg, rgba(37, 40, 60, 0) -9.8%, $gray-950 19.52%), $width: 130px) {
+  opacity: 0;
+  position: absolute;
+  width: $width;
+  height: 100%;
+  top: 0;
+  right: 0;
+  background: $linear-gradient;
+  z-index: 0;
 }

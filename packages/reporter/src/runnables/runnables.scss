@@ -121,6 +121,13 @@ $dotted-line-left-padding: 19px;
       border-left: $status-border-width solid transparent;
       padding: 0;
 
+      .button-hover-shadow {
+        @include button-hover-shadow(
+          $linear-gradient: linear-gradient(90deg, rgba(22, 24, 39, 0) 5.39%, #161827 31.97%),
+          $width: 130px
+        );
+      }
+
       .collapsible-header {
         &:hover,
         &:focus-visible {
@@ -135,11 +142,15 @@ $dotted-line-left-padding: 19px;
           .launch-studio-button {
             opacity: 1 !important;
           }
+
+          .button-hover-shadow {
+            opacity: 1 !important;
+          }
         }
 
         &:hover {
-          .launch-studio-button {
-            @include new-test-gradient-fade-before(-41px);
+          .collapsible-header-inner {
+            background-color: $gray-900;
           }
         }
 
@@ -165,7 +176,6 @@ $dotted-line-left-padding: 19px;
           .launch-studio-button {
             border-color: $gray-900;
             background-color: $gray-900;
-            @include new-test-gradient-fade-before(-42px);
           }
         }
 
@@ -212,13 +222,6 @@ $dotted-line-left-padding: 19px;
 
     &.suite .collapsible-indicator {
       flex-shrink: 0;
-
-      .icon-dark {
-        stroke: $gray-400;
-      }
-      .icon-light {
-        fill: $gray-400;
-      }
     }
 
     &.runnable-pending,
@@ -397,8 +400,6 @@ $dotted-line-left-padding: 19px;
       }
 
       .runnable-commands-region {
-        margin: 0 8px;
-
         .hooks-container {
           display: flex;
           gap: 4px;

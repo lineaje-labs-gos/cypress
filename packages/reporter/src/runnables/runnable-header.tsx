@@ -5,9 +5,7 @@ import type { StatsStore } from '../header/stats-store'
 import { formatDuration, getFilenameParts } from '../lib/util'
 import { RunnablesStore } from './runnables-store'
 import { DebugDismiss } from '../header/DebugDismiss'
-import Button from '@cypress-design/react-button'
-import events from '../lib/events'
-import { IconWindowCodeEditor } from '@cypress-design/react-icon'
+import { OpenFileInIDEButton } from '../OpenFileInIDEButton'
 
 const renderRunnableHeader = (children: ReactElement) => <div className="runnable-header" data-cy="runnable-header">{children}</div>
 
@@ -51,15 +49,11 @@ const RunnableHeader: React.FC<RunnableHeaderProps> = observer(({ spec, statsSto
     relativeFile: relativeSpecPath,
   }
 
-  const openInIDE = () => {
-    return <Button size='20' variant='outline-dark' className='open-in-ide-button' onClick={() => events.emit('open:file:unified', fileDetails)}><IconWindowCodeEditor strokeColor='gray-500' fillColor='gray-900' /> Open in IDE </Button>
-  }
-
   return renderRunnableHeader(
     <>
       <div className='runnable-header-file-name'>
         {fileDetails.displayFile || fileDetails.originalFile}{!!fileDetails.line && `:${fileDetails.line}`}{!!fileDetails.column && `:${fileDetails.column}`}
-        {openInIDE()}
+        <OpenFileInIDEButton fileDetails={fileDetails} />
       </div>
       {runnablesStore.testFilter && runnablesStore.totalTests > 0 && <DebugDismiss matched={runnablesStore.totalTests} total={runnablesStore.totalUnfilteredTests} />}
       {Boolean(statsStore.duration) && (
