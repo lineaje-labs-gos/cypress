@@ -189,12 +189,24 @@ $color-transition: color 150ms ease-out;
         font-weight: 300;
       }
 
+      .button-hover-shadow {
+        @include button-hover-shadow(
+          $linear-gradient: linear-gradient(90deg, rgba(22, 24, 39, 0) 5.39%, $gray-1100 31.97%),
+          $width: 160px
+        );
+      }
+
       .open-in-ide-button {
         @include new-test-button;
       }
 
-      &:hover {
+      &:hover,
+      &:focus-visible {
         .open-in-ide-button {
+          opacity: 1;
+        }
+
+        .button-hover-shadow {
           opacity: 1;
         }
       }
