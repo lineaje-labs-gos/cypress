@@ -83,7 +83,7 @@ $color-transition: color 150ms ease-out;
   }
 
   .controls-container-studio {
-    // TODO: change this to 32px for the studio redesign
+    // TODO: https://github.com/cypress-io/cypress-services/issues/10425 change this to 32px for the studio redesign
     @include control-container-styles(24px);
   }
 
