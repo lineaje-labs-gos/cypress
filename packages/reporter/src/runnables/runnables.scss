@@ -33,12 +33,17 @@ $dotted-line-left-padding: 19px;
     padding-left: 0;
     width: 100%;
     margin-bottom: 16px;
+    margin-top: 4px;
   }
 
   .runnables {
     padding-left: 0;
     display: flex;
     flex-direction: column;
+
+    .last-test-margin-bottom {
+      margin-bottom: 16px;
+    }
   }
 
   .no-tests {
@@ -110,7 +115,6 @@ $dotted-line-left-padding: 19px;
     background-color: $gray-1100;
     overflow: auto;
     line-height: 18px;
-    padding: $open-test-border-padding;
 
     .runnable-wrapper {
       border-radius: 4px;
@@ -170,7 +174,6 @@ $dotted-line-left-padding: 19px;
           align-items: center;
           height: 100%;
           width: 100%;
-          min-height: 36px;
 
           &:focus {
             outline: 0;
@@ -260,13 +263,6 @@ $dotted-line-left-padding: 19px;
       border: 1px solid $gray-950;
       border-left: $status-border-width solid $gray-500;
     }
-    &.suite.runnable {
-      margin-top: 16px;
-    }
-
-    &.suite.runnable:first-child {
-      margin-top: 4px;
-    }
 
     &.suite > .collapsible {
       > .runnable-wrapper {
@@ -282,7 +278,7 @@ $dotted-line-left-padding: 19px;
         }
 
         .collapsible-header-inner {
-          padding: 8px 11px;
+          padding: 9px 11px;
           background-color: $gray-1100;
         }
 
@@ -320,6 +316,8 @@ $dotted-line-left-padding: 19px;
     }
 
     &.test {
+      padding: $open-test-border-padding;
+
       > .collapsible {
         display: flex;
         flex-direction: column;
