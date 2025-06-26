@@ -81,11 +81,11 @@ $code-border-radius: 4px;
   .runnable-err-content {
     width: 100%;
 
-  .is-open {
-     > .runnable-err-stack-expander .err-collapsible-indicator {
-      transform: rotate(90deg);
+    .is-open {
+      > .runnable-err-stack-expander .err-collapsible-indicator {
+        transform: rotate(90deg);
+      }
     }
-  }
   }
 
   .studio-err-wrapper {
@@ -169,7 +169,7 @@ $code-border-radius: 4px;
 
   .runnable-err-stack-expander {
     align-items: center;
-    border-top: 1px solid #4B364C40;
+    border-top: 1px solid #4b364c40;
     display: flex;
     padding: 16px 14px;
     flex-wrap: wrap-reverse;
@@ -194,10 +194,10 @@ $code-border-radius: 4px;
         }
       }
 
-      div {
+      .collapsible-header-inner {
         cursor: pointer;
         outline: none;
-        padding: 6px 0;
+        padding: 0 !important;
         width: 100%;
 
         .collapsible-header-text {
