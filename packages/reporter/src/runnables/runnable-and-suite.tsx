@@ -137,6 +137,7 @@ const Runnable: React.FC<RunnableProps> = observer(({ appState: appStateProps = 
       className={cs(`${model.type} runnable runnable-${model.state}`, {
         'runnable-retried': model.hasRetried,
         'runnable-studio': appStateProps.studioActive,
+        'last-test-margin-bottom': model.type === 'test' && !shouldShowConnectingDots,
       })}
       data-model-state={model.state}
     >
