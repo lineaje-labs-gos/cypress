@@ -381,7 +381,7 @@ $dotted-line-left-padding: 19px;
 
             .collapsible-header {
               border: 1px solid $gray-800;
-              border-left: none;
+              border-left: 1px solid transparent;
               border-radius: 0 4px 0 0;
             }
 
