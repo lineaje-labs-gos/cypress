@@ -416,7 +416,7 @@ $dotted-line-left-padding: 19px;
 
         .studio-save,
         .studio-copy {
-          display: block;
+          display: flex;
         }
       }
     }
@@ -556,7 +556,8 @@ $dotted-line-left-padding: 19px;
 
   .studio-controls {
     display: none;
-    margin: 10px 20px 10px 0;
+    margin: 10px 16px;
+    align-items: center;
 
     button {
       border-radius: 5px;
@@ -576,7 +577,6 @@ $dotted-line-left-padding: 19px;
     .studio-cancel {
       color: rgba($white, 0.75);
       cursor: pointer;
-      margin: 7px 0 0 5px;
 
       &:hover {
         text-decoration: underline;
@@ -591,7 +591,7 @@ $dotted-line-left-padding: 19px;
         color: $indigo-500;
         display: none;
         font-size: 16px;
-        padding: 4px 10px 2px;
+        padding: 6px 10px;
 
         &:hover,
         &:focus {
