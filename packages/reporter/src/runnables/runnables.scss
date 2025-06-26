@@ -247,7 +247,7 @@ $dotted-line-left-padding: 19px;
       border-left: $status-border-width solid $retried;
     }
 
-    &.runnable-studio.runnable-passed > div > .runnable-wrapper,
+    &.runnable-studio.runnable-passed.test > div > .runnable-wrapper,
     &.runnable-studio.runnable-passed > div > .runnable-instruments {
       border-left: $status-border-width solid $purple-400;
     }
