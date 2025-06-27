@@ -28,6 +28,14 @@ _Released 07/15/2025 (PENDING)_
 
 - Migration helpers and related errors are no longer shown when upgrading from Cypress versions earlier than 10.0.0. To migrate from a pre-10.0.0 version, upgrade one major version at a time to receive the appropriate guidance. Addresses [#31345](https://github.com/cypress-io/cypress/issues/31345). Addressed in [https://github.com/cypress-io/cypress/pull/31629/](https://github.com/cypress-io/cypress/pull/31629/).
 
+## 14.5.1
+
+_Released 7/01/2025 (PENDING)_
+
+**Dependency Updates:**
+
+- Updated `pbkdf2` from `3.1.2` to `3.1.3`. This removes the [SNYK-JS-PBKDF2-10495498](https://security.snyk.io/vuln/SNYK-JS-PBKDF2-10495498) vulnerability being reported in security scans. Addressed in [#31941](https://github.com/cypress-io/cypress/pull/31941).
+
 ## 14.5.0
 
 _Released 6/17/2025_
