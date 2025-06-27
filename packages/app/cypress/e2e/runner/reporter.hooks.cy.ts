@@ -67,9 +67,7 @@ describe('hooks', {
     })
 
     // does not display commands from skipped tests
-    cy.contains('test 1').click()
-    cy.contains('test 1').parents('.collapsible').first().should('not.contain', 'testBody 1')
-    cy.contains('test 1').click()
+    cy.contains('test 1').should('have.css', 'pointer-events', 'none')
 
     // displays before hook when following it.skip
     // https://github.com/cypress-io/cypress/issues/8086
