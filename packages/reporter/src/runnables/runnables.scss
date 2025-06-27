@@ -532,14 +532,6 @@ $dotted-line-left-padding: 19px;
     }
   }
 
-  // don't show the dotted line on the last test
-  // since sometimes tests are contained within a collapsible with other collapsibles
-  :nth-last-child(1 of .test) {
-    &::before {
-      content: none !important;
-    }
-  }
-
   .test.runnable-failed .runnable-controls .runnable-controls-status {
     visibility: visible;
   }
