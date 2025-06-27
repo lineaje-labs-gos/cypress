@@ -53,10 +53,10 @@ describe('hooks', {
       o.sinon.stub(ctx.actions.file, 'openFile')
     })
 
-    cy.get('.open-in-ide-button').invoke('show').click()
+    cy.get('.hook-open-in-ide').first().invoke('show').click()
 
     cy.withCtx((ctx, o) => {
-      expect(ctx.actions.file.openFile).to.have.been.calledWith(o.sinon.match(new RegExp(`hooks/basic\.cy\.js$`)), 1, 1)
+      expect(ctx.actions.file.openFile).to.have.been.calledWith(o.sinon.match(new RegExp(`hooks/basic\.cy\.js$`)), 2, 2)
     })
   })
 
