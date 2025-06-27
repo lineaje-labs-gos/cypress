@@ -367,13 +367,9 @@ describe('studio controls', () => {
         it('is visible without save and copy button if test was skipped', () => {
           cy.contains('nested suite 1')
           .parents('.collapsible').first()
-          .contains('test 1').click()
+          .contains('test 1').should('have.css', 'pointer-events', 'none')
           .parents('.collapsible').first().scrollIntoView()
-          .find('.studio-controls').as('pendingControls')
-          .should('be.visible')
-
-          cy.get('@pendingControls').find('.studio-save').should('not.be.visible')
-          cy.get('@pendingControls').find('.studio-copy').should('not.be.visible')
+          .find('.studio-controls').should('not.exist')
         })
 
         it('is not visible while test is running', () => {
