@@ -224,8 +224,8 @@ $dotted-line-left-padding: 19px;
       flex-shrink: 0;
     }
 
-    &.runnable-pending,
-    &.runnable-processing {
+    &.test.runnable-pending,
+    &.test.runnable-processing {
       pointer-events: none;
     }
 
