@@ -13,9 +13,6 @@ export interface SuiteProps extends RunnableProps {
 export default class Suite extends Runnable {
   children: Array<TestModel | Suite> = []
   type = 'suite'
-  private _cachedTestChildStates: TestState[] | null = null
-  private _cachedChildrenCount = 0
-  private _cachedTestIds: string[] | null = null
 
   constructor (props: SuiteProps, level: number) {
     super(props, level)
@@ -25,10 +22,10 @@ export default class Suite extends Runnable {
       state: computed,
       _testChildStates: computed,
       hasRetried: computed,
-      _anyTestChildrenRunning: computed,
       _anyTestChildrenFailed: computed,
       _allTestChildrenPassedOrPending: computed,
       _allTestChildrenPending: computed,
+      _anyTestChildrenRunning: computed,
     })
   }
 
@@ -52,46 +49,14 @@ export default class Suite extends Runnable {
     return 'processing'
   }
 
-  private _shouldRecalculate (): boolean {
-    if (this._cachedTestChildStates === null) {
-      return true
-    }
-
-    const testChildren = this.children.filter((child) => child.type === 'test')
-
-    // Check if the number of test children changed
-    if (testChildren.length !== this._cachedChildrenCount) {
-      return true
-    }
-
-    // Check if the test IDs changed (indicating different tests)
-    const currentTestIds = testChildren.map((child) => child.id)
-
-    if (!this._cachedTestIds || !_.isEqual(currentTestIds, this._cachedTestIds)) {
-      return true
-    }
-
-    return false
-  }
-
   get _testChildStates () {
     /**
-    * without this caching, we'll recalculate the state of the suite on every render
-    * and it will cause recalculate style performance issues in the browser
-    */
-    if (this._shouldRecalculate()) {
-      /**
      * since we're displaying a collapsible for each suite whether it's a nested suite or not,
      * we only want to consider the test children of the current suite and not the state of any suite children
      */
-      const testChildren = this.children.filter((child) => child.type === 'test')
+    const testChildren = this.children.filter((child) => child.type === 'test')
 
-      this._cachedTestChildStates = _.map(testChildren, 'state')
-      this._cachedChildrenCount = testChildren.length
-      this._cachedTestIds = testChildren.map((child) => child.id)
-    }
-
-    return this._cachedTestChildStates
+    return _.map(testChildren, 'state')
   }
 
   get hasRetried (): boolean {
@@ -111,18 +76,14 @@ export default class Suite extends Runnable {
   }
 
   get _allTestChildrenPassedOrPending () {
-    const states = this._testChildStates || []
-
-    return !states.length || _.every(states, (state) => {
+    return !this._testChildStates.length || _.every(this._testChildStates, (state) => {
       return state === 'passed' || state === 'pending'
     })
   }
 
   get _allTestChildrenPending () {
-    const states = this._testChildStates || []
-
-    return !!states.length
-            && _.every(states, (state) => {
+    return !!this._testChildStates.length
+            && _.every(this._testChildStates, (state) => {
               return state === 'pending'
             })
   }
