@@ -1,7 +1,7 @@
 import cs from 'classnames'
 import _ from 'lodash'
 import { observer } from 'mobx-react'
-import React, { MouseEvent, useCallback } from 'react'
+import React, { MouseEvent, useCallback, useMemo } from 'react'
 
 import appState, { AppState } from '../lib/app-state'
 import events, { Events } from '../lib/events'
@@ -71,7 +71,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     </>
   }, [model.state])
 
-  const HeaderComponent = ({ isOpen }: CollapsibleHeaderComponentProps) => {
+  const HeaderComponent = useCallback(({ isOpen }: CollapsibleHeaderComponentProps) => {
     return (
       <>
         <div className='runnable-and-suite-header-icon'>
@@ -89,19 +89,21 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
         )}
       </>
     )
-  }
+  }, [getHeaderIcon, model.title, studioEnabled, appState.studioActive, _launchStudio])
 
-  let runnablesList = <ul className='runnables'>
-    {_.map(model.children, (runnable, index) => {
-      return (<Runnable
-        key={runnable.id}
-        model={runnable}
-        studioEnabled={studioEnabled}
-        canSaveStudioLogs={canSaveStudioLogs}
-        shouldShowConnectingDots={shouldShowConnectionDots(model.children, runnable, index)}
-      />)
-    })}
-  </ul>
+  const runnablesList = useMemo(() => (
+    <ul className='runnables'>
+      {_.map(model.children, (runnable, index) => {
+        return (<Runnable
+          key={runnable.id}
+          model={runnable}
+          studioEnabled={studioEnabled}
+          canSaveStudioLogs={canSaveStudioLogs}
+          shouldShowConnectingDots={shouldShowConnectionDots(model.children, runnable, index)}
+        />)
+      })}
+    </ul>
+  ), [model.children, studioEnabled, canSaveStudioLogs])
 
   return (
     // we don't want to show the collapsible if there are no tests in the suite
