@@ -58,7 +58,7 @@ describe('suites', () => {
 
     cy.contains('suite 1 > nested suite 1')
     .closest('.runnable')
-    .should('have.class', 'runnable-active')
+    .should('have.class', 'runnable-processing')
 
     cy.contains('suite 2')
     .closest('.runnable')
