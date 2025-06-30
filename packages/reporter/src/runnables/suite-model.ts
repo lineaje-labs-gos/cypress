@@ -30,9 +30,10 @@ export default class Suite extends Runnable {
   }
 
   get state (): TestState {
-    if (this._anyTestChildrenRunning) {
-      return 'active'
-    }
+    // TODO https://github.com/cypress-io/cypress-services/issues/11050
+    // if (this._anyTestChildrenRunning) {
+    //   return 'active'
+    // }
 
     if (this._anyTestChildrenFailed) {
       return 'failed'
@@ -49,18 +50,20 @@ export default class Suite extends Runnable {
     return 'processing'
   }
 
+  get _testChildren () {
+    return this.children.filter((child) => child.type === 'test')
+  }
+
   get _testChildStates () {
     /**
      * since we're displaying a collapsible for each suite whether it's a nested suite or not,
      * we only want to consider the test children of the current suite and not the state of any suite children
      */
-    const testChildren = this.children.filter((child) => child.type === 'test')
-
-    return _.map(testChildren, 'state')
+    return _.map(this._testChildren, 'state')
   }
 
   get hasRetried (): boolean {
-    return _.some(this.children, (v) => v.hasRetried)
+    return _.some(this._testChildren, (v) => v.hasRetried)
   }
 
   get _anyTestChildrenRunning () {
