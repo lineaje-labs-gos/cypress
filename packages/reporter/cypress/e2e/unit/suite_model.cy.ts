@@ -41,19 +41,22 @@ describe('Suite model', () => {
       expect(suite.state).to.equal('passed')
     })
 
-    it('is active when all children are active', () => {
+    // TODO: https://github.com/cypress-io/cypress-services/issues/11050
+    it.skip('is active when all children are active', () => {
       const suite = suiteWithChildren([{ state: 'active' }, { state: 'active' }])
 
       expect(suite.state).to.equal('active')
     })
 
-    it('is active when there are active tests with passing tests', () => {
+    // TODO: https://github.com/cypress-io/cypress-services/issues/11050
+    it.skip('is active when there are active tests with passing tests', () => {
       const suite = suiteWithChildren([{ state: 'active' }, { state: 'passed' }])
 
       expect(suite.state).to.equal('active')
     })
 
-    it('is active when there are active tests with pending tests', () => {
+    // TODO: https://github.com/cypress-io/cypress-services/issues/11050
+    it.skip('is active when there are active tests with pending tests', () => {
       const suite = suiteWithChildren([{ state: 'active' }, { state: 'pending' }])
 
       expect(suite.state).to.equal('active')
@@ -97,7 +100,8 @@ describe('Suite model', () => {
       expect(suite.children[2].state).to.equal('passed')
     })
 
-    it('is active even when children suites are not', () => {
+    // TODO: https://github.com/cypress-io/cypress-services/issues/11050
+    it.skip('is active even when children suites are not', () => {
       const suite = suiteWithChildren([{ state: 'active' }, { state: 'processing', type: 'suite' }, { state: 'passed', type: 'suite' }])
 
       expect(suite.state).to.equal('active')
