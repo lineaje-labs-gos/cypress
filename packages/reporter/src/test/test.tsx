@@ -135,7 +135,7 @@ const Test: React.FC<TestProps> = observer(({ model, events: eventsProps = event
   const _controls = () => {
     let controls: Array<JSX.Element> = []
 
-    if (studioEnabled && !appStateProps.studioActive) {
+    if (studioEnabled && !appStateProps.studioActive && model.state !== 'pending') {
       controls.push(
         <LaunchStudioIcon
           key={`studio-command-${model}`}
