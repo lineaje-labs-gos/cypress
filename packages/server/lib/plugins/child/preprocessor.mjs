@@ -1,6 +1,6 @@
-const _ = require('lodash')
-const EE = require('events')
-const util = require('../util')
+import _ from 'lodash'
+import EE from 'events'
+import util from '../util.js'
 
 let fileObjects = {}
 
@@ -47,9 +47,8 @@ const wrap = (ipc, invoke, ids, args) => {
   util.wrapChildPromise(ipc, invoke, ids, [childFile])
 }
 
-module.exports = {
+export default {
   wrap,
-
   // for testing purposes
   _clearFiles: () => {
     for (let file in fileObjects) {

@@ -1,15 +1,14 @@
-const md5 = require('md5')
-const { fs } = require('memfs')
-const path = require('path')
-const webpack = require('webpack')
-const VirtualModulesPlugin = require('webpack-virtual-modules')
-
-const resolve = require('../../util/resolve')
+import md5 from 'md5'
+import { fs } from 'memfs'
+import path from 'path'
+import webpack from 'webpack'
+import VirtualModulesPlugin from 'webpack-virtual-modules'
+import resolve from '../../util/resolve.mjs'
 
 fs.join = path.join
 
-const processCallback = ({ file, fn, projectRoot }) => {
-  const { getFullWebpackOptions } = require('@cypress/webpack-batteries-included-preprocessor')
+const processCallback = async ({ file, fn, projectRoot }) => {
+  const { getFullWebpackOptions } = await import('@cypress/webpack-batteries-included-preprocessor')
 
   const source = fn.replace(/Cypress\.require/g, 'require')
   const typescriptPath = resolve.typescript(projectRoot)
@@ -62,6 +61,6 @@ const processCallback = ({ file, fn, projectRoot }) => {
   })
 }
 
-module.exports = {
+export default {
   processCallback,
 }

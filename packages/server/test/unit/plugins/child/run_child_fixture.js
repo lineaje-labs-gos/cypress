@@ -1,7 +1,7 @@
 const childProcess = require('child_process')
 const path = require('path')
 
-const REQUIRE_ASYNC_CHILD_PATH = require.resolve('@packages/server/lib/plugins/child/require_async_child')
+const REQUIRE_ASYNC_CHILD_PATH = require.resolve('@packages/server/lib/plugins/child/require_async_child.mjs')
 
 let proc
 

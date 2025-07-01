@@ -1,7 +1,9 @@
-const env = require('./env')
-const debug = require('debug')('cypress:server:plugins')
+import module from 'module'
+import env from './env.js'
+import debugLib from 'debug'
+const debug = debugLib('cypress:server:plugins')
 
-module.exports = {
+export default {
   /**
    * Resolves the path to 'typescript' module.
    *
@@ -15,6 +17,8 @@ module.exports = {
 
     try {
       debug('resolving typescript with projectRoot %o', projectRoot)
+
+      const require = module.createRequire(import.meta.url)
 
       const resolved = require.resolve('typescript', { paths: [projectRoot] })
 

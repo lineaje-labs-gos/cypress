@@ -1,6 +1,9 @@
-require('../../../spec_helper')
+import module from 'module'
 
-const runRequireAsyncChild = require('../../../../lib/plugins/child/run_require_async_child')
+import { run as runRequireAsyncChild } from '../../../../lib/plugins/child/run_require_async_child.mjs'
+const require = module.createRequire(import.meta.url)
+
+require('../../../spec_helper')
 
 describe('lib/plugins/child/run_require_async_child', () => {
   beforeEach(function () {

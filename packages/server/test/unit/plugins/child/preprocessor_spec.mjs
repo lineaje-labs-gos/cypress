@@ -1,9 +1,11 @@
+import EE from 'events'
+import util from '../../../../lib/plugins/util.js'
+import preprocessor from '../../../../lib/plugins/child/preprocessor.mjs'
+import module from 'module'
+
+const require = module.createRequire(import.meta.url)
+
 require('../../../spec_helper')
-
-const EE = require('events')
-
-const util = require(`../../../../lib/plugins/util`)
-const preprocessor = require(`../../../../lib/plugins/child/preprocessor`)
 
 // NOTE: todo come back to this
 describe.skip('lib/plugins/child/preprocessor', () => {

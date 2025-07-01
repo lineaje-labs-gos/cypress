@@ -1,5 +1,5 @@
-const EE = require('events')
-const util = require('../util')
+import EE from 'events'
+import util from '../util.js'
 
 const wrap = (ipc, invoke, ids, args) => {
   const [options] = args
@@ -18,4 +18,6 @@ const wrap = (ipc, invoke, ids, args) => {
   util.wrapChildPromise(ipc, invoke, ids, args)
 }
 
-module.exports = { wrap }
+export default {
+  wrap,
+}

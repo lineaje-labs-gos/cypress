@@ -1,6 +1,6 @@
-const util = require('../util')
+import util from '../util.js'
 
-module.exports = {
+export default {
   wrapBefore (ipc, invoke, ids, args) {
     util.wrapChildPromise(ipc, invoke, ids, args)
   },

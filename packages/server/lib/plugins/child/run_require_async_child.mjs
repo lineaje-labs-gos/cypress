@@ -1,10 +1,16 @@
-require('graceful-fs').gracefulify(require('fs'))
-const debugLib = require('debug')
-const { pathToFileURL } = require('url')
-const util = require('../util')
-const { RunPlugins } = require('./run_plugins')
+import gracefulFs from 'graceful-fs'
+import fs from 'fs'
+import { pathToFileURL } from 'url'
+import { register } from 'tsx/esm/api'
+import { serializeError, nonNodeRequires } from '../util.js'
+
+import debugLib from 'debug'
+import { RunPlugins } from './run_plugins.mjs'
+import errors from '@packages/errors'
 
 const debug = debugLib(`cypress:lifecycle:child:run_require_async_child:${process.pid}`)
+
+gracefulFs.gracefulify(fs)
 
 /**
  * Executes and returns the passed `file` (usually `configFile`) file in the ipc `loadConfig` event
@@ -13,7 +19,7 @@ const debug = debugLib(`cypress:lifecycle:child:run_require_async_child:${proces
  * @param {*} projectRoot the root of the typescript project (useful mainly for tsnode)
  * @returns
  */
-function run (ipc, file, projectRoot) {
+export function run (ipc, file, projectRoot) {
   debug('configFile:', file)
   debug('projectRoot:', projectRoot)
   if (!projectRoot) {
@@ -21,8 +27,8 @@ function run (ipc, file, projectRoot) {
   }
 
   process.on('uncaughtException', (err) => {
-    debug('uncaught exception:', util.serializeError(err))
-    ipc.send('childProcess:unhandledError', util.serializeError(err))
+    debug('uncaught exception:', serializeError(err))
+    ipc.send('childProcess:unhandledError', serializeError(err))
 
     return false
   })
@@ -38,15 +44,15 @@ function run (ipc, file, projectRoot) {
       err = event.reason
     }
 
-    ipc.send('childProcess:unhandledError', util.serializeError(err))
+    ipc.send('childProcess:unhandledError', serializeError(err))
 
     return false
   })
 
   const isValidSetupNodeEvents = (config, testingType) => {
     if (config[testingType] && config[testingType].setupNodeEvents && typeof config[testingType].setupNodeEvents !== 'function') {
-      ipc.send('setupTestingType:error', util.serializeError(
-        require('@packages/errors').getError('SETUP_NODE_EVENTS_IS_NOT_FUNCTION', file, testingType, config[testingType].setupNodeEvents),
+      ipc.send('setupTestingType:error', serializeError(
+        errors.getError('SETUP_NODE_EVENTS_IS_NOT_FUNCTION', file, testingType, config[testingType].setupNodeEvents),
       ))
 
       return false
@@ -55,7 +61,7 @@ function run (ipc, file, projectRoot) {
     return true
   }
 
-  const getValidDevServer = (config) => {
+  const getValidDevServer = async (config) => {
     const { devServer } = config
 
     if (devServer && typeof devServer === 'function') {
@@ -64,16 +70,20 @@ function run (ipc, file, projectRoot) {
 
     if (devServer && typeof devServer === 'object') {
       if (devServer.bundler === 'webpack') {
-        return { devServer: require('@cypress/webpack-dev-server').devServer, objApi: true }
+        const { devServer } = await import('@cypress/webpack-dev-server')
+
+        return { devServer, objApi: true }
       }
 
       if (devServer.bundler === 'vite') {
-        return { devServer: require('@cypress/vite-dev-server').devServer, objApi: true }
+        const { devServer } = await import('@cypress/vite-dev-server')
+
+        return { devServer, objApi: true }
       }
     }
 
-    ipc.send('setupTestingType:error', util.serializeError(
-      require('@packages/errors').getError('CONFIG_FILE_DEV_SERVER_IS_NOT_VALID', file, config),
+    ipc.send('setupTestingType:error', serializeError(
+      errors.getError('CONFIG_FILE_DEV_SERVER_IS_NOT_VALID', file, config),
     ))
 
     return false
@@ -84,9 +94,16 @@ function run (ipc, file, projectRoot) {
   const loadFile = async (file) => {
     try {
       debug('Loading file %s', file)
+      // we need to register the tsx/esm api in order to await import() CJS or ESM modules to get interop here
+      const unregister = register()
 
-      return require(file)
+      const result = await import(file)
+
+      unregister()
+
+      return result
     } catch (err) {
+      // TODO: not valid anymore?
       if (!err.stack.includes('[ERR_REQUIRE_ESM]') && !err.stack.includes('SyntaxError: Cannot use import statement outside a module')) {
         throw err
       }
@@ -95,7 +112,7 @@ function run (ipc, file, projectRoot) {
     debug('User is loading an ESM config file')
 
     try {
-      // We cannot replace the initial `require` with `await import` because
+      // We cannot replace the initial `import` with `await import` because
       // Certain modules cannot be dynamically imported.
       // pathToFileURL for windows interop: https://github.com/nodejs/node/issues/31710
       const fileURL = pathToFileURL(file).href
@@ -121,11 +138,11 @@ function run (ipc, file, projectRoot) {
         return typeof val === 'function' ? `[Function ${val.name}]` : val
       }
 
-      ipc.send('loadConfig:reply', { initialConfig: JSON.stringify(result, replacer), requires: util.nonNodeRequires() })
+      ipc.send('loadConfig:reply', { initialConfig: JSON.stringify(result, replacer), requires: nonNodeRequires() })
 
       let hasSetup = false
 
-      ipc.on('setupTestingType', (testingType, options) => {
+      ipc.on('setupTestingType', async (testingType, options) => {
         if (hasSetup) {
           throw new Error('Already Setup')
         }
@@ -141,7 +158,9 @@ function run (ipc, file, projectRoot) {
         }
 
         if (testingType === 'component') {
-          const devServerInfo = getValidDevServer(result.component || {})
+          const devServerInfo = await getValidDevServer(result.component || {})
+
+          console.log('devServerInfo', devServerInfo)
 
           if (!devServerInfo) {
             return
@@ -153,8 +172,8 @@ function run (ipc, file, projectRoot) {
             const setupNodeEvents = result.component && result.component.setupNodeEvents || ((on, config) => {})
 
             const onConfigNotFound = (devServer, root, searchedFor) => {
-              ipc.send('setupTestingType:error', util.serializeError(
-                require('@packages/errors').getError('DEV_SERVER_CONFIG_FILE_NOT_FOUND', devServer, root, searchedFor),
+              ipc.send('setupTestingType:error', serializeError(
+                errors.getError('DEV_SERVER_CONFIG_FILE_NOT_FOUND', devServer, root, searchedFor),
               ))
             }
 
@@ -185,7 +204,7 @@ function run (ipc, file, projectRoot) {
         } else {
           // Notify the plugins init that there's no plugins to resolve
           ipc.send('setupTestingType:reply', {
-            requires: util.nonNodeRequires(),
+            requires: nonNodeRequires(),
           })
         }
       })
@@ -209,13 +228,11 @@ function run (ipc, file, projectRoot) {
         }
       }
 
-      ipc.send('loadConfig:error', util.serializeError(
-        require('@packages/errors').getError('CONFIG_FILE_REQUIRE_ERROR', file, err),
+      ipc.send('loadConfig:error', serializeError(
+        errors.getError('CONFIG_FILE_REQUIRE_ERROR', file, err),
       ))
     }
   })
 
   ipc.send('ready')
 }
-
-module.exports = run

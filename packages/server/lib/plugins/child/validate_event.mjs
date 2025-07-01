@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import _ from 'lodash'
 
 const createErrorResult = (errorMessage) => {
   return {
@@ -73,4 +73,4 @@ const validateEvent = (event, handler, config, errConstructorFn) => {
   return result
 }
 
-module.exports = validateEvent
+export default validateEvent

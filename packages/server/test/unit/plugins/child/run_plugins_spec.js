@@ -2,12 +2,12 @@ require('../../../spec_helper')
 
 const _ = require('lodash')
 
-const preprocessor = require('../../../../lib/plugins/child/preprocessor')
+const preprocessor = require('../../../../lib/plugins/child/preprocessor.mjs')
 const util = require('../../../../lib/plugins/util')
-const resolve = require('../../../../lib/util/resolve')
+const resolve = require('../../../../lib/util/resolve.mjs')
 const browserUtils = require('../../../../lib/browsers/utils')
-const { RunPlugins } = require('../../../../lib/plugins/child/run_plugins')
-const crossOrigin = require('../../../../lib/plugins/child/cross_origin')
+const { RunPlugins } = require('../../../../lib/plugins/child/run_plugins.mjs')
+const crossOrigin = require('../../../../lib/plugins/child/cross_origin.mjs')
 
 describe('lib/plugins/child/run_plugins', () => {
   let ipc

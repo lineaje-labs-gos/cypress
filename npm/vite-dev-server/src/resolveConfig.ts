@@ -8,11 +8,10 @@ import type { InlineConfig } from 'vite-6'
 import path from 'path'
 import semverGte from 'semver/functions/gte'
 
-import { configFiles } from './constants'
-import type { ViteDevServerConfig } from './devServer'
-import { Cypress, CypressSourcemap } from './plugins/index'
-import type { Vite } from './getVite'
-import { dynamicImport } from './dynamic-import'
+import { configFiles } from './constants.js'
+import type { ViteDevServerConfig } from './devServer.js'
+import { Cypress, CypressSourcemap } from './plugins/index.js'
+import type { Vite } from './getVite.js'
 
 const debug = debugFn('cypress:vite-dev-server:resolve-config')
 

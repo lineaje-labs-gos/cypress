@@ -2,23 +2,26 @@
 // this module is responsible for loading the plugins file
 // and running the exported function to register event handlers
 // and executing any tasks that the plugin registers
-const debugLib = require('debug')
-const Promise = require('bluebird')
-const _ = require('lodash')
+
+import debugLib from 'debug'
+import Promise from 'bluebird'
+import _ from 'lodash'
+import errors from '@packages/errors'
+import webpackPreprocessor from '@cypress/webpack-batteries-included-preprocessor'
+
+import preprocessor from './preprocessor.mjs'
+import devServer from './dev-server.mjs'
+import resolve from '../../util/resolve.mjs'
+import browserLaunch from './browser_launch.mjs'
+import util from '../util.js'
+import validateEvent from './validate_event.mjs'
+import crossOrigin from './cross_origin.mjs'
 
 const debug = debugLib(`cypress:lifecycle:child:RunPlugins:${process.pid}`)
 
-const preprocessor = require('./preprocessor')
-const devServer = require('./dev-server')
-const resolve = require('../../util/resolve')
-const browserLaunch = require('./browser_launch')
-const util = require('../util')
-const validateEvent = require('./validate_event')
-const crossOrigin = require('./cross_origin')
-
 const UNDEFINED_SERIALIZED = '__cypress_undefined__'
 
-class RunPlugins {
+export class RunPlugins {
   constructor (ipc, projectRoot, requiredFile) {
     this.ipc = ipc
     /**
@@ -69,8 +72,8 @@ class RunPlugins {
 
       if (!isValid) {
         const err = userEvents
-          ? require('@packages/errors').getError('SETUP_NODE_EVENTS_INVALID_EVENT_NAME_ERROR', this.requiredFile, event, userEvents, error)
-          : require('@packages/errors').getError('CONFIG_FILE_SETUP_NODE_EVENTS_ERROR', this.requiredFile, initialConfig.testingType, error)
+          ? errors.getError('SETUP_NODE_EVENTS_INVALID_EVENT_NAME_ERROR', this.requiredFile, event, userEvents, error)
+          : errors.getError('CONFIG_FILE_SETUP_NODE_EVENTS_ERROR', this.requiredFile, initialConfig.testingType, error)
 
         this.ipc.send('setupTestingType:error', util.serializeError(err))
 
@@ -134,7 +137,7 @@ class RunPlugins {
     })
     .catch((err) => {
       debug('plugins file errored:', err && err.stack)
-      this.ipc.send('setupTestingType:error', util.serializeError(require('@packages/errors').getError(
+      this.ipc.send('setupTestingType:error', util.serializeError(errors.getError(
         'CONFIG_FILE_SETUP_NODE_EVENTS_ERROR',
         this.requiredFile,
         initialConfig.testingType,
@@ -221,7 +224,7 @@ class RunPlugins {
     const duplicates = _.intersection(_.keys(target), _.keys(events))
 
     if (duplicates.length) {
-      require('@packages/errors').warning('DUPLICATE_TASK_KEY', duplicates)
+      errors.warning('DUPLICATE_TASK_KEY', duplicates)
     }
 
     return _.extend(target, events)
@@ -258,10 +261,6 @@ class RunPlugins {
 
     debug('creating webpack batteries included preprocessor with options %o', options)
 
-    const webpackPreprocessor = require('@cypress/webpack-batteries-included-preprocessor')
-
     return webpackPreprocessor(options)
   }
 }
-
-exports.RunPlugins = RunPlugins

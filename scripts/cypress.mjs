@@ -1,7 +1,10 @@
-const path = require('path')
-const execa = require('execa')
-const inspector = require('inspector')
-const debug = require('debug')('cypress:scripts')
+import path from 'path'
+import execa from 'execa'
+import inspector from 'inspector'
+import debugModule from 'debug'
+
+const debug = debugModule('cypress:scripts')
+const __dirname = import.meta.dirname
 
 const args = process.argv.slice(2)
 

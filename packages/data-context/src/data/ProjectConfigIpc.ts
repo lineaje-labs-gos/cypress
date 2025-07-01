@@ -18,7 +18,7 @@ const pkg = require('@packages/root')
 const debug = debugLib(`cypress:lifecycle:ProjectConfigIpc`)
 const debugVerbose = debugLib(`cypress-verbose:lifecycle:ProjectConfigIpc`)
 
-const CHILD_PROCESS_FILE_PATH = require.resolve('@packages/server/lib/plugins/child/require_async_child')
+const CHILD_PROCESS_FILE_PATH = require.resolve('@packages/server/lib/plugins/child/require_async_child.mjs')
 
 // NOTE: need the file:// prefix to avoid https://nodejs.org/api/errors.html#err_unsupported_esm_url_scheme on windows
 const tsx = os.platform() === 'win32' ? `file://${toPosix(require.resolve('tsx'))}` : toPosix(require.resolve('tsx'))
@@ -280,7 +280,7 @@ export class ProjectConfigIpc extends EventEmitter {
       // NOTE: The IDE in which you are working likely will not let attach to this process until it is running if using the --inspect option
       // If needing to debug the child process (webpack-dev-server/vite-dev-server/webpack-preprocessor(s)/config loading), you may want to use --inspect-brk instead
       // as it will NOT execute that process until you attach the debugger to it.
-      .push(`--inspect=${process.debugPort + 1}`)
+      .push(`--inspect-brk=${process.debugPort + 1}`)
       .value()
     }
 
