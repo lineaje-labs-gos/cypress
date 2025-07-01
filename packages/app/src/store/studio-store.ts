@@ -178,6 +178,12 @@ export const useStudioStore = defineStore('studioRecorder', {
       this.suiteId = undefined
     },
 
+    clearSuiteId () {
+      this.suiteId = undefined
+      this._removeUrlParams(['testId', 'suiteId'])
+      this._updateUrlParams(['testId', 'suiteId'])
+    },
+
     openInstructionModal () {
       this.instructionModalIsOpen = true
     },
@@ -233,7 +239,7 @@ export const useStudioStore = defineStore('studioRecorder', {
 
     initialize () {
       if (this.suiteId) {
-        getCypress().runner.setOnlySuiteId(this.suiteId)
+        // getCypress().runner.setOnlySuiteId(this.suiteId)
       } else if (this.testId) {
         getCypress().runner.setOnlyTestId(this.testId)
       }
