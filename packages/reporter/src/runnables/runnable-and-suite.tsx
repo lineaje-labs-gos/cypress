@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { observer } from 'mobx-react'
 import React, { MouseEvent, useCallback, useMemo } from 'react'
 
-import appState, { AppState } from '../lib/app-state'
+import appState from '../lib/app-state'
 import events, { Events } from '../lib/events'
 import Test from '../test/test'
 import Collapsible, { CollapsibleHeaderComponentProps } from '../collapsible/collapsible'
@@ -125,7 +125,6 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
 Suite.displayName = 'Suite'
 
 export interface RunnableProps {
-  appState?: AppState
   model: TestModel | SuiteModel
   studioEnabled: boolean
   canSaveStudioLogs: boolean
@@ -136,12 +135,11 @@ export interface RunnableProps {
 // in order to mess with its internal state. converting it to a functional
 // component breaks that, so it needs to stay a Class-based component or
 // else the driver tests need to be refactored to support it being functional
-const Runnable: React.FC<RunnableProps> = observer(({ appState: appStateProps = appState, model, studioEnabled, canSaveStudioLogs, shouldShowConnectingDots }) => {
+const Runnable: React.FC<RunnableProps> = observer(({ model, studioEnabled, canSaveStudioLogs, shouldShowConnectingDots }) => {
   return (<>
     <li
       className={cs(`${model.type} runnable runnable-${model.state}`, {
         'runnable-retried': model.hasRetried,
-        'runnable-studio': appStateProps.studioActive,
         'last-test-margin-bottom': model.type === 'test' && !shouldShowConnectingDots,
       })}
       data-model-state={model.state}

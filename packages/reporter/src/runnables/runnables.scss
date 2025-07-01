@@ -255,11 +255,6 @@ $dotted-line-left-padding: 19px;
       border-left: $status-border-width solid $retried;
     }
 
-    &.runnable-studio.runnable-passed.test > div > .runnable-wrapper,
-    &.runnable-studio.runnable-passed > div > .runnable-instruments {
-      border-left: $status-border-width solid $purple-400;
-    }
-
     &.runnable-skipped > .runnable-wrapper {
       .runnable-title {
         color: $gray-600;
@@ -416,17 +411,6 @@ $dotted-line-left-padding: 19px;
       }
     }
 
-    &.test.runnable-passed.runnable-studio {
-      .studio-controls {
-        display: flex;
-
-        .studio-save,
-        .studio-copy {
-          display: flex;
-        }
-      }
-    }
-
     &.test.runnable-pending {
       .runnable-title {
         color: $indigo-300;
@@ -449,16 +433,6 @@ $dotted-line-left-padding: 19px;
 
     .runnable-state-icon {
       flex-shrink: 0;
-
-      &.wand-icon {
-        margin-top: 4px !important;
-        margin-left: 4px;
-
-        .icon-light {
-          fill: $purple-300;
-          stroke: $purple-300;
-        }
-      }
     }
   }
 
