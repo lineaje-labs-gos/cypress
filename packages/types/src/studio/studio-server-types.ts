@@ -3,6 +3,7 @@
 import type { Router } from 'express'
 import type { AxiosInstance } from 'axios'
 import type { Socket } from 'socket.io'
+import type { BinaryLike } from 'crypto'
 
 export const StudioMetricsTypes = {
   STUDIO_STARTED: 'studio:started',
@@ -51,6 +52,8 @@ export interface StudioServerOptions {
   cloudApi: StudioCloudApi
   betterSqlite3Path: string
   sessionId?: string
+  manifest: Record<string, string>
+  verifyHash: (contents: BinaryLike, expectedHash: string) => boolean
 }
 
 export interface StudioAIInitializeOptions {
