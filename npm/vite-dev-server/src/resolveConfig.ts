@@ -32,7 +32,7 @@ export const createViteDevServerConfig = async (config: ViteDevServerConfig, vit
     // Set "configFile: false" to disable auto resolution of <project-root>/vite.config.js
     resolvedOverrides = { configFile: false, ...resolvedOverrides }
   } else {
-    const { findUp } = await dynamicImport<typeof import('find-up')>('find-up')
+    const { findUp } = await import('find-up')
 
     const configFile = await findUp(configFiles, { cwd: projectRoot })
 
