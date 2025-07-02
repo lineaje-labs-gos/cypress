@@ -2,10 +2,11 @@ import { observer } from 'mobx-react'
 import React, { ReactElement } from 'react'
 
 import type { StatsStore } from '../header/stats-store'
-import { formatDuration, getFilenameParts } from '../lib/util'
+import { getFilenameParts } from '../lib/util'
 import { RunnablesStore } from './runnables-store'
 import { DebugDismiss } from '../header/DebugDismiss'
-import { OpenFileInIDEButton } from '../OpenFileInIDEButton'
+import { OpenFileInIDEButton } from '../header/OpenFileInIDEButton'
+import { Duration } from '../duration/duration'
 
 const renderRunnableHeader = (children: ReactElement) => <div className="runnable-header" data-cy="runnable-header">{children}</div>
 
@@ -56,9 +57,7 @@ const RunnableHeader: React.FC<RunnableHeaderProps> = observer(({ spec, statsSto
         <OpenFileInIDEButton fileDetails={fileDetails} />
       </div>
       {runnablesStore.testFilter && runnablesStore.totalTests > 0 && <DebugDismiss matched={runnablesStore.totalTests} total={runnablesStore.totalUnfilteredTests} />}
-      {Boolean(statsStore.duration) && (
-        <span className='duration' data-cy="spec-duration">{formatDuration(statsStore.duration)}</span>
-      )}
+      <Duration duration={statsStore.duration} />
     </>,
   )
 })

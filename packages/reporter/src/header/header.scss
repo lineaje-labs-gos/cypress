@@ -189,17 +189,6 @@ $color-transition: color 150ms ease-out;
         font-weight: 300;
       }
 
-      .button-hover-shadow {
-        @include button-hover-shadow(
-          $linear-gradient: linear-gradient(90deg, rgba(22, 24, 39, 0) 5.39%, $gray-1100 31.97%),
-          $width: 160px
-        );
-      }
-
-      .open-in-ide-button {
-        @include new-test-button;
-      }
-
       &:hover,
       &:focus-visible {
         .open-in-ide-button {
@@ -228,17 +217,6 @@ $color-transition: color 150ms ease-out;
         color: $white;
         font-weight: 500;
       }
-    }
-
-    .duration {
-      border: 1px solid $gray-900;
-      border-radius: 18px;
-      color: $gray-400;
-      font-size: 12px;
-      font-weight: 500;
-      line-height: 20px;
-      padding: 0 8px;
-      font-variant-numeric: tabular-nums;
     }
   }
 

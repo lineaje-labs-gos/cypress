@@ -7,7 +7,7 @@ import Command from '../commands/command'
 import Collapsible from '../collapsible/collapsible'
 import type HookModel from './hook-model'
 import type { HookName } from './hook-model'
-import { OpenFileInIDEButton } from '../OpenFileInIDEButton'
+import { OpenFileInIDEButton } from '../header/OpenFileInIDEButton'
 
 export interface HookHeaderProps {
   model: HookModel
