@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc || echo 'built, with type errors'",
     "check-ts": "tsc --noEmit",
-    "cypress:open": "node ../../scripts/cypress open --project . --component",
-    "cypress:run": "node ../../scripts/cypress run --project . --component",
+    "cypress:open": "node ../../scripts/cypress.mjs open --project . --component",
+    "cypress:run": "node ../../scripts/cypress.mjs run --project . --component",
     "lint": "eslint --ext .js,.ts,.json, .",
     "test": "npm run cypress:run",
     "watch": "tsc -w"

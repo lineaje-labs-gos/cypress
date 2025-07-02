@@ -14,7 +14,7 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "rebuild-better-sqlite3": "electron-rebuild -f -o better-sqlite3",
     "repl": "node repl.js",
-    "start": "node ../../scripts/cypress open --dev --global",
+    "start": "node ../../scripts/cypress.mjs open --dev --global",
     "test": "node ./test/scripts/run.js",
     "test-integration": "node ./test/scripts/run.js --glob-in-dir=test/integration",
     "test-performance": "node ./test/scripts/run.js --glob-in-dir=test/performance",
