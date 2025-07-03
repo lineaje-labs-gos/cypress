@@ -1,7 +1,6 @@
 require('../../../spec_helper')
 
 const _ = require('lodash')
-const validateEvent = require('../../../../lib/plugins/child/validate_event')
 
 const events = [
   ['after:browser:launch', 'a function', () => {}],
@@ -16,7 +15,9 @@ const events = [
   ['task', 'an object', {}],
 ]
 
-describe('lib/plugins/child/validate_event', () => {
+describe('lib/plugins/child/validate_event', async () => {
+  const validateEvent = (await import('../../../../lib/plugins/child/validate_event.mjs')).default
+
   it('returns error when called with no event name', () => {
     const { isValid, error } = validateEvent()
 
