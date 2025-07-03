@@ -2,7 +2,7 @@ import gracefulFs from 'graceful-fs'
 import fs from 'fs'
 import { pathToFileURL } from 'url'
 import { register } from 'tsx/esm/api'
-import { serializeError, nonNodeRequires } from '../util.js'
+import { serializeError, buildErrorLocationFromTransformError, nonNodeRequires } from '../util.js'
 
 import debugLib from 'debug'
 import { RunPlugins } from './run_plugins.mjs'
@@ -211,7 +211,7 @@ export function run (ipc, file, projectRoot) {
     } catch (err) {
       // With tsx, errors now come in as TransformErrors instead of TSErrors (as they also include JavaScript errors).
       if (err.name === 'TransformError' || err.stack.includes('TransformError')) {
-        const { compilerErrorLocation, originalMessage, message } = util.buildErrorLocationFromTransformError(err, projectRoot)
+        const { compilerErrorLocation, originalMessage, message } = buildErrorLocationFromTransformError(err, projectRoot)
 
         err.compilerErrorLocation = compilerErrorLocation
         err.originalMessage = originalMessage
