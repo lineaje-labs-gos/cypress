@@ -160,8 +160,6 @@ export function run (ipc, file, projectRoot) {
         if (testingType === 'component') {
           const devServerInfo = await getValidDevServer(result.component || {})
 
-          console.log('devServerInfo', devServerInfo)
-
           if (!devServerInfo) {
             return
           }
