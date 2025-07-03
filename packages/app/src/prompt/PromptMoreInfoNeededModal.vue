@@ -17,7 +17,7 @@
 import { Dialog, DialogOverlay } from '@headlessui/vue'
 import { init, loadRemote } from '@module-federation/runtime'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import type { CyPromptAppDefaultShape, GetCodeModalContentsShape } from './prompt-app-types'
+import type { CyPromptAppDefaultShape, MoreInfoNeededModalContentsShape } from './prompt-app-types'
 import { usePromptStore } from '../store/prompt-store'
 
 interface CyPromptApp { default: CyPromptAppDefaultShape }
@@ -45,20 +45,22 @@ const closeModal = () => {
 
 const container = ref<HTMLDivElement | null>(null)
 const error = ref<string | null>(null)
-const ReactGetCodeModalContents = ref<GetCodeModalContentsShape | null>(null)
+const ReactMoreInfoNeededModalContents = ref<MoreInfoNeededModalContentsShape | null>(null)
 const reactRoot = ref<Root | null>(null)
 const promptStore = usePromptStore()
 
 const maybeRenderReactComponent = () => {
-  if (!ReactGetCodeModalContents.value || !!error.value) {
+  if (!ReactMoreInfoNeededModalContents.value || !!error.value) {
     return
   }
 
-  const panel = window.UnifiedRunner.React.createElement(ReactGetCodeModalContents.value, {
+  const panel = window.UnifiedRunner.React.createElement(ReactMoreInfoNeededModalContents.value, {
     Cypress,
-    testId: promptStore.currentGetCodeModalInfo?.testId,
-    logId: promptStore.currentGetCodeModalInfo?.logId,
+    testId: promptStore.currentMoreInfoNeededModalInfo?.testId,
+    logId: promptStore.currentMoreInfoNeededModalInfo?.logId,
+    eventManager: window.getEventManager(),
     onClose: () => {
+      promptStore.currentMoreInfoNeededModalInfo?.onCancel()
       closeModal()
     },
   })
@@ -71,7 +73,7 @@ const maybeRenderReactComponent = () => {
 }
 
 const unmountReactComponent = () => {
-  if (!ReactGetCodeModalContents.value || !container.value) {
+  if (!ReactMoreInfoNeededModalContents.value || !container.value) {
     return
   }
 
@@ -114,7 +116,7 @@ loadRemote<CyPromptApp>('cy-prompt').then((module) => {
     return
   }
 
-  ReactGetCodeModalContents.value = module.default.GetCodeModalContents
+  ReactMoreInfoNeededModalContents.value = module.default.MoreInfoNeededModalContents
   maybeRenderReactComponent()
 }).catch((e) => {
   error.value = e.message

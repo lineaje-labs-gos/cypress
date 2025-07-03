@@ -1,5 +1,5 @@
 import { init, loadRemote } from '@module-federation/runtime'
-import type { CypressInternal, CyPromptDriverDefaultShape } from './prompt-driver-types'
+import type { CypressInternal, CyPromptDriverDefaultShape, CyPromptMoreInfoNeededOptions } from './prompt-driver-types'
 import type Emitter from 'component-emitter'
 import $errUtils from '../../../cypress/error_utils'
 import $stackUtils from '../../../cypress/stack_utils'
@@ -10,6 +10,7 @@ declare global {
   interface Window {
     getEventManager?: () => {
       ws: Emitter
+      localBus: Emitter
     }
   }
 }
@@ -76,6 +77,13 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress, cy: Cypress.Cyp
       cloudModule = await initializeModule(Cypress)
     }
 
+    if (!Cypress.isCrossOriginSpecBridge) {
+      Cypress.primaryOriginCommunicator.removeAllListeners('prompt:more-info-needed')
+      Cypress.primaryOriginCommunicator.on('prompt:more-info-needed', ({ testId, logId, onSave, onCancel }: CyPromptMoreInfoNeededOptions) => {
+        window.getEventManager!().ws.emit('prompt:more-info-needed', { testId, logId, onSave, onCancel })
+      })
+    }
+
     return await cloudModule.createCyPrompt({
       Cypress: Cypress as CypressInternal,
       cy,
@@ -85,6 +93,13 @@ const initializeCloudCyPrompt = async (Cypress: Cypress.Cypress, cy: Cypress.Cyp
         throwErrByPath: $errUtils.throwErrByPath,
       },
       getSourceDetailsForFirstLine: $stackUtils.getSourceDetailsForFirstLine,
+      onMoreInfoNeeded: ({ testId, logId, onSave, onCancel }: CyPromptMoreInfoNeededOptions) => {
+        if (Cypress.isCrossOriginSpecBridge) {
+          Cypress.specBridgeCommunicator.toPrimary('prompt:more-info-needed', { testId, logId, onSave, onCancel })
+        } else {
+          window.getEventManager!().localBus.emit('prompt:more-info-needed', { testId, logId, onSave, onCancel })
+        }
+      },
     })
   } catch (error) {
     return error
@@ -100,7 +115,7 @@ export default (Commands: Cypress.Cypress['Commands'], Cypress: Cypress.Cypress,
       initializeCloudCyPromptPromise = initializeCloudCyPrompt(Cypress, cy)
     }
 
-    const prompt = (steps: string | string[], commandOptions: object = {}) => {
+    const prompt = (steps: string[], commandOptions: object = {}) => {
       const promptCmd = cy.state('current')
 
       if (Cypress.testingType === 'component') {

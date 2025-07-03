@@ -1,6 +1,6 @@
 // Note: This file is owned by the cloud delivered
-// cy prompt bundle. It is downloaded and copied here.
-// It should not be modified directly here.
+// cy-prompt bundle. It is downloaded and copied to the app.
+// It should not be modified directly in the app.
 
 import type Emitter from 'component-emitter'
 
@@ -8,6 +8,10 @@ interface InternalActions extends Cypress.Actions {
   (
     eventName: 'prompt:backend:request',
     listener: (...args: any[]) => void
+  ): Cypress.Cypress
+  (
+    eventName: 'test:after:run:async',
+    listener: (test: { id: string, err: Error }) => void
   ): Cypress.Cypress
 }
 
@@ -59,6 +63,13 @@ export interface CyPromptStackLineDetail {
   column: number
 }
 
+export interface CyPromptMoreInfoNeededOptions {
+  testId: string
+  logId: string
+  onSave: () => void
+  onCancel: () => void
+}
+
 export interface CyPromptOptions {
   Cypress: CypressInternal
   cy: Cypress.cy & { state: (key: string) => any }
@@ -70,6 +81,7 @@ export interface CyPromptOptions {
     stack: string,
     projectRoot?: string
   ) => CyPromptStackLineDetail | undefined
+  onMoreInfoNeeded: (options: CyPromptMoreInfoNeededOptions) => void
 }
 
 export interface CyPromptDriverDefaultShape {

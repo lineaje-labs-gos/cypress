@@ -1,6 +1,6 @@
 // Note: This file is owned by the cloud delivered
-// cy prompt bundle. It is downloaded and copied here.
-// It should not be modified directly here.
+// cy-prompt bundle. It is downloaded and copied to the app.
+// It should not be modified directly in the app.
 
 /// <reference types="cypress" />
 
@@ -74,9 +74,15 @@ export interface CyPromptCDPClient {
   ): void
 }
 
+export interface CyPromptAddSocketListenerOptions {
+  socket: Socket
+  onBeforeSave: () => void
+  onAfterSave: (options: { error?: Error }) => void
+}
+
 export interface CyPromptServerShape {
   initializeRoutes(router: Router): void
-  addSocketListeners(socket: Socket): void
+  addSocketListeners(addSocketListenerOptions: CyPromptAddSocketListenerOptions): void
   connectToBrowser: (cdpClient: CyPromptCDPClient) => void
   reset: (testId?: string) => void
 }

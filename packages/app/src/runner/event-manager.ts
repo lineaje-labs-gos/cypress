@@ -472,13 +472,13 @@ export class EventManager {
       Cypress.state('isProtocolEnabled', isDefaultProtocolEnabled)
     }
 
+    this._addListeners()
+
     if (Cypress.config('experimentalPromptCommand')) {
       await new Promise((resolve) => {
         this.ws.emit('prompt:reset', resolve)
       })
     }
-
-    this._addListeners()
   }
 
   isBrowserFamily (family: string) {
@@ -919,6 +919,8 @@ export class EventManager {
       return
     }
 
+    this.promptStore.resetState()
+
     await this.resetReporter()
 
     // this probably isn't 100% necessary since Cypress will fall out of scope
@@ -1027,6 +1029,16 @@ export class EventManager {
       this.promptStore.openGetCodeModal({
         testId,
         logId,
+      })
+    })
+
+    this.localBus.removeAllListeners('prompt:more-info-needed')
+    this.localBus.on('prompt:more-info-needed', ({ testId, logId, onSave, onCancel }) => {
+      this.promptStore.openMoreInfoNeededModal({
+        testId,
+        logId,
+        onSave,
+        onCancel,
       })
     })
   }
