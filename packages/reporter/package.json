@@ -9,7 +9,7 @@
     "clean-deps": "rimraf node_modules",
     "cypress:open": "node ../../scripts/cypress.mjs open --project .",
     "cypress:run": "node ../../scripts/cypress.mjs run --project .",
-    "cypress:run:ct": "cross-env TZ=America/New_York node ../../scripts/cypress run --component --project .",
+    "cypress:run:ct": "cross-env TZ=America/New_York node ../../scripts/cypress.mjs run --component --project .",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "tslint": "tslint --config ../ts/tslint.json --project .",
     "watch": "yarn build-for-tests --watch --progress"
