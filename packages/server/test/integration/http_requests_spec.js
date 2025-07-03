@@ -22,7 +22,6 @@ const config = require(`../../lib/config`)
 const { ServerBase } = require(`../../lib/server-base`)
 const pluginsModule = require(`../../lib/plugins`)
 const preprocessor = require(`../../lib/plugins/preprocessor`)
-const resolve = require(`../../lib/util/resolve.mjs`)
 const { fs } = require(`../../lib/util/fs`)
 const CacheBuster = require(`../../lib/util/cache_buster`)
 const Fixtures = require('@tooling/system-tests')
@@ -77,12 +76,15 @@ function getHugeJsFile () {
 }
 
 let ctx
+let resolve
 
 describe('Routes', () => {
   require('mocha-banner').register()
 
   beforeEach(async function () {
     await scaffoldCommonNodeModules()
+    resolve = await import(`../../lib/util/resolve.mjs`)
+
     ctx = getCtx()
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
