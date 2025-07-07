@@ -31,7 +31,11 @@ _Released 07/15/2025 (PENDING)_
 
 ## 14.5.1
 
-_Released 7/01/2025 (PENDING)_
+_Released 7/01/2025_
+
+**Bugfixes:**
+
+- Fixed an issue where prerequests with Firefox BiDi were prematurely being removed or matched incorrectly. Addresses [#31482](https://github.com/cypress-io/cypress/issues/31482).
 
 **Dependency Updates:**
 
@@ -48,7 +52,6 @@ _Released 6/17/2025_
 **Bugfixes:**
 
 - Fixed an issue when using `Cypress.stop()` where a run may be aborted prior to receiving the required runner events causing Test Replay to not be available. Addresses [#31781](https://github.com/cypress-io/cypress/issues/31781).
-- Fixed an issue where prerequests with Firefox BiDi were prematurely being removed or matched incorrectly. Addresses [#31482](https://github.com/cypress-io/cypress/issues/31482).
 
 ## 14.4.1
 
