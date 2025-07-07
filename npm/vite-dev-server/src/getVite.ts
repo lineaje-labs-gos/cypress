@@ -1,6 +1,8 @@
 import debugFn from 'debug'
 import module from 'module'
+import path from 'path'
 import type { ViteDevServerConfig } from './devServer'
+import majorVersion from 'semver/functions/major'
 
 const debug = debugFn('cypress:vite-dev-server:getVite')
 
@@ -11,8 +13,42 @@ export type Vite = typeof import('vite-6')
 // use the version the user has installed
 export async function getVite (config: ViteDevServerConfig): Promise<Vite> {
   try {
+    const require = module.createRequire(import.meta.url)
+    const vitePackageJsonPath = require.resolve('vite/package.json', { paths: [config.cypressConfig.projectRoot] })
+    const vitePackageJson = await import(vitePackageJsonPath)
+
+    const viteExports = vitePackageJson.exports['.']
+    let esmPath = null
+    let cjsPath = null
+
+    // In Node 20, require.resolve in the ESM context returns the CJS path as if we were in a CJS context.
+    // In Node 22, this is not the case and the ESM context is returned correctly.
+    // In order to work around this, we need to check where the ESM path is so we can import the correct path.
+    // In Vite 7, the CJS build was removed so there is only a single string entry in the export.
+    // Otherwise, both builds exists in Vite 6 and under and we only want to get the ESM path.
+    switch (majorVersion(vitePackageJson.version)) {
+      case 4:
+      case 6:
+        esmPath = viteExports.import
+        cjsPath = viteExports.require
+        break
+      case 5:
+        esmPath = viteExports.import.default
+        cjsPath = viteExports.require.default
+        break
+      case 7:
+        esmPath = viteExports
+        break
+      default:
+        throw new Error(`Unsupported Vite version: ${vitePackageJson.version}`)
+    }
+
+    debug('vite ESM build path: %s', esmPath)
+    debug('vite CJS build path: %s', cjsPath)
+
     try {
-      const esmViteImportPath = import.meta.resolve('vite', config.cypressConfig.projectRoot)
+      // try to import the ESM build of Vite
+      const esmViteImportPath = path.resolve(vitePackageJsonPath, '../', esmPath)
 
       debug('resolved esmViteImportPath as %s', esmViteImportPath)
 
@@ -20,15 +56,17 @@ export async function getVite (config: ViteDevServerConfig): Promise<Vite> {
 
       return viteImport
     } catch (err) {
-      const require = module.createRequire(import.meta.url)
-
-      const cjsViteImportPath = require.resolve('vite', { paths: [config.cypressConfig.projectRoot] })
+      // if the ESM build import fails, try to import the CJS build
+      debug('importing vite as ESM failed:', err)
+      debug('importing vite as CJS')
+      // Vite 4-6 both include the CJS distribution of Vite
+      const cjsViteImportPath = path.resolve(vitePackageJsonPath, '../', cjsPath)
 
       debug('resolved cjsViteImportPath as %s', cjsViteImportPath)
 
-      const viteImport = (await import(cjsViteImportPath)).default
+      const viteImport = await import(cjsViteImportPath)
 
-      return viteImport
+      return viteImport.default
     }
   } catch (err) {
     throw new Error(`Could not find "vite" in your project's dependencies. Please install "vite" to fix this error.\n\n${err}`)
