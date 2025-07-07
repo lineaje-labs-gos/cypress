@@ -38,7 +38,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({ isOpen: isOpenAsProp = false,
 
   return (
     <div className={cs('collapsible', { 'is-open': isOpen })} ref={containerRef}>
-      <div className={cs('collapsible-header-wrapper', headerClass)}>
+      <div className={cs('collapsible-header-wrapper', headerClass, { 'collapsible-is-open': isOpen })}>
         <div
           aria-expanded={isOpen}
           className='collapsible-header'

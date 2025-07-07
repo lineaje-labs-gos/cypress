@@ -280,7 +280,7 @@ $dotted-line-left-padding: 19px;
         background-color: $gray-1100;
 
         .collapsible-header-text {
-          svg {
+          .collapsible-indicator {
             margin-top: 1px;
           }
         }
@@ -378,24 +378,24 @@ $dotted-line-left-padding: 19px;
           border-radius: 4px;
           box-shadow: 0 0 0 3px #43486159;
           background-color: $reporter-section-background;
-
-          .runnable-wrapper {
-            border-bottom-left-radius: 0;
-
-            .collapsible-header {
-              border: 1px solid $gray-800;
-              border-left: 1px solid transparent;
-              border-radius: 0 4px 0 0;
-            }
-
-            .collapsible-header-inner {
-              background-color: $reporter-section-background;
-            }
-          }
         }
 
         .collapsible-header-inner {
           padding: 8px 8px 8px 6px;
+        }
+      }
+
+      .collapsible-header-wrapper.collapsible-is-open {
+        border-bottom-left-radius: 0;
+
+        .collapsible-header {
+          border: 1px solid $gray-800;
+          border-left: 1px solid transparent;
+          border-radius: 0 4px 0 0;
+        }
+
+        .collapsible-header-inner {
+          background-color: $reporter-section-background;
         }
       }
 

@@ -1,42 +1,39 @@
 diff --git a/node_modules/prismjs/themes/prism.css b/node_modules/prismjs/themes/prism.css
-index 5b8ed2d..8173ec6 100644
+index 5b8ed2d..37f3e74 100644
 --- a/node_modules/prismjs/themes/prism.css
 +++ b/node_modules/prismjs/themes/prism.css
-@@ -4,8 +4,8 @@
+@@ -4,8 +4,13 @@
   * @author Lea Verou
   */
  
 -code[class*="language-"],
 -pre[class*="language-"] {
++/*
++ * This is a patch to only target the code blocks that are used in the runner.
++ * This reduces the number of selectors that are attempting to be targeted by the runner.
++ * And improves rendering performance.
++ */
 +code.language-js, code.language-ts,
 +pre.language-js, pre.language-ts {
  	color: black;
  	background: none;
  	text-shadow: 0 1px white;
-@@ -28,39 +28,43 @@ pre[class*="language-"] {
+@@ -28,39 +33,27 @@ pre[class*="language-"] {
  	hyphens: none;
  }
  
 -pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
 -code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
-+pre.language-js::-moz-selection, pre.language-js ::-moz-selection,
-+pre.language-ts::-moz-selection, pre.language-ts ::-moz-selection,
-+code.language-js::-moz-selection, code.language-js ::-moz-selection,
-+code.language-ts::-moz-selection, code.language-ts ::-moz-selection {
- 	text-shadow: none;
- 	background: #b3d4fc;
- }
- 
+-	text-shadow: none;
+-	background: #b3d4fc;
+-}
+-
 -pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
 -code[class*="language-"]::selection, code[class*="language-"] ::selection {
-+pre.language-js::selection, pre.language-js ::selection,
-+pre.language-ts::selection, pre.language-ts ::selection,
-+code.language-js::selection, code.language-js ::selection,
-+code.language-ts::selection, code.language-ts ::selection {
- 	text-shadow: none;
- 	background: #b3d4fc;
- }
- 
+-	text-shadow: none;
+-	background: #b3d4fc;
+-}
+-
  @media print {
 -	code[class*="language-"],
 -	pre[class*="language-"] {
