@@ -1,6 +1,7 @@
 import cs from 'classnames'
+import _ from 'lodash'
 import { observer } from 'mobx-react'
-import React, { MouseEvent, useCallback, useMemo } from 'react'
+import React, { MouseEvent, useCallback } from 'react'
 
 import appState, { AppState } from '../lib/app-state'
 import events, { Events } from '../lib/events'
@@ -105,9 +106,9 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
     )
   }, [getHeaderIcon, model.title, studioEnabled, appState.studioActive, _launchStudio])
 
-  const runnablesList = useMemo(() => (
+  const runnablesList = (
     <ul className='runnables'>
-      {model.children.map((runnable, index) => {
+      {_.map(model.children, (runnable, index) => {
         return (<Runnable
           key={runnable.id}
           model={runnable}
@@ -117,7 +118,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
         />)
       })}
     </ul>
-  ), [model.children, studioEnabled, canSaveStudioLogs])
+  )
 
   return (
     // we don't want to show the collapsible if there are no tests in the suite

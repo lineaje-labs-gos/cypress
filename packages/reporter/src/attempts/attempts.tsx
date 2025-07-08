@@ -1,6 +1,6 @@
 import cs from 'classnames'
 import { observer } from 'mobx-react'
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import type { TestState } from '@packages/types'
 import Agents from '../agents/agents'
@@ -103,22 +103,19 @@ interface AttemptsProps {
 }
 
 const Attempts: React.FC<AttemptsProps> = observer(({ test, scrollIntoView, studioActive }: AttemptsProps) => {
-  // Memoize the mapped attempts to prevent unnecessary re-renders
-  const attemptsElements = useMemo(() => {
-    return test.attempts.map((attempt) => (
-      <Attempt
-        key={attempt.id}
-        scrollIntoView={scrollIntoView}
-        studioActive={studioActive}
-        model={attempt}
-      />
-    ))
-  }, [test.attempts, scrollIntoView, studioActive])
-
   return (<ul className={cs('attempts', {
     'has-multiple-attempts': test.hasMultipleAttempts,
   })}>
-    {attemptsElements}
+    {test.attempts.map((attempt) => {
+      return (
+        <Attempt
+          key={attempt.id}
+          scrollIntoView={scrollIntoView}
+          studioActive={studioActive}
+          model={attempt}
+        />
+      )
+    })}
   </ul>)
 })
 
