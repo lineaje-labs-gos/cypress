@@ -23,8 +23,6 @@ export class Scroller {
   private _userScrollCount = 0
   private _countUserScrollsTimeout?: number
   private _userScrollThresholdMs = SCROLL_THRESHOLD_MS
-  private _lastScrollTime = 0
-  private _scrollDebounceMs = 16 // ~60fps
   private _elementCache = new WeakMap<HTMLElement, { offsetTop: number, clientHeight: number }>()
   private _cacheTimeout?: number
 
@@ -100,13 +98,6 @@ export class Scroller {
       throw new Error('A container must be set on the scroller with `scroller.setContainer(container)` before trying to scroll an element into view')
     }
 
-    // Debounce rapid scroll calls
-    const now = Date.now()
-
-    if (now - this._lastScrollTime < this._scrollDebounceMs) {
-      return
-    }
-
     // Cache DOM measurements to avoid multiple reads
     const containerScrollTop = this._container.scrollTop
     const elementMeasurements = this._getElementMeasurements(element)
@@ -134,7 +125,6 @@ export class Scroller {
 
       this._userScrollCount--
       this._container!.scrollTop = scrollTopGoal
-      this._lastScrollTime = Date.now()
     })
   }
 
@@ -147,10 +137,12 @@ export class Scroller {
     if (!this._container) return false
 
     const containerScrollTop = this._container.scrollTop
-    const elementMeasurements = this._getElementMeasurements(element)
+    const elementOffsetTop = element.offsetTop
+    const elementClientHeight = element.clientHeight
     const containerClientHeight = this._container.clientHeight
 
-    return this._isFullyVisibleWithCache(elementMeasurements, containerScrollTop, containerClientHeight)
+    return elementOffsetTop - containerScrollTop > 0
+           && containerScrollTop > elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
   }
 
   _aboveBottom (element: HTMLElement) {
@@ -161,9 +153,10 @@ export class Scroller {
     if (!this._container) return 0
 
     const containerClientHeight = this._container.clientHeight
-    const elementMeasurements = this._getElementMeasurements(element)
+    const elementOffsetTop = element.offsetTop
+    const elementClientHeight = element.clientHeight
 
-    return elementMeasurements.offsetTop + elementMeasurements.clientHeight - containerClientHeight + PADDING
+    return elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
   }
 
   getScrollTop () {
@@ -189,12 +182,6 @@ export class Scroller {
     clearTimeout(this._countUserScrollsTimeout)
     this._countUserScrollsTimeout = undefined
     this._userScrollThresholdMs = SCROLL_THRESHOLD_MS
-    this._lastScrollTime = 0
-    this._elementCache = new WeakMap()
-    if (this._cacheTimeout) {
-      clearTimeout(this._cacheTimeout)
-      this._cacheTimeout = undefined
-    }
   }
 
   __setScrollThresholdMs (ms: number) {
