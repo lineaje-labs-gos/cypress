@@ -88,10 +88,6 @@ export default class Test extends Runnable {
       hookId: props.id.toString(),
       hookName: 'test body',
       invocationDetails: props.invocationDetails,
-    }, {
-      hookId: `${props.id.toString()}-studio`,
-      hookName: 'studio commands',
-      isStudio: true,
     }]
 
     _.each(props.prevAttempts || [], (attempt) => this._addAttempt(attempt))
