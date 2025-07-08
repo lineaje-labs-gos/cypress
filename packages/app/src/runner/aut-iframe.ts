@@ -20,6 +20,9 @@ export class AutIframe {
   debouncedToggleSelectorPlayground: DebouncedFunc<(isEnabled: any) => void>
   $iframe?: JQuery<HTMLIFrameElement>
   _highlightedEl?: Element
+  // Cache the blank page content to avoid repeated generation
+  private _cachedTestIsolationContent?: string
+  private _cachedInitialContent?: string
 
   constructor (
     private projectName: string,
@@ -50,11 +53,21 @@ export class AutIframe {
   }
 
   _showInitialBlankPage () {
-    this._showContents(blankContents.initial())
+    // Cache the content to avoid repeated HTML generation
+    if (!this._cachedInitialContent) {
+      this._cachedInitialContent = blankContents.initial()
+    }
+
+    this._showContents(this._cachedInitialContent)
   }
 
   _showTestIsolationBlankPage () {
-    this._showContents(blankContents.testIsolationBlankPage())
+    // Cache the content to avoid repeated HTML generation
+    if (!this._cachedTestIsolationContent) {
+      this._cachedTestIsolationContent = blankContents.testIsolationBlankPage()
+    }
+
+    this._showContents(this._cachedTestIsolationContent)
   }
 
   showVisitFailure = (props) => {

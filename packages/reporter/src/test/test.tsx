@@ -93,6 +93,7 @@ interface TestProps {
 const Test: React.FC<TestProps> = observer(({ model, events: eventsProps = events, appState: appStateProps = appState, scroller: scrollerProps = scroller, studioEnabled, canSaveStudioLogs }) => {
   const containerRef = useRef(null)
   const [isMounted, setIsMounted] = useState(false)
+  const rafIdRef = useRef<number | null>(null)
 
   useEffect(() => {
     _scrollIntoView()
@@ -110,16 +111,28 @@ const Test: React.FC<TestProps> = observer(({ model, events: eventsProps = event
     eventsProps.emit('studio:init:test', model.id)
   }, [eventsProps, model.id])
 
-  const _scrollIntoView = () => {
-    if (appStateProps.autoScrollingEnabled && (appStateProps.isRunning || appStateProps.studioActive) && model.state !== 'processing') {
-      window.requestAnimationFrame(() => {
-        // since this executes async in a RAF the ref might be null
-        if (containerRef.current) {
-          scrollerProps.scrollIntoView(containerRef.current as HTMLElement)
-        }
-      })
+  const _scrollIntoView = useCallback(() => {
+    // Early return if conditions aren't met
+    if (!appStateProps.autoScrollingEnabled ||
+        (!appStateProps.isRunning && !appStateProps.studioActive) ||
+        model.state === 'processing' ||
+        !containerRef.current) {
+      return
     }
-  }
+
+    // Cancel any pending RAF to prevent multiple calls
+    if (rafIdRef.current) {
+      window.cancelAnimationFrame(rafIdRef.current)
+    }
+
+    rafIdRef.current = window.requestAnimationFrame(() => {
+      rafIdRef.current = null
+      // Double-check ref exists since RAF is async
+      if (containerRef.current) {
+        scrollerProps.scrollIntoView(containerRef.current as HTMLElement)
+      }
+    })
+  }, [appStateProps.autoScrollingEnabled, appStateProps.isRunning, appStateProps.studioActive, model.state, scrollerProps])
 
   const _header = () => {
     return (<>

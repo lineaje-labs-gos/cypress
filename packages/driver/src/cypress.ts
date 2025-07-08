@@ -409,11 +409,23 @@ class $Cypress {
     this.emit('cypress:in:cypress:runner:event', ...args)
   }
 
+  private _handleMochaEvent (eventType: string, args: unknown[], isTextTerminal: boolean) {
+    this.maybeEmitCypressInCypress('mocha', eventType, ...args)
+
+    if (isTextTerminal) {
+      return this.emit('mocha', eventType, ...args)
+    }
+  }
+
   action (eventName, ...args) {
     // normalizes all the various ways
     // other objects communicate intent
     // and 'action' to Cypress
     debug(eventName)
+
+    const isTextTerminal = this.config('isTextTerminal')
+    const isInteractive = this.config('isInteractive')
+
     switch (eventName) {
       case 'recorder:frame':
         return this.emit('recorder:frame', args[0])
@@ -434,13 +446,7 @@ class $Cypress {
           return
         }
 
-        this.maybeEmitCypressInCypress('mocha', 'start', args[0])
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'start', args[0])
-        }
-
-        break
+        return this._handleMochaEvent('start', args, isTextTerminal)
 
       case 'runner:end':
         $sourceMapUtils.destroySourceMapConsumers()
@@ -451,102 +457,43 @@ class $Cypress {
         // TODO: it would be nice to await this emit before preceding.
         this.emit('run:end')
 
-        this.maybeEmitCypressInCypress('mocha', 'end', args[0])
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'end', args[0])
-        }
-
-        break
+        return this._handleMochaEvent('end', args, isTextTerminal)
 
       case 'runner:suite:start':
         // mocha runner started processing a suite
-        this.maybeEmitCypressInCypress('mocha', 'suite', ...args)
+        return this._handleMochaEvent('suite', args, isTextTerminal)
 
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'suite', ...args)
-        }
-
-        break
       case 'runner:suite:end':
         // mocha runner finished processing a suite
-        this.maybeEmitCypressInCypress('mocha', 'suite end', ...args)
+        return this._handleMochaEvent('suite end', args, isTextTerminal)
 
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'suite end', ...args)
-        }
-
-        break
       case 'runner:hook:start':
         // mocha runner started processing a hook
-
-        this.maybeEmitCypressInCypress('mocha', 'hook', ...args)
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'hook', ...args)
-        }
-
-        break
+        return this._handleMochaEvent('hook', args, isTextTerminal)
 
       case 'runner:hook:end':
         // mocha runner finished processing a hook
-        this.maybeEmitCypressInCypress('mocha', 'hook end', ...args)
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'hook end', ...args)
-        }
-
-        break
+        return this._handleMochaEvent('hook end', args, isTextTerminal)
 
       case 'runner:test:start':
         // mocha runner started processing a hook
-        this.maybeEmitCypressInCypress('mocha', 'test', ...args)
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'test', ...args)
-        }
-
-        break
+        return this._handleMochaEvent('test', args, isTextTerminal)
 
       case 'runner:test:end':
-        this.maybeEmitCypressInCypress('mocha', 'test end', ...args)
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'test end', ...args)
-        }
-
-        break
+        return this._handleMochaEvent('test end', args, isTextTerminal)
 
       case 'runner:pass':
         // mocha runner calculated a pass
         // this is delayed from when mocha would normally fire it
         // since we fire it after all afterEach hooks have ran
-        this.maybeEmitCypressInCypress('mocha', 'pass', ...args)
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'pass', ...args)
-        }
-
-        break
+        return this._handleMochaEvent('pass', args, isTextTerminal)
 
       case 'runner:pending':
         // mocha runner calculated a pending test
-        this.maybeEmitCypressInCypress('mocha', 'pending', ...args)
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'pending', ...args)
-        }
-
-        break
+        return this._handleMochaEvent('pending', args, isTextTerminal)
 
       case 'runner:fail': {
-        this.maybeEmitCypressInCypress('mocha', 'fail', ...args)
-
-        if (this.config('isTextTerminal')) {
-          return this.emit('mocha', 'fail', ...args)
-        }
-
-        break
+        return this._handleMochaEvent('fail', args, isTextTerminal)
       }
       // retry event only fired in mocha version 6+
       // https://github.com/mochajs/mocha/commit/2a76dd7589e4a1ed14dd2a33ab89f182e4c4a050
@@ -554,7 +501,7 @@ class $Cypress {
         // mocha runner calculated a pass
         this.maybeEmitCypressInCypress('mocha', 'retry', ...args)
 
-        if (this.config('isTextTerminal')) {
+        if (isTextTerminal) {
           this.emit('mocha', 'retry', ...args)
         }
 
@@ -567,7 +514,7 @@ class $Cypress {
       case 'runner:test:before:run':
         this.maybeEmitCypressInCypress('mocha', 'test:before:run', args[0])
 
-        if (this.config('isTextTerminal')) {
+        if (isTextTerminal) {
           // needed for handling test retries
           this.emit('mocha', 'test:before:run', args[0])
         }
@@ -602,7 +549,7 @@ class $Cypress {
         this.emit('test:after:run', ...args)
         this.maybeEmitCypressInCypress('mocha', 'test:after:run', args[0])
 
-        if (this.config('isTextTerminal')) {
+        if (isTextTerminal) {
           // needed for calculating wallClockDuration
           // and the timings of after + afterEach hooks
           return this.emit('mocha', 'test:after:run', args[0])
@@ -628,7 +575,7 @@ class $Cypress {
           return // do not emit hidden logs to public apis
         }
 
-        this.runner?.addLog(args[0], this.config('isInteractive'))
+        this.runner?.addLog(args[0], isInteractive)
 
         return this.emit('log:added', ...args)
 
@@ -641,7 +588,7 @@ class $Cypress {
 
         // Cypress logs will only trigger an update every 4 ms so there is a
         // chance the runner has been torn down when the update is triggered.
-        this.runner?.addLog(args[0], this.config('isInteractive'))
+        this.runner?.addLog(args[0], isInteractive)
 
         return this.emit('log:changed', ...args)
 

@@ -23,6 +23,10 @@ export class Scroller {
   private _userScrollCount = 0
   private _countUserScrollsTimeout?: number
   private _userScrollThresholdMs = SCROLL_THRESHOLD_MS
+  private _lastScrollTime = 0
+  private _scrollDebounceMs = 16 // ~60fps
+  private _elementCache = new WeakMap<HTMLElement, { offsetTop: number, clientHeight: number }>()
+  private _cacheTimeout?: number
 
   setContainer (container: Element, onUserScroll?: UserScrollCallback) {
     this._container = container
@@ -66,33 +70,87 @@ export class Scroller {
     })
   }
 
+  private _getElementMeasurements (element: HTMLElement) {
+    const cached = this._elementCache.get(element)
+
+    if (cached) {
+      return cached
+    }
+
+    const measurements = {
+      offsetTop: element.offsetTop,
+      clientHeight: element.clientHeight,
+    }
+
+    this._elementCache.set(element, measurements)
+
+    // Clear cache periodically to prevent memory leaks
+    if (!this._cacheTimeout) {
+      this._cacheTimeout = window.setTimeout(() => {
+        this._elementCache = new WeakMap()
+        this._cacheTimeout = undefined
+      }, 5000) // Clear cache every 5 seconds
+    }
+
+    return measurements
+  }
+
   scrollIntoView (element: HTMLElement) {
     if (!this._container) {
       throw new Error('A container must be set on the scroller with `scroller.setContainer(container)` before trying to scroll an element into view')
     }
 
-    if (this._isFullyVisible(element)) {
+    // Debounce rapid scroll calls
+    const now = Date.now()
+
+    if (now - this._lastScrollTime < this._scrollDebounceMs) {
       return
     }
 
-    // aim to scroll just into view, so that the bottom of the element
-    // is just above the bottom of the container
-    let scrollTopGoal = this._aboveBottom(element)
+    // Cache DOM measurements to avoid multiple reads
+    const containerScrollTop = this._container.scrollTop
+    const elementMeasurements = this._getElementMeasurements(element)
+    const containerClientHeight = this._container.clientHeight
 
-    // can't have a negative scroll, so put it to the top
-    if (scrollTopGoal < 0) {
-      scrollTopGoal = 0
+    // Check if fully visible using cached values
+    if (this._isFullyVisibleWithCache(elementMeasurements, containerScrollTop, containerClientHeight)) {
+      return
     }
 
-    this._userScrollCount--
-    this._container.scrollTop = scrollTopGoal
+    // Use RAF for smooth scrolling
+    requestAnimationFrame(() => {
+      // Re-measure in case element changed during RAF
+      const currentMeasurements = this._getElementMeasurements(element)
+      const currentContainerScrollTop = this._container!.scrollTop
+      const currentContainerClientHeight = this._container!.clientHeight
+
+      // Re-check visibility in case it changed
+      if (this._isFullyVisibleWithCache(currentMeasurements, currentContainerScrollTop, currentContainerClientHeight)) {
+        return
+      }
+
+      // Calculate scroll goal using cached values
+      const scrollTopGoal = Math.max(0, currentMeasurements.offsetTop + currentMeasurements.clientHeight - currentContainerClientHeight + PADDING)
+
+      this._userScrollCount--
+      this._container!.scrollTop = scrollTopGoal
+      this._lastScrollTime = Date.now()
+    })
+  }
+
+  private _isFullyVisibleWithCache (elementMeasurements: { offsetTop: number, clientHeight: number }, containerScrollTop: number, containerClientHeight: number) {
+    return elementMeasurements.offsetTop - containerScrollTop > 0
+           && containerScrollTop > elementMeasurements.offsetTop + elementMeasurements.clientHeight - containerClientHeight + PADDING
   }
 
   _isFullyVisible (element: HTMLElement) {
     if (!this._container) return false
 
-    return element.offsetTop - this._container.scrollTop > 0
-           && this._container.scrollTop > this._aboveBottom(element)
+    const containerScrollTop = this._container.scrollTop
+    const elementMeasurements = this._getElementMeasurements(element)
+    const containerClientHeight = this._container.clientHeight
+
+    return this._isFullyVisibleWithCache(elementMeasurements, containerScrollTop, containerClientHeight)
   }
 
   _aboveBottom (element: HTMLElement) {
@@ -100,9 +158,12 @@ export class Scroller {
     // the offset, causing the running command to be half cut off
     // https://github.com/cypress-io/cypress/issues/228
 
-    const containerHeight = this._container ? this._container.clientHeight : 0
+    if (!this._container) return 0
 
-    return element.offsetTop + element.clientHeight - containerHeight + PADDING
+    const containerClientHeight = this._container.clientHeight
+    const elementMeasurements = this._getElementMeasurements(element)
+
+    return elementMeasurements.offsetTop + elementMeasurements.clientHeight - containerClientHeight + PADDING
   }
 
   getScrollTop () {
@@ -128,6 +189,12 @@ export class Scroller {
     clearTimeout(this._countUserScrollsTimeout)
     this._countUserScrollsTimeout = undefined
     this._userScrollThresholdMs = SCROLL_THRESHOLD_MS
+    this._lastScrollTime = 0
+    this._elementCache = new WeakMap()
+    if (this._cacheTimeout) {
+      clearTimeout(this._cacheTimeout)
+      this._cacheTimeout = undefined
+    }
   }
 
   __setScrollThresholdMs (ms: number) {

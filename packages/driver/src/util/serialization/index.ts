@@ -10,12 +10,21 @@ export const UNSERIALIZABLE = '__cypress_unserializable_value'
 // @ts-ignore
 const structuredCloneRef = window?.structuredClone || structuredClonePonyfill
 
+const isFirefox = () => {
+  // @ts-ignore
+  return Cypress.isBrowser('firefox')
+}
+
+const isNativeStructuredClone = () => {
+  return structuredCloneRef === window?.structuredClone
+}
+
 export const isSerializableInCurrentBrowser = (value: any) => {
   try {
     structuredCloneRef(value)
 
     // @ts-ignore
-    if (Cypress.isBrowser('firefox') && _.isError(value) && structuredCloneRef !== window?.structuredClone) {
+    if (isFirefox() && _.isError(value) && !isNativeStructuredClone()) {
       /**
        * NOTE: structuredClone() was introduced in Firefox 94. Supported versions below 94 need to use the ponyfill
        * to determine whether or not a value can be serialized through postMessage. Since the ponyfill deems Errors
@@ -51,8 +60,11 @@ const convertObjectToSerializableLiteral = (obj): typeof obj => {
 
   do {
     const props = Object.getOwnPropertyNames(currentObjectRef)
+    const propsLength = props.length
 
-    props.forEach((prop: string) => {
+    for (let i = 0; i < propsLength; i++) {
+      const prop = props[i]
+
       try {
         if (!allProps.includes(prop) && isSerializableInCurrentBrowser(currentObjectRef[prop])) {
           allProps.push(prop)
@@ -69,16 +81,19 @@ const convertObjectToSerializableLiteral = (obj): typeof obj => {
           throw err
         }
       }
-    })
+    }
 
     currentObjectRef = Object.getPrototypeOf(currentObjectRef)
   } while (currentObjectRef && currentObjectRef !== Object.prototype && currentObjectRef !== Date.prototype)
 
   const objectAsLiteral = {}
+  const allPropsLength = allProps.length
 
-  allProps.forEach((key) => {
+  for (let i = 0; i < allPropsLength; i++) {
+    const key = allProps[i]
+
     objectAsLiteral[key] = obj[key]
-  })
+  }
 
   return objectAsLiteral
 }
@@ -110,9 +125,14 @@ export const preprocessForSerialization = <T>(valueToSanitize: { [key: string]: 
       const sanitizedValueAsLiteral = convertObjectToSerializableLiteral(valueToSanitize) as T
 
       // convert any nested structures as well, if objects or arrays, to literals. This is needed in the case of Proxy objects
-      _.forEach(sanitizedValueAsLiteral as any, (value, key) => {
-        sanitizedValueAsLiteral[key] = preprocessForSerialization(value)
-      })
+      const keys = Object.keys(sanitizedValueAsLiteral as any)
+      const keysLength = keys.length
+
+      for (let i = 0; i < keysLength; i++) {
+        const key = keys[i]
+
+        sanitizedValueAsLiteral[key] = preprocessForSerialization(sanitizedValueAsLiteral[key])
+      }
 
       return sanitizedValueAsLiteral
     } catch (err) {

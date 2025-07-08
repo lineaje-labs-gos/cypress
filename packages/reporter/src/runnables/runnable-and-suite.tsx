@@ -1,5 +1,4 @@
 import cs from 'classnames'
-import _ from 'lodash'
 import { observer } from 'mobx-react'
 import React, { MouseEvent, useCallback, useMemo } from 'react'
 
@@ -17,7 +16,22 @@ import { RunnableArray } from './runnables-store'
 
 // should only show connection dots if the current runnable is a test and the next runnable is a test and is not the last runnable
 export const shouldShowConnectionDots = (runnables: RunnableArray, runnable: SuiteModel | TestModel, runnableIndex: number) => {
-  return runnable.type === 'test' && runnableIndex !== runnables.length - 1 && runnables[runnableIndex + 1].type === 'test'
+  // Early return for non-test runnables
+  if (runnable.type !== 'test') {
+    return false
+  }
+
+  const runnablesLength = runnables.length
+
+  // Early return if this is the last runnable
+  if (runnableIndex === runnablesLength - 1) {
+    return false
+  }
+
+  // Check if next runnable is a test
+  const nextRunnable = runnables[runnableIndex + 1]
+
+  return nextRunnable && nextRunnable.type === 'test'
 }
 
 interface SuiteProps {
@@ -93,7 +107,7 @@ const Suite: React.FC<SuiteProps> = observer(({ eventManager = events, model, st
 
   const runnablesList = useMemo(() => (
     <ul className='runnables'>
-      {_.map(model.children, (runnable, index) => {
+      {model.children.map((runnable, index) => {
         return (<Runnable
           key={runnable.id}
           model={runnable}

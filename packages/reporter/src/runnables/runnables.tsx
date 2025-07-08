@@ -1,7 +1,6 @@
-import _ from 'lodash'
 import { action } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { MouseEvent, useCallback, useEffect, useRef } from 'react'
+import React, { MouseEvent, useCallback, useEffect, useRef, useMemo } from 'react'
 
 import events, { Events } from '../lib/events'
 import { RunnablesError, RunnablesErrorModel } from './runnable-error'
@@ -91,17 +90,23 @@ interface RunnablesListProps {
 }
 
 const RunnablesList: React.FC<RunnablesListProps> = observer(({ runnables, studioEnabled, canSaveStudioLogs }: RunnablesListProps) => {
+  // Memoize the mapped runnables to prevent unnecessary re-renders
+  const runnablesElements = useMemo(() => {
+    return runnables.map((runnable, index) => (
+      <Runnable
+        key={runnable.id}
+        model={runnable}
+        canSaveStudioLogs={canSaveStudioLogs}
+        studioEnabled={studioEnabled}
+        shouldShowConnectingDots={shouldShowConnectionDots(runnables, runnable, index)}
+      />
+    ))
+  }, [runnables, studioEnabled, canSaveStudioLogs])
+
   return (
     <div className='wrap'>
       <ul className='runnables'>
-        {_.map(runnables, (runnable, index) =>
-          (<Runnable
-            key={runnable.id}
-            model={runnable}
-            canSaveStudioLogs={canSaveStudioLogs}
-            studioEnabled={studioEnabled}
-            shouldShowConnectingDots={shouldShowConnectionDots(runnables, runnable, index)}
-          />))}
+        {runnablesElements}
       </ul>
     </div>
   )

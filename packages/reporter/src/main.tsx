@@ -2,7 +2,7 @@
 import { action } from 'mobx'
 import { observer } from 'mobx-react'
 import cs from 'classnames'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { createRoot } from 'react-dom/client'
 // @ts-ignore
 import EQ from 'css-element-queries/src/ElementQueries'
@@ -56,6 +56,11 @@ const Reporter: React.FC<SingleReporterProps> = observer(({ appState = appStateD
   const previousSpecRunId = usePrevious(runnerStore.specRunId)
   const [isMounted, setIsMounted] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
+
+  // Memoize the renderReporterHeader function to prevent unnecessary re-renders
+  const memoizedRenderReporterHeader = useCallback((props: ReporterHeaderProps) => {
+    return renderReporterHeader(props)
+  }, [renderReporterHeader])
 
   // this registration needs to happen synchronously and not async inside useEffect or else the events will not be registered and the reporter might hang inside cy-in-cy tests
   if (!isInitialized) {
@@ -112,7 +117,7 @@ const Reporter: React.FC<SingleReporterProps> = observer(({ appState = appStateD
       'studio-active': appState.studioActive,
       'mounted': isMounted,
     })}>
-      {renderReporterHeader({ appState, statsStore, runnablesStore, spec: runnerStore.spec })}
+      {memoizedRenderReporterHeader({ appState, statsStore, runnablesStore, spec: runnerStore.spec })}
       {appState?.isPreferencesMenuOpen ? (
         <TestingPreferences appState={appState} />
       ) : (

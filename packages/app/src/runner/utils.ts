@@ -20,11 +20,7 @@ export function getReporterElement () {
 }
 
 export function empty (el: HTMLElement) {
-  while (el.lastChild) {
-    if (el && el.firstChild) {
-      el.removeChild(el.firstChild)
-    }
-  }
+  el.innerHTML = ''
 }
 
 export const togglePlayground = (autIframe: AutIframe) => {

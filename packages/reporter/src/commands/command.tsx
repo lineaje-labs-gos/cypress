@@ -2,7 +2,7 @@ import _ from 'lodash'
 import cs from 'classnames'
 import Markdown from 'markdown-it'
 import { observer } from 'mobx-react'
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useState, useEffect, useMemo } from 'react'
 import Tooltip from '@cypress/react-tooltip'
 
 import appState from '../lib/app-state'
@@ -423,21 +423,43 @@ const Command: React.FC<CommandProps> = observer(({ model, aliasesWithDuplicates
   }
 
   const commandName = model.name ? nameClassName(model.name) : ''
-  const groupPlaceholder: Array<JSX.Element> = []
 
-  let groupLevel = 0
+  // Memoize group placeholder generation to prevent unnecessary re-renders
+  const groupPlaceholder = useMemo(() => {
+    const placeholder: Array<JSX.Element> = []
+    let groupLevel = 0
 
-  if (model.groupLevel !== undefined) {
-    // cap the group nesting to 5 levels to keep the log text legible
-    groupLevel = model.groupLevel < 6 ? model.groupLevel : 5
+    if (model.groupLevel !== undefined) {
+      // cap the group nesting to 5 levels to keep the log text legible
+      groupLevel = model.groupLevel < 6 ? model.groupLevel : 5
 
-    for (let i = 1; i < groupLevel; i++) {
-      groupPlaceholder.push(<span key={`${groupId}-${i}`} className='command-group-block' onClick={(e) => {
-        e.stopPropagation()
-        model.toggleOpen()
-      }} />)
+      for (let i = 1; i < groupLevel; i++) {
+        placeholder.push(<span key={`${groupId}-${i}`} className='command-group-block' onClick={(e) => {
+          e.stopPropagation()
+          model.toggleOpen()
+        }} />)
+      }
     }
-  }
+
+    return { placeholder, groupLevel }
+  }, [model.groupLevel, groupId, model.toggleOpen])
+
+  // Memoize children elements to prevent unnecessary re-renders
+  const childrenElements = useMemo(() => {
+    if (!model.hasChildren || !model.isOpen) {
+      return null
+    }
+
+    return model.children.map((child) => (
+      <Command
+        key={child.id}
+        model={child}
+        aliasesWithDuplicates={null}
+        groupId={model.id}
+        scrollIntoView={scrollIntoView}
+      />
+    ))
+  }, [model.hasChildren, model.isOpen, model.children, model.id, scrollIntoView])
 
   const _isPinned = () => {
     return appState.pinnedSnapshotId === model.id
@@ -533,7 +555,7 @@ const Command: React.FC<CommandProps> = observer(({ model, aliasesWithDuplicates
               onMouseEnter={() => _snapshot(true)}
               onMouseLeave={() => _snapshot(false)}
             >
-              {groupPlaceholder}
+              {groupPlaceholder.placeholder}
 
               {model.hasChildren && groupId && (
                 <div className={cs('command-expander-column-group', { 'nested-group-expander': model.groupLevel })} onClick={(e) => {
@@ -551,15 +573,7 @@ const Command: React.FC<CommandProps> = observer(({ model, aliasesWithDuplicates
         <Progress model={model} />
         {model.hasChildren && model.isOpen && (
           <ul className='command-child-container'>
-            {model.children.map((child) => (
-              <Command
-                key={child.id}
-                model={child}
-                aliasesWithDuplicates={null}
-                groupId={model.id}
-                scrollIntoView={scrollIntoView}
-              />
-            ))}
+            {childrenElements}
           </ul>
         )}
       </li>
@@ -570,7 +584,7 @@ const Command: React.FC<CommandProps> = observer(({ model, aliasesWithDuplicates
             testId={model.testId}
             commandId={model.id}
             // if the err is recovered and the current command is a log group, nest the test error within the group
-            groupLevel={model.group && model.hasChildren ? ++groupLevel : groupLevel}
+            groupLevel={model.group && model.hasChildren ? ++groupPlaceholder.groupLevel : groupPlaceholder.groupLevel}
           />
         </li>
       )}
