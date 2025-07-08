@@ -385,20 +385,6 @@ $dotted-line-left-padding: 19px;
         }
       }
 
-      .collapsible-header-wrapper.collapsible-is-open {
-        border-bottom-left-radius: 0;
-
-        .collapsible-header {
-          border: 1px solid $gray-800;
-          border-left: 1px solid transparent;
-          border-radius: 0 4px 0 0;
-        }
-
-        .collapsible-header-inner {
-          background-color: $reporter-section-background;
-        }
-      }
-
       .runnable-commands-region {
         .hooks-container {
           display: flex;
