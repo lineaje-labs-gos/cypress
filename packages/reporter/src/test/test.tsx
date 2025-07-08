@@ -96,7 +96,7 @@ const Test: React.FC<TestProps> = observer(({ model, events: eventsProps = event
       hideExpander
     >
       <div>
-        <Attempts studioActive={appStateProps.studioActive} test={model} scrollIntoView={() => _scrollIntoView()} />
+        <Attempts test={model} scrollIntoView={() => _scrollIntoView()} />
       </div>
     </Collapsible>
   )
