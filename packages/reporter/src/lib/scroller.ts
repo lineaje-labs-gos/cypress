@@ -23,8 +23,6 @@ export class Scroller {
   private _userScrollCount = 0
   private _countUserScrollsTimeout?: number
   private _userScrollThresholdMs = SCROLL_THRESHOLD_MS
-  private _elementCache = new WeakMap<HTMLElement, { offsetTop: number, clientHeight: number }>()
-  private _cacheTimeout?: number
 
   setContainer (container: Element, onUserScroll?: UserScrollCallback) {
     this._container = container
@@ -68,69 +66,45 @@ export class Scroller {
     })
   }
 
-  private _getElementMeasurements (element: HTMLElement) {
-    const cached = this._elementCache.get(element)
-
-    if (cached) {
-      return cached
-    }
-
-    const measurements = {
-      offsetTop: element.offsetTop,
-      clientHeight: element.clientHeight,
-    }
-
-    this._elementCache.set(element, measurements)
-
-    // Clear cache periodically to prevent memory leaks
-    if (!this._cacheTimeout) {
-      this._cacheTimeout = window.setTimeout(() => {
-        this._elementCache = new WeakMap()
-        this._cacheTimeout = undefined
-      }, 5000) // Clear cache every 5 seconds
-    }
-
-    return measurements
-  }
-
   scrollIntoView (element: HTMLElement) {
     if (!this._container) {
       throw new Error('A container must be set on the scroller with `scroller.setContainer(container)` before trying to scroll an element into view')
     }
 
-    // Cache DOM measurements to avoid multiple reads
+    // Batch DOM reads for better performance
     const containerScrollTop = this._container.scrollTop
-    const elementMeasurements = this._getElementMeasurements(element)
+    const elementOffsetTop = element.offsetTop
+    const elementClientHeight = element.clientHeight
     const containerClientHeight = this._container.clientHeight
 
-    // Check if fully visible using cached values
-    if (this._isFullyVisibleWithCache(elementMeasurements, containerScrollTop, containerClientHeight)) {
+    // Check if fully visible using batched measurements
+    if (this._isFullyVisibleWithMeasurements(elementOffsetTop, elementClientHeight, containerScrollTop, containerClientHeight)) {
       return
     }
 
     // Use RAF for smooth scrolling
     requestAnimationFrame(() => {
-      // Re-measure in case element changed during RAF
-      const currentMeasurements = this._getElementMeasurements(element)
+      // Re-check with fresh measurements in case element changed
       const currentContainerScrollTop = this._container!.scrollTop
+      const currentElementOffsetTop = element.offsetTop
+      const currentElementClientHeight = element.clientHeight
       const currentContainerClientHeight = this._container!.clientHeight
 
-      // Re-check visibility in case it changed
-      if (this._isFullyVisibleWithCache(currentMeasurements, currentContainerScrollTop, currentContainerClientHeight)) {
+      if (this._isFullyVisibleWithMeasurements(currentElementOffsetTop, currentElementClientHeight, currentContainerScrollTop, currentContainerClientHeight)) {
         return
       }
 
-      // Calculate scroll goal using cached values
-      const scrollTopGoal = Math.max(0, currentMeasurements.offsetTop + currentMeasurements.clientHeight - currentContainerClientHeight + PADDING)
+      // Calculate scroll goal using current measurements
+      const scrollTopGoal = Math.max(0, currentElementOffsetTop + currentElementClientHeight - currentContainerClientHeight + PADDING)
 
       this._userScrollCount--
       this._container!.scrollTop = scrollTopGoal
     })
   }
 
-  private _isFullyVisibleWithCache (elementMeasurements: { offsetTop: number, clientHeight: number }, containerScrollTop: number, containerClientHeight: number) {
-    return elementMeasurements.offsetTop - containerScrollTop > 0
-           && elementMeasurements.offsetTop + elementMeasurements.clientHeight - containerScrollTop < containerClientHeight - PADDING
+  private _isFullyVisibleWithMeasurements (elementOffsetTop: number, elementClientHeight: number, containerScrollTop: number, containerClientHeight: number) {
+    return elementOffsetTop - containerScrollTop > 0
+      && containerScrollTop > elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
   }
 
   _isFullyVisible (element: HTMLElement) {
@@ -141,22 +115,11 @@ export class Scroller {
     const elementClientHeight = element.clientHeight
     const containerClientHeight = this._container.clientHeight
 
-    return elementOffsetTop - containerScrollTop > 0
-           && containerScrollTop > elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
-  }
-
-  _aboveBottom (element: HTMLElement) {
     // add padding, since commands expanding and collapsing can mess with
     // the offset, causing the running command to be half cut off
     // https://github.com/cypress-io/cypress/issues/228
-
-    if (!this._container) return 0
-
-    const containerClientHeight = this._container.clientHeight
-    const elementOffsetTop = element.offsetTop
-    const elementClientHeight = element.clientHeight
-
-    return elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
+    return elementOffsetTop - containerScrollTop > 0
+      && containerScrollTop > elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
   }
 
   getScrollTop () {
