@@ -40,6 +40,10 @@ interface Root {
   unmount: () => void
 }
 
+interface ReactRootContainer extends HTMLElement {
+  _studioReactRoot: Root
+}
+
 const retryStudioMutationGql = gql`
   mutation RetryStudio {
     retryStudio
@@ -56,10 +60,9 @@ const props = defineProps<{
 
 interface StudioApp { default: StudioAppDefaultShape }
 
-const container = ref<HTMLElement | null>(null)
+const container = ref<ReactRootContainer | null>(null)
 const error = ref<string | null>(null)
 const ReactStudioPanel = ref<StudioPanelShape | null>(null)
-const reactRoot = ref<Root | null>(null)
 
 const retryStudioMutation = useMutation(retryStudioMutationGql)
 
@@ -69,7 +72,7 @@ const maybeRenderReactComponent = () => {
     return
   }
 
-  if (!ReactStudioPanel.value || !!error.value) {
+  if (!ReactStudioPanel.value || !!error.value || !container.value) {
     return
   }
 
@@ -79,11 +82,11 @@ const maybeRenderReactComponent = () => {
     studioSessionId: props.cloudStudioSessionId,
   })
 
-  if (!reactRoot.value) {
-    reactRoot.value = window.UnifiedRunner.ReactDOM.createRoot(container.value)
+  if (!container.value._studioReactRoot) {
+    container.value._studioReactRoot = window.UnifiedRunner.ReactDOM.createRoot(container.value)
   }
 
-  reactRoot.value?.render(panel)
+  container.value._studioReactRoot.render(panel)
 }
 
 watch(() => props.canAccessStudioAI, maybeRenderReactComponent)
@@ -94,7 +97,7 @@ const unmountReactComponent = () => {
     return
   }
 
-  reactRoot.value?.unmount()
+  container.value._studioReactRoot?.unmount()
 }
 
 init({
