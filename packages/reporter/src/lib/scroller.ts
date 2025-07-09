@@ -91,8 +91,13 @@ export class Scroller {
   _isFullyVisible (element: HTMLElement) {
     if (!this._container) return false
 
-    return element.offsetTop - this._container.scrollTop > 0
-           && this._container.scrollTop > this._aboveBottom(element)
+    const elementOffsetTop = element.offsetTop
+    const elementClientHeight = element.clientHeight
+    const containerScrollTop = this._container.scrollTop
+    const containerClientHeight = this._container.clientHeight
+
+    return elementOffsetTop - containerScrollTop > 0
+      && containerScrollTop > elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
   }
 
   _aboveBottom (element: HTMLElement) {
