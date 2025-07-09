@@ -322,6 +322,10 @@ describe('src/cy/commands/storage', () => {
   })
 
   context('#clearLocalStorage', () => {
+    beforeEach(() => {
+      cy.visit('/fixtures/set-storage-on-multiple-origins.html')
+    })
+
     it('passes keys onto Cypress.LocalStorage.clear', () => {
       const clear = cy.spy(Cypress.LocalStorage, 'clear')
 
@@ -404,6 +408,18 @@ describe('src/cy/commands/storage', () => {
 
           expect(lastLog.get('snapshots').length).to.eq(1)
           expect(lastLog.get('snapshots')[0]).to.be.an('object')
+        })
+      })
+
+      it('consoleProps includes the empty storage yielded', () => {
+        const ls = cy.state('window').localStorage
+
+        cy.clearLocalStorage().then(() => {
+          const consoleProps = logs[1].get('consoleProps')()
+
+          expect(consoleProps.name).to.equal('clearLocalStorage')
+          expect(consoleProps.type).to.equal('command')
+          expect(consoleProps.props.Yielded).to.deep.equal(ls)
         })
       })
     })

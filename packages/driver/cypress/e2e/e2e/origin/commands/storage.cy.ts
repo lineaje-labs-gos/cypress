@@ -114,7 +114,7 @@ context('cy.origin storage', { browser: '!webkit' }, () => {
 
         expect(consoleProps.name).to.equal('clearLocalStorage')
         expect(consoleProps.type).to.equal('command')
-        expect(consoleProps.props.Yielded).to.be.null
+        expect(consoleProps.props.Yielded).to.deep.equal({})
       })
     })
   })
