@@ -71,55 +71,38 @@ export class Scroller {
       throw new Error('A container must be set on the scroller with `scroller.setContainer(container)` before trying to scroll an element into view')
     }
 
-    // Batch DOM reads for better performance
-    const containerScrollTop = this._container.scrollTop
-    const elementOffsetTop = element.offsetTop
-    const elementClientHeight = element.clientHeight
-    const containerClientHeight = this._container.clientHeight
-
-    // Check if fully visible using batched measurements
-    if (this._isFullyVisibleWithMeasurements(elementOffsetTop, elementClientHeight, containerScrollTop, containerClientHeight)) {
+    if (this._isFullyVisible(element)) {
       return
     }
 
-    // Use RAF for smooth scrolling
-    requestAnimationFrame(() => {
-      // Re-check with fresh measurements in case element changed
-      const currentContainerScrollTop = this._container!.scrollTop
-      const currentElementOffsetTop = element.offsetTop
-      const currentElementClientHeight = element.clientHeight
-      const currentContainerClientHeight = this._container!.clientHeight
+    // aim to scroll just into view, so that the bottom of the element
+    // is just above the bottom of the container
+    let scrollTopGoal = this._aboveBottom(element)
 
-      if (this._isFullyVisibleWithMeasurements(currentElementOffsetTop, currentElementClientHeight, currentContainerScrollTop, currentContainerClientHeight)) {
-        return
-      }
+    // can't have a negative scroll, so put it to the top
+    if (scrollTopGoal < 0) {
+      scrollTopGoal = 0
+    }
 
-      // Calculate scroll goal using current measurements
-      const scrollTopGoal = Math.max(0, currentElementOffsetTop + currentElementClientHeight - currentContainerClientHeight + PADDING)
-
-      this._userScrollCount--
-      this._container!.scrollTop = scrollTopGoal
-    })
-  }
-
-  private _isFullyVisibleWithMeasurements (elementOffsetTop: number, elementClientHeight: number, containerScrollTop: number, containerClientHeight: number) {
-    return elementOffsetTop - containerScrollTop > 0
-      && containerScrollTop > elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
+    this._userScrollCount--
+    this._container.scrollTop = scrollTopGoal
   }
 
   _isFullyVisible (element: HTMLElement) {
     if (!this._container) return false
 
-    const containerScrollTop = this._container.scrollTop
-    const elementOffsetTop = element.offsetTop
-    const elementClientHeight = element.clientHeight
-    const containerClientHeight = this._container.clientHeight
+    return element.offsetTop - this._container.scrollTop > 0
+           && this._container.scrollTop > this._aboveBottom(element)
+  }
 
+  _aboveBottom (element: HTMLElement) {
     // add padding, since commands expanding and collapsing can mess with
     // the offset, causing the running command to be half cut off
     // https://github.com/cypress-io/cypress/issues/228
-    return elementOffsetTop - containerScrollTop > 0
-      && containerScrollTop > elementOffsetTop + elementClientHeight - containerClientHeight + PADDING
+
+    const containerHeight = this._container ? this._container.clientHeight : 0
+
+    return element.offsetTop + element.clientHeight - containerHeight + PADDING
   }
 
   getScrollTop () {
