@@ -786,7 +786,6 @@ const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, getO
   }
 
   const onlyIdMode = () => {
-    // Cache the results to avoid repeated function calls
     const onlyTestId = getOnlyTestId()
     const onlySuiteId = getOnlySuiteId()
 
@@ -844,7 +843,6 @@ const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, getO
           }
 
           if (type === 'suites' && isOnlyIdMode) {
-            // Cache suiteHasOnlyId result to avoid repeated calculations
             const hasOnlyId = suiteHasOnlyId(childRunnable)
 
             if (hasOnlyId) {
@@ -930,7 +928,6 @@ const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, getO
 
         if ((suite._onlySuites.indexOf(childSuite) !== -1) || filterOnly(normalizedChildSuite, childSuite)) {
           if (isOnlyIdMode) {
-            // Cache suiteHasOnlyId result
             const hasOnlyId = suiteHasOnlyId(childSuite)
 
             if (hasOnlyId) {

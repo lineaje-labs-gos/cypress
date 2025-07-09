@@ -130,7 +130,7 @@ export class Scroller {
 
   private _isFullyVisibleWithCache (elementMeasurements: { offsetTop: number, clientHeight: number }, containerScrollTop: number, containerClientHeight: number) {
     return elementMeasurements.offsetTop - containerScrollTop > 0
-           && containerScrollTop > elementMeasurements.offsetTop + elementMeasurements.clientHeight - containerClientHeight + PADDING
+           && elementMeasurements.offsetTop + elementMeasurements.clientHeight - containerScrollTop < containerClientHeight - PADDING
   }
 
   _isFullyVisible (element: HTMLElement) {
