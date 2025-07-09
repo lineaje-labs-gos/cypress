@@ -82,6 +82,10 @@ const maybeRenderReactComponent = () => {
     studioSessionId: props.cloudStudioSessionId,
   })
 
+  // Store the react root on the container. We do this so that we have a reference to it that's
+  // tied to the container value but absolutely do not want to use vue to do the tracking.
+  // If vue tracks it (e.g. using a ref) it creates proxies that do not play nicely with React in
+  // production
   if (!container.value._studioReactRoot) {
     container.value._studioReactRoot = window.UnifiedRunner.ReactDOM.createRoot(container.value)
   }
