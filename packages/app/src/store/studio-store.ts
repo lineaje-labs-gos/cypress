@@ -239,6 +239,10 @@ export const useStudioStore = defineStore('studioRecorder', {
       }
     },
 
+    setStudioActive (isActive: boolean) {
+      this.isActive = isActive
+    },
+
     interceptTest (test) {
       if (this.suiteId) {
         this.setTestId(test.id)

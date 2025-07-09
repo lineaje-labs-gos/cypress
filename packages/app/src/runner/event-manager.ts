@@ -291,7 +291,7 @@ export class EventManager {
 
         this.studioStore.setCanAccessStudioAI(canAccessStudioAI)
         this.studioStore.setCloudStudioSessionId(cloudStudioSessionId)
-        studioInit()
+        this.studioStore.setStudioActive(true)
       })
     }
 
