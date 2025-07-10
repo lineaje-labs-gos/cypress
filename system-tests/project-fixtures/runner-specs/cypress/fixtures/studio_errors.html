@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Studio Error Test</title>
+</head>
+<body>
+  <div>
+    <button class="trigger-studio-error">Trigger Studio Error</button>
+    <button class="trigger-regular-error">Trigger Regular Error</button>
+    <button class="trigger-studio-async-error">Trigger Studio Async Error</button>
+  </div>
+  <p class="error-output"></p>
+
+  <script>
+    // Custom error class that allows setting the stack
+    class CustomError extends Error {
+      constructor(message) {
+        super(message)
+        this.name = 'CustomError'
+      }
+      
+      setStack(stack) {
+        this.stack = stack
+        return this
+      }
+    }
+
+    // Function to create an error with __cypress-studio in the stack
+    function createStudioError(message) {
+      return new CustomError(message)
+        .setStack(`Error: ${message}
+    at __cypress-studio/StudioPanelContentInner (http://localhost:3000/__cypress/runner/cypress_runner.js:123:45)
+    at ReactErrorBoundary (http://localhost:3000/__cypress/runner/cypress_runner.js:456:78)
+    at StudioPanelContent (http://localhost:3000/__cypress/runner/cypress_runner.js:789:12)
+    at eval (http://localhost:3000/__cypress/tests?p=cypress/e2e/studio_error_filtered.cy.js:5:16)`)
+    }
+
+    // Function to create a regular error
+    function createRegularError(message) {
+      return new Error(message)
+    }
+
+    document.querySelector(".trigger-studio-error").addEventListener('click', function () {
+      throw createStudioError('Studio error that should be filtered')
+    })
+
+    document.querySelector(".trigger-regular-error").addEventListener('click', function () {
+      throw createRegularError('Regular error that should be displayed')
+    })
+
+    document.querySelector(".trigger-studio-async-error").addEventListener('click', function () {
+      setTimeout(function () {
+        throw createStudioError('Async studio error that should be filtered')
+      }, 100)
+    })
+
+    // Listen for errors to display them on the page
+    window.addEventListener('error', (event) => {
+      document.querySelector('.error-output').innerText = `Error: ${event.error.message}`
+    })
+
+    window.addEventListener('unhandledrejection', (event) => {
+      document.querySelector('.error-output').innerText = `Rejection: ${event.reason.message}`
+    })
+  </script>
+</body>
+</html> 

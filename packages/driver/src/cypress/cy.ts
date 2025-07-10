@@ -81,25 +81,40 @@ const setTopOnError = function (Cypress, cy: $Cy) {
     return
   }
 
+  const shouldHandleUncaughtError = (error) => {
+    const stack = error?.stack?.split('\n')
+
+    if (stack) {
+      // if the error is coming from studio, we don't want to handle it
+      // (note: the first line is the error message itself so we look at the second line)
+      return !stack[1]?.includes('__cypress-studio')
+    }
+
+    return true
+  }
+
   // eslint-disable-next-line @cypress/dev/arrow-body-multiline-braces
   const onTopError = (handlerType) => (event) => {
     const { originalErr, err, promise } = $errUtils.errorFromUncaughtEvent(handlerType, event) as ErrorFromProjectRejectionEvent
+    const shouldHandleError = shouldHandleUncaughtError(err)
 
-    // in some callbacks like for cy.intercept, we catch the errors and then
-    // rethrow them, causing them to get caught by the top frame
-    // but they came from the spec, so we need to differentiate them
-    const isSpecError = $errUtils.isSpecError(Cypress.config('spec'), err)
+    if (shouldHandleError) {
+      // in some callbacks like for cy.intercept, we catch the errors and then
+      // rethrow them, causing them to get caught by the top frame
+      // but they came from the spec, so we need to differentiate them
+      const isSpecError = $errUtils.isSpecError(Cypress.config('spec'), err)
 
-    const handled = curCy!.onUncaughtException({
-      err,
-      promise,
-      handlerType,
-      frameType: isSpecError ? 'spec' : 'app',
-    })
+      const handled = curCy!.onUncaughtException({
+        err,
+        promise,
+        handlerType,
+        frameType: isSpecError ? 'spec' : 'app',
+      })
 
-    debugErrors('uncaught top error: %o', originalErr)
+      debugErrors('uncaught top error: %o', originalErr)
 
-    $errUtils.logError(Cypress, handlerType, originalErr, handled)
+      $errUtils.logError(Cypress, handlerType, originalErr, handled)
+    }
 
     // return undefined so the browser does its default
     // uncaught exception behavior (logging to console)

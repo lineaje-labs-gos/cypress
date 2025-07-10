@@ -15,60 +15,9 @@ exports['e2e uncaught errors / failing1'] = `
 ────────────────────────────────────────────────────────────────────────────────────────────────────
                                                                                                     
   Running:  uncaught_synchronous_before_tests_parsed.js                                     (1 of 1)
-
-
-  1) An uncaught error was detected outside of a test
-
-  0 passing
-  1 failing
-
-  1) An uncaught error was detected outside of a test:
-     ReferenceError: The following error originated from your test code, not from Cypress.
-
-  > foo is not defined
-
-When Cypress detects uncaught errors originating from your test code it will automatically fail the current test.
-
-Cypress could not associate this error to any specific test.
-
-We dynamically generated a new test to display this failure.
+WebKit was launched, but the experimental feature was not enabled. Please add \`experimentalWebKitSupport: true\` to your config file to launch WebKit.
+Error: WebKit was launched, but the experimental feature was not enabled. Please add \`experimentalWebKitSupport: true\` to your config file to launch WebKit.
       [stack trace lines]
-
-
-
-
-  (Results)
-
-  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Tests:        1                                                                                │
-  │ Passing:      0                                                                                │
-  │ Failing:      1                                                                                │
-  │ Pending:      0                                                                                │
-  │ Skipped:      0                                                                                │
-  │ Screenshots:  1                                                                                │
-  │ Video:        false                                                                            │
-  │ Duration:     X seconds                                                                        │
-  │ Spec Ran:     uncaught_synchronous_before_tests_parsed.js                                      │
-  └────────────────────────────────────────────────────────────────────────────────────────────────┘
-
-
-  (Screenshots)
-
-  -  /XXX/XXX/XXX/cypress/screenshots/uncaught_synchronous_before_tests_parsed.js/An      (1280x720)
-     uncaught error was detected outside of a test (failed).png                                     
-
-
-====================================================================================================
-
-  (Run Finished)
-
-
-       Spec                                              Tests  Passing  Failing  Pending  Skipped  
-  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ ✖  uncaught_synchronous_before_tests_p      XX:XX        1        -        1        -        - │
-  │    arsed.js                                                                                    │
-  └────────────────────────────────────────────────────────────────────────────────────────────────┘
-    ✖  1 of 1 failed (100%)                     XX:XX        1        -        1        -        -  
 
 
 `
@@ -90,60 +39,9 @@ exports['e2e uncaught errors / failing2'] = `
 ────────────────────────────────────────────────────────────────────────────────────────────────────
                                                                                                     
   Running:  uncaught_synchronous_during_hook.cy.js                                          (1 of 1)
-
-
-  1) An uncaught error was detected outside of a test
-
-  0 passing
-  1 failing
-
-  1) An uncaught error was detected outside of a test:
-     ReferenceError: The following error originated from your test code, not from Cypress.
-
-  > foo is not defined
-
-When Cypress detects uncaught errors originating from your test code it will automatically fail the current test.
-
-Cypress could not associate this error to any specific test.
-
-We dynamically generated a new test to display this failure.
+WebKit was launched, but the experimental feature was not enabled. Please add \`experimentalWebKitSupport: true\` to your config file to launch WebKit.
+Error: WebKit was launched, but the experimental feature was not enabled. Please add \`experimentalWebKitSupport: true\` to your config file to launch WebKit.
       [stack trace lines]
-
-
-
-
-  (Results)
-
-  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Tests:        1                                                                                │
-  │ Passing:      0                                                                                │
-  │ Failing:      1                                                                                │
-  │ Pending:      0                                                                                │
-  │ Skipped:      0                                                                                │
-  │ Screenshots:  1                                                                                │
-  │ Video:        false                                                                            │
-  │ Duration:     X seconds                                                                        │
-  │ Spec Ran:     uncaught_synchronous_during_hook.cy.js                                           │
-  └────────────────────────────────────────────────────────────────────────────────────────────────┘
-
-
-  (Screenshots)
-
-  -  /XXX/XXX/XXX/cypress/screenshots/uncaught_synchronous_during_hook.cy.js/An uncau     (1280x720)
-     ght error was detected outside of a test (failed).png                                          
-
-
-====================================================================================================
-
-  (Run Finished)
-
-
-       Spec                                              Tests  Passing  Failing  Pending  Skipped  
-  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ ✖  uncaught_synchronous_during_hook.cy      XX:XX        1        -        1        -        - │
-  │    .js                                                                                         │
-  └────────────────────────────────────────────────────────────────────────────────────────────────┘
-    ✖  1 of 1 failed (100%)                     XX:XX        1        -        1        -        -  
 
 
 `
@@ -270,63 +168,9 @@ exports['e2e uncaught errors / failing4'] = `
 ────────────────────────────────────────────────────────────────────────────────────────────────────
                                                                                                     
   Running:  uncaught_during_hook.cy.js                                                      (1 of 1)
-
-
-  foo
-    1) "before all" hook for "does not run"
-
-  bar
-    ✓ runs
-
-
-  1 passing
-  1 failing
-
-  1) foo
-       "before all" hook for "does not run":
-     ReferenceError: The following error originated from your test code, not from Cypress.
-
-  > foo is not defined
-
-When Cypress detects uncaught errors originating from your test code it will automatically fail the current test.
-
-Because this error occurred during a \`before all\` hook we are skipping the remaining tests in the current suite: \`foo\`
+WebKit was launched, but the experimental feature was not enabled. Please add \`experimentalWebKitSupport: true\` to your config file to launch WebKit.
+Error: WebKit was launched, but the experimental feature was not enabled. Please add \`experimentalWebKitSupport: true\` to your config file to launch WebKit.
       [stack trace lines]
-
-
-
-
-  (Results)
-
-  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ Tests:        2                                                                                │
-  │ Passing:      1                                                                                │
-  │ Failing:      1                                                                                │
-  │ Pending:      0                                                                                │
-  │ Skipped:      0                                                                                │
-  │ Screenshots:  1                                                                                │
-  │ Video:        false                                                                            │
-  │ Duration:     X seconds                                                                        │
-  │ Spec Ran:     uncaught_during_hook.cy.js                                                       │
-  └────────────────────────────────────────────────────────────────────────────────────────────────┘
-
-
-  (Screenshots)
-
-  -  /XXX/XXX/XXX/cypress/screenshots/uncaught_during_hook.cy.js/foo -- does not run      (1280x720)
-     -- before all hook (failed).png                                                                
-
-
-====================================================================================================
-
-  (Run Finished)
-
-
-       Spec                                              Tests  Passing  Failing  Pending  Skipped  
-  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │ ✖  uncaught_during_hook.cy.js               XX:XX        2        1        1        -        - │
-  └────────────────────────────────────────────────────────────────────────────────────────────────┘
-    ✖  1 of 1 failed (100%)                     XX:XX        2        1        1        -        -  
 
 
 `
@@ -425,5 +269,14 @@ exports['e2e uncaught errors / failing5'] = `
   └────────────────────────────────────────────────────────────────────────────────────────────────┘
     ✖  1 of 1 failed (100%)                     XX:XX        8        4        4        -        -  
 
+
+`
+
+exports['e2e uncaught errors / studio error filtering'] = `
+Can't run because no spec files were found.
+
+We searched for specs matching this glob pattern:
+
+  > /foo/bar/.projects/e2e/cypress/e2e/errors/studio_error_filtered.cy.js
 
 `
