@@ -47,11 +47,7 @@ export function useEventManager () {
         return
       }
 
-      // studio might be active from clicking on the studio button to create a new test
-      // so we don't want to reattach it again
-      if (!studioStore.isActive) {
-        getAutIframeModel().reattachStudio()
-      }
+      getAutIframeModel().reattachStudio()
     })
 
     eventManager.on('visit:blank', async ({ testIsolation }) => {
@@ -59,9 +55,7 @@ export function useEventManager () {
     })
 
     eventManager.on('run:end', () => {
-      // studio might be active from clicking on the studio button to create a new test
-      // so we don't want to start studio again
-      if (studioStore.isLoading && !studioStore.isActive) {
+      if (studioStore.isLoading) {
         getAutIframeModel().startStudio()
       }
     })
