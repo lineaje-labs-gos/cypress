@@ -89,7 +89,9 @@ const getShell = function (shell) {
   if (isWindows()) {
     log('use default shell on Windows')
 
-    return Promise.resolve()
+    // TODO: detect the shell to support other shells
+    // https://github.com/cypress-io/cypress/issues/789
+    return Promise.resolve('cmd.exe')
   }
 
   return findBash()
