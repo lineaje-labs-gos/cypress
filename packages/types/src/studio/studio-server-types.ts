@@ -3,6 +3,7 @@
 import type { Router } from 'express'
 import type { AxiosInstance } from 'axios'
 import type { Socket } from 'socket.io'
+import type { BinaryLike } from 'crypto'
 
 export const StudioMetricsTypes = {
   STUDIO_STARTED: 'studio:started',
@@ -50,6 +51,8 @@ export interface StudioServerOptions {
   projectSlug?: string
   cloudApi: StudioCloudApi
   betterSqlite3Path: string
+  manifest: Record<string, string>
+  verifyHash: (contents: BinaryLike, expectedHash: string) => boolean
 }
 
 export interface StudioAIInitializeOptions {
@@ -61,6 +64,7 @@ export interface StudioServerShape {
   canAccessStudioAI(browser: Cypress.Browser): Promise<boolean>
   addSocketListeners(socket: Socket): void
   initializeStudioAI(options: StudioAIInitializeOptions): Promise<void>
+  updateSessionId(sessionId: string): void
   reportError(
     error: unknown,
     studioMethod: string,
