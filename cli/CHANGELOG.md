@@ -8,6 +8,10 @@ _Released 7/15/2025 (PENDING)_
 - Fixed a regression introduced in [`14.5.0`](https://docs.cypress.io/guides/references/changelog#14-5-0) where the Stop button would not immediately stop the spec timer. Addresses [#31920](https://github.com/cypress-io/cypress/issues/31920).
 - Fixed an issue with the `CloudRequest` where it used the wrong port for `https` requests. Addressed in [#31992](https://github.com/cypress-io/cypress/pull/31992).
 
+**Dependency Updates:**
+
+- Updated `execa` from `1.0.0` to `4.1.0`. Addressed in [#32027](https://github.com/cypress-io/cypress/pull/32027).
+
 ## 14.5.1
 
 _Released 7/01/2025_
