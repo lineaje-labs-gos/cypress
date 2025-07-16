@@ -89,7 +89,7 @@ const getShell = function (shell) {
   if (isWindows()) {
     log('use default shell on Windows')
 
-    return Promise.resolve()
+    return Promise.resolve('cmd.exe')
   }
 
   return findBash()
