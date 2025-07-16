@@ -1,7 +1,15 @@
 <!-- See the ../guides/writing-the-cypress-changelog.md for details on writing the changelog. -->
+## 14.5.3
+
+_Released 7/30/2025 (PENDING)_
+
+**Bugfixes:**
+
+- Fixed missing support for setting an absolute path for `component.indexHtmlFile` in `@cypress/webpack-dev-server`. Fixes [#31819](https://github.com/cypress-io/cypress/issues/31819).
+
 ## 14.5.2
 
-_Released 7/15/2025 (PENDING)_
+_Released 7/15/2025_
 
 **Bugfixes:**
 
