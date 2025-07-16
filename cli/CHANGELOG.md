@@ -7,6 +7,10 @@ _Released 7/30/2025 (PENDING)_
 
 - Fixed missing support for setting an absolute path for `component.indexHtmlFile` in `@cypress/webpack-dev-server`. Fixes [#31819](https://github.com/cypress-io/cypress/issues/31819).
 
+**Dependency Updates:**
+
+- Updated `execa` from `1.0.0` to `4.1.0`. Addressed in [#32027](https://github.com/cypress-io/cypress/pull/32027).
+
 ## 14.5.2
 
 _Released 7/15/2025_
@@ -15,10 +19,6 @@ _Released 7/15/2025_
 
 - Fixed a regression introduced in [`14.5.0`](https://docs.cypress.io/guides/references/changelog#14-5-0) where the Stop button would not immediately stop the spec timer. Addresses [#31920](https://github.com/cypress-io/cypress/issues/31920).
 - Fixed an issue with the `CloudRequest` where it used the wrong port for `https` requests. Addressed in [#31992](https://github.com/cypress-io/cypress/pull/31992).
-
-**Dependency Updates:**
-
-- Updated `execa` from `1.0.0` to `4.1.0`. Addressed in [#32027](https://github.com/cypress-io/cypress/pull/32027).
 
 ## 14.5.1
 
