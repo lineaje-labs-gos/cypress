@@ -37,6 +37,7 @@ module.exports = {
         // do we want to return all fields returned by execa?
         result.shell = shell
         result.cmd = cmd
+        result.code = result.exitCode
 
         return result
       }).then(pickMainProps)
