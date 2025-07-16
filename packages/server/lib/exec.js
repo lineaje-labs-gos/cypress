@@ -46,6 +46,7 @@ module.exports = {
 
         return result
       })
+      .then(pickMainProps) // transform rejection into an object
       .then(trimStdio)
     }
 
