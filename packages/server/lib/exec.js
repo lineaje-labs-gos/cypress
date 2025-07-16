@@ -36,7 +36,7 @@ module.exports = {
       .then((result) => {
         // do we want to return all fields returned by execa?
         result.shell = shell
-        result.command = cmd
+        result.cmd = cmd
         result.code = result.exitCode
 
         return result
