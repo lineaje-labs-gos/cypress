@@ -30,26 +30,33 @@ export class CyPromptManager implements CyPromptManagerShape {
   async setup ({ script, cyPromptPath, cyPromptHash, getProjectOptions, cloudApi, manifest }: SetupOptions): Promise<void> {
     const { createCyPromptServer } = requireScript<CyPromptServer>(script).default
 
-    this._cyPromptServer = await createCyPromptServer({
-      cyPromptHash,
-      cyPromptPath,
-      cloudApi,
-      getProjectOptions,
-      manifest,
-      verifyHash: (contents: BinaryLike, expectedHash: string) => {
-        // If we are running locally, we don't need to verify the signature. This
-        // environment variable will get stripped in the binary.
-        if (process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
-          return true
-        }
+    debug(`initializing cy-prompt`)
 
-        const actualHash = crypto.createHash('sha256').update(contents).digest('hex')
+    try {
+      this._cyPromptServer = await createCyPromptServer({
+        cyPromptHash,
+        cyPromptPath,
+        cloudApi,
+        getProjectOptions,
+        manifest,
+        verifyHash: (contents: BinaryLike, expectedHash: string) => {
+          // If we are running locally, we don't need to verify the signature. This
+          // environment variable will get stripped in the binary.
+          if (process.env.CYPRESS_LOCAL_CY_PROMPT_PATH) {
+            return true
+          }
 
-        return actualHash === expectedHash
-      },
-    })
+          const actualHash = crypto.createHash('sha256').update(contents).digest('hex')
 
-    this.status = 'INITIALIZED'
+          return actualHash === expectedHash
+        },
+      })
+
+      this.status = 'INITIALIZED'
+    } catch (e) {
+      debug(`Failed initializing cy-prompt %o`, e)
+      this.status = 'IN_ERROR'
+    }
   }
 
   initializeRoutes (router: Router): void {

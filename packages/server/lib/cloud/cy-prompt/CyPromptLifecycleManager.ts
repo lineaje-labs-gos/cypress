@@ -2,7 +2,7 @@ import { CyPromptManager } from './CyPromptManager'
 import Debug from 'debug'
 import type { CloudDataSource } from '@packages/data-context/src/sources'
 import type { DataContext } from '@packages/data-context'
-import { CloudRequest } from '../api/cloud_request'
+import { CloudRequest, createCloudRequest } from '../api/cloud_request'
 import { isRetryableError } from '../network/is_retryable_error'
 import { asyncRetry } from '../../util/async_retry'
 import { postCyPromptSession } from '../api/cy-prompt/post_cy_prompt_session'
@@ -77,6 +77,7 @@ export class CyPromptLifecycleManager {
           cloudUrl,
           cloudHeaders,
           CloudRequest,
+          createCloudRequest,
           isRetryableError,
           asyncRetry,
         },
@@ -185,6 +186,7 @@ export class CyPromptLifecycleManager {
       cloudApi: {
         cloudUrl,
         CloudRequest,
+        createCloudRequest,
         isRetryableError,
         asyncRetry,
       },

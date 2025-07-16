@@ -20,7 +20,7 @@ describe('src/cy/commands/prompt', () => {
 
     cy['commandFns']['prompt'].__reset()
     // @ts-expect-error - this will not error when we actually release the experimentalPromptCommand flag
-    cy.prompt('Hello, world!')
+    cy.prompt(['Hello, world!'])
   })
 
   it('errors if wait for ready does not return success and error is ECONNREFUSED', (done) => {
@@ -44,6 +44,6 @@ describe('src/cy/commands/prompt', () => {
 
     cy['commandFns']['prompt'].__reset()
     // @ts-expect-error - this will not error when we actually release the experimentalPromptCommand flag
-    cy.prompt('Hello, world!')
+    cy.prompt(['Hello, world!'])
   })
 })

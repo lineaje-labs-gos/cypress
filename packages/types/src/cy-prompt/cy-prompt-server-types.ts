@@ -29,6 +29,12 @@ interface RetryOptions {
 export interface CyPromptCloudApi {
   cloudUrl: string
   CloudRequest: AxiosInstance
+  createCloudRequest: (opts?: {
+    baseURL?: string
+    additionalHeaders?: Record<string, string>
+    enableLogging?: boolean
+    enableErrorTransform?: boolean
+  }) => AxiosInstance
   isRetryableError: (err: unknown) => boolean
   cloudHeaders?: Record<string, string>
   asyncRetry: AsyncRetry
