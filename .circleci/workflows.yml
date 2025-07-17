@@ -1880,6 +1880,108 @@ jobs:
       - sanitize-verify-and-store-mocha-results:
           expectedResultCount: 1
 
+  server-unit-tests-cloud-environment-cmd:
+    <<: *defaults
+    parameters:
+      <<: *defaultsParameters
+      resource_class:
+        type: string
+        default: medium
+    resource_class: << parameters.resource_class >>
+    parallelism: 1
+    steps:
+      - restore_cached_workspace
+      # TODO: Remove this once we switch off self-hosted M1 runners
+      - when:
+          condition:
+            equal: [ *darwin-arm64-executor, << parameters.executor >> ]
+          steps:
+            - run: rm -f /tmp/cypress/junit/*
+      # this is a temporary work around while we wait for circle to resolve issues with packages
+      # with an @ character in windows during save_cache.
+      # @see https://github.com/cypress-io/cypress/issues/30343 for more details.
+      - when:
+          condition:
+            equal: [ *windows-executor, << parameters.executor >> ]
+          steps:
+            - run:
+                name: reinstall dependencies to work around cache issue (Windows only)
+                command: rm -rf node_modules && yarn
+      - run:
+          name: Run server unit tests (cmd.exe)
+          shell: cmd.exe
+          command: yarn workspace @packages/server test-unit cloud/environment_spec.ts
+      - sanitize-verify-and-store-mocha-results:
+          expectedResultCount: 1
+
+  server-unit-tests-cloud-environment-bash:
+    <<: *defaults
+    parameters:
+      <<: *defaultsParameters
+      resource_class:
+        type: string
+        default: medium
+    resource_class: << parameters.resource_class >>
+    parallelism: 1
+    steps:
+      - restore_cached_workspace
+      # TODO: Remove this once we switch off self-hosted M1 runners
+      - when:
+          condition:
+            equal: [ *darwin-arm64-executor, << parameters.executor >> ]
+          steps:
+            - run: rm -f /tmp/cypress/junit/*
+      # this is a temporary work around while we wait for circle to resolve issues with packages
+      # with an @ character in windows during save_cache.
+      # @see https://github.com/cypress-io/cypress/issues/30343 for more details.
+      - when:
+          condition:
+            equal: [ *windows-executor, << parameters.executor >> ]
+          steps:
+            - run:
+                name: reinstall dependencies to work around cache issue (Windows only)
+                command: rm -rf node_modules && yarn
+      - run:
+          name: Run server unit tests (bash.exe)
+          shell: bash.exe
+          command: yarn workspace @packages/server test-unit cloud/environment_spec.ts
+      - sanitize-verify-and-store-mocha-results:
+          expectedResultCount: 1
+
+  server-unit-tests-cloud-environment-powershell:
+    <<: *defaults
+    parameters:
+      <<: *defaultsParameters
+      resource_class:
+        type: string
+        default: medium
+    resource_class: << parameters.resource_class >>
+    parallelism: 1
+    steps:
+      - restore_cached_workspace
+      # TODO: Remove this once we switch off self-hosted M1 runners
+      - when:
+          condition:
+            equal: [ *darwin-arm64-executor, << parameters.executor >> ]
+          steps:
+            - run: rm -f /tmp/cypress/junit/*
+      # this is a temporary work around while we wait for circle to resolve issues with packages
+      # with an @ character in windows during save_cache.
+      # @see https://github.com/cypress-io/cypress/issues/30343 for more details.
+      - when:
+          condition:
+            equal: [ *windows-executor, << parameters.executor >> ]
+          steps:
+            - run:
+                name: reinstall dependencies to work around cache issue (Windows only)
+                command: rm -rf node_modules && yarn
+      - run:
+          name: Run server unit tests (powershell.exe)
+          shell: powershell.exe -ExecutionPolicy Bypass
+          command: yarn workspace @packages/server test-unit cloud/environment_spec.ts
+      - sanitize-verify-and-store-mocha-results:
+          expectedResultCount: 1
+
   server-integration-tests:
     <<: *defaults
     parallelism: 1
@@ -3861,30 +3963,24 @@ windows-workflow: &windows-workflow
         requires:
           - windows-build
 
-    - server-unit-tests-cloud-environment:
+    - server-unit-tests-cloud-environment-cmd:
         name: windows-server-unit-tests-cloud-environment-cmd
         executor: windows
         resource_class: windows.medium
-        parameters:
-          shell: cmd.exe
         requires:
           - windows-build
 
-    - server-unit-tests-cloud-environment:
+    - server-unit-tests-cloud-environment-bash:
         name: windows-server-unit-tests-cloud-environment-bash
         executor: windows
         resource_class: windows.medium
-        parameters:
-          shell: bash.exe
         requires:
           - windows-build
 
-    - server-unit-tests-cloud-environment:
+    - server-unit-tests-cloud-environment-powershell:
         name: windows-server-unit-tests-cloud-environment-powershell
         executor: windows
         resource_class: windows.medium
-        parameters:
-          shell: powershell.exe
         requires:
           - windows-build
 
