@@ -1850,6 +1850,9 @@ jobs:
       resource_class:
         type: string
         default: medium
+      shell:
+        type: string
+        default: powershell.exe -ExecutionPolicy Bypass
     resource_class: << parameters.resource_class >>
     parallelism: 1
     steps:
@@ -1870,7 +1873,10 @@ jobs:
             - run:
                 name: reinstall dependencies to work around cache issue (Windows only)
                 command: rm -rf node_modules && yarn
-      - run: yarn workspace @packages/server test-unit cloud/environment_spec.ts
+      - run:
+          name: Run server unit tests
+          shell: << parameters.shell >>
+          command: yarn workspace @packages/server test-unit cloud/environment_spec.ts
       - sanitize-verify-and-store-mocha-results:
           expectedResultCount: 1
 
@@ -3856,9 +3862,32 @@ windows-workflow: &windows-workflow
           - windows-build
 
     - server-unit-tests-cloud-environment:
-        name: windows-server-unit-tests-cloud-environment
+        name: windows-server-unit-tests-cloud-environment-cmd
         executor: windows
         resource_class: windows.medium
+        parameters:
+          executor: windows
+          shell: cmd.exe
+        requires:
+          - windows-build
+
+    - server-unit-tests-cloud-environment:
+        name: windows-server-unit-tests-cloud-environment-bash
+        executor: windows
+        resource_class: windows.medium
+        parameters:
+          executor: windows
+          shell: bash.exe
+        requires:
+          - windows-build
+
+    - server-unit-tests-cloud-environment:
+        name: windows-server-unit-tests-cloud-environment-powershell
+        executor: windows
+        resource_class: windows.medium
+        parameters:
+          executor: windows
+          shell: powershell.exe -ExecutionPolicy Bypass
         requires:
           - windows-build
 
