@@ -1,6 +1,16 @@
-require('../../../spec_helper')
+/* eslint-disable @typescript-eslint/no-this-alias, @typescript-eslint/unbound-method, mocha/no-synchronous-tests */
+import '../../../spec_helper'
+import runRequireAsyncChild from '../../../../lib/plugins/child/run_require_async_child'
 
-const runRequireAsyncChild = require('../../../../lib/plugins/child/run_require_async_child').default
+// Global declarations for test environment
+declare const describe: any
+declare const beforeEach: any
+declare const afterEach: any
+declare const it: any
+declare const expect: any
+declare const sinon: any
+declare const mockery: any
+declare const process: any
 
 describe('lib/plugins/child/run_require_async_child', () => {
   beforeEach(function () {
