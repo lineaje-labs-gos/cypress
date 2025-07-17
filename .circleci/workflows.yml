@@ -3866,7 +3866,6 @@ windows-workflow: &windows-workflow
         executor: windows
         resource_class: windows.medium
         parameters:
-          executor: windows
           shell: cmd.exe
         requires:
           - windows-build
@@ -3876,7 +3875,6 @@ windows-workflow: &windows-workflow
         executor: windows
         resource_class: windows.medium
         parameters:
-          executor: windows
           shell: bash.exe
         requires:
           - windows-build
@@ -3886,8 +3884,7 @@ windows-workflow: &windows-workflow
         executor: windows
         resource_class: windows.medium
         parameters:
-          executor: windows
-          shell: powershell.exe -ExecutionPolicy Bypass
+          shell: powershell.exe
         requires:
           - windows-build
 
