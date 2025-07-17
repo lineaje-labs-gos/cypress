@@ -5,7 +5,9 @@ const PROJECT_ROOT = path.join(path.dirname(require.resolve('@tooling/system-tes
 
 describe('require_async_child', () => {
   it('disconnects if the parent ipc is closed', (done) => {
-    const child = childProcess.fork(path.join(__dirname, 'run_child_fixture'))
+    const child = childProcess.fork(path.join(__dirname, 'run_child_fixture'), {
+      execArgv: ['--import', 'tsx'],
+    })
 
     let childPid
 

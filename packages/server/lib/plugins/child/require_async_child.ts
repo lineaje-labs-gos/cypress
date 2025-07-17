@@ -1,8 +1,14 @@
 process.title = 'Cypress: Config Manager'
 
-const { telemetry, OTLPTraceExporterIpc, decodeTelemetryContext } = require('@packages/telemetry')
+import { telemetry, OTLPTraceExporterIpc, decodeTelemetryContext } from '@packages/telemetry'
+import minimist from 'minimist'
+import { suppress } from '../../util/suppress_warnings'
+import gracefulFs from 'graceful-fs'
+import fs from 'fs'
+import * as util from '../util'
+import run from './run_require_async_child'
 
-const { file, projectRoot, telemetryCtx } = require('minimist')(process.argv.slice(2))
+const { file, projectRoot, telemetryCtx } = minimist(process.argv.slice(2))
 
 const { context, version } = decodeTelemetryContext(telemetryCtx)
 
@@ -14,16 +20,14 @@ if (version && context) {
 
 const span = telemetry.startSpan({ name: 'child:process', active: true })
 
-require('../../util/suppress_warnings').suppress()
+suppress()
 
 process.on('disconnect', () => {
   process.exit()
 })
 
-require('graceful-fs').gracefulify(require('fs'))
-const util = require('../util')
+gracefulFs.gracefulify(fs)
 const ipc = util.wrapIpc(process)
-const run = require('./run_require_async_child').default
 
 exporter.attachIPC(ipc)
 
