@@ -107,6 +107,7 @@
             :on-studio-panel-close="handleStudioPanelClose"
             :event-manager="eventManager"
             :studio-status="studioStatus"
+            :studio-ai-available="studioStore.cloudStudioRequested"
           />
         </HideDuringScreenshot>
       </template>

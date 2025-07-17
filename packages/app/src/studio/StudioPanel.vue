@@ -53,6 +53,7 @@ const props = defineProps<{
   eventManager: EventManager
   studioStatus: string | null
   cloudStudioSessionId?: string
+  studioAiAvailable: boolean
 }>()
 
 interface StudioApp { default: StudioAppDefaultShape }
@@ -76,6 +77,7 @@ const maybeRenderReactComponent = () => {
     canAccessStudioAI: props.canAccessStudioAI,
     onStudioPanelClose: props.onStudioPanelClose,
     studioSessionId: props.cloudStudioSessionId,
+    studioAiAvailable: props.studioAiAvailable,
   })
 
   if (!reactRoot.value) {
