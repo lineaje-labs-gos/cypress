@@ -1,5 +1,5 @@
-const childProcess = require('child_process')
-const path = require('path')
+import childProcess from 'child_process'
+import path from 'path'
 
 const PROJECT_ROOT = path.join(path.dirname(require.resolve('@tooling/system-tests/package.json')), 'projects/kill-child-process')
 
@@ -11,7 +11,7 @@ describe('require_async_child', () => {
 
     let childPid
 
-    child.on('message', (msg) => {
+    child.on('message', (msg: any) => {
       if (msg.childPid) {
         childPid = msg.childPid
         child.send({ msg: 'toChild', data: { event: 'loadConfig', args: [] } })
