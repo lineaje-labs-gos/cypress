@@ -18,7 +18,7 @@ const pkg = require('@packages/root')
 const debug = debugLib(`cypress:lifecycle:ProjectConfigIpc`)
 const debugVerbose = debugLib(`cypress-verbose:lifecycle:ProjectConfigIpc`)
 
-const CHILD_PROCESS_FILE_PATH = require.resolve('@packages/server/lib/plugins/child/require_async_child.ts')
+const CHILD_PROCESS_FILE_PATH = process.env.CYPRESS_INTERNAL_ENV === 'production' ? require.resolve('@packages/server/lib/plugins/child/require_async_child.js') : require.resolve('@packages/server/lib/plugins/child/require_async_child.ts')
 
 // NOTE: need the file:// prefix to avoid https://nodejs.org/api/errors.html#err_unsupported_esm_url_scheme on windows
 const tsx = os.platform() === 'win32' ? `file://${toPosix(require.resolve('tsx'))}` : toPosix(require.resolve('tsx'))
