@@ -1852,7 +1852,7 @@ jobs:
         default: medium
       shell:
         type: string
-        default: powershell.exe -ExecutionPolicy Bypass
+        default: bash.exe
     resource_class: << parameters.resource_class >>
     parallelism: 1
     steps:
