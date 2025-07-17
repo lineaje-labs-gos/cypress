@@ -815,6 +815,7 @@ commands:
 
               DEBUG=<<parameters.debug>> \
               CYPRESS_CONFIG_ENV=production \
+              DEBUG=cypress:server:* \
               CYPRESS_RECORD_KEY=$MAIN_RECORD_KEY \
               PERCY_PARALLEL_NONCE=$CIRCLE_WORKFLOW_WORKSPACE_ID \
               PERCY_ENABLE=${PERCY_TOKEN:-0} \

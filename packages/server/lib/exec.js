@@ -2,7 +2,7 @@ const Promise = require('bluebird')
 const execa = require('execa')
 const shellEnv = require('shell-env')
 const _ = require('lodash')
-const log = require('./log')
+const log = require('debug')('cypress:server:exec')
 const utils = require('./util/shell')
 
 const pickMainProps = (val) => _.pick(val, ['stdout', 'stderr', 'code'])
