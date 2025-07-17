@@ -144,6 +144,34 @@ describe('commands', () => {
       cy.percySnapshot()
     })
 
+    it('should render prompt get code button when state is failed', () => {
+      config.withArgs('experimentalPromptCommand').returns(true)
+      config.withArgs('isTextTerminal').returns(false)
+      cy.mount(
+        <div>
+          <Command
+            model={
+              new CommandModel({
+                name: 'prompt',
+                state: 'failed',
+                numElements: 1,
+                hookId: '1',
+                id: 1,
+                testId: '1',
+              })
+            }
+            scrollIntoView={() => {}}
+            aliasesWithDuplicates={[]}
+          />
+        </div>,
+      )
+
+      cy.get('.command-prompt-get-code').should('be.visible').should('have.text', 'Get code')
+      cy.get('.command-prompt-get-code-indicator').should('be.visible')
+
+      cy.percySnapshot()
+    })
+
     it('should not render prompt get code button when state is not passed', () => {
       config.withArgs('experimentalPromptCommand').returns(true)
       config.withArgs('isTextTerminal').returns(false)
