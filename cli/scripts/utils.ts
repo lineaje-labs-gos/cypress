@@ -3,7 +3,7 @@
  * when we bundle Cypress NPM package. These folder have ".d.ts"
  * definition files that we will need to include with our NPM package.
  */
-const includeTypes = [
+export const includeTypes: string[] = [
   'bluebird',
   'lodash',
   'mocha',
@@ -14,5 +14,3 @@ const includeTypes = [
   'chai-jquery',
   'jquery',
 ]
-
-module.exports = { includeTypes }

@@ -1,10 +1,12 @@
-const _ = require('lodash')
-const path = require('path')
-const shell = require('shelljs')
-const fs = require('../lib/fs')
+import _ from 'lodash'
+import path from 'path'
+import shell from 'shelljs'
+import fs from '../lib/fs'
 
 // grab the current version and a few other properties
 // from the root package.json
+import rootPkg from '@packages/root'
+
 const {
   version,
   description,
@@ -13,17 +15,20 @@ const {
   bugs,
   repository,
   keywords,
-} = require('@packages/root')
+} = rootPkg as any
 
 // the rest of properties should come from the package.json in CLI folder
 const packageJsonSrc = path.join('package.json')
 const packageJsonDest = path.join('build', 'package.json')
 
-function getStdout (cmd) {
+// Type fs as any since it's promisified and has Async methods
+const fsAsync = fs as any
+
+function getStdout (cmd: string): string {
   return shell.exec(cmd).trim()
 }
 
-function preparePackageForNpmRelease (json, branchName) {
+function preparePackageForNpmRelease (json: any, branchName?: string): any {
   // modify the existing package.json
   // to prepare it for releasing to npm
   delete json.devDependencies
@@ -49,29 +54,29 @@ function preparePackageForNpmRelease (json, branchName) {
     types: 'types', // typescript types
     scripts: {
       postinstall: 'node index.js --exec install',
-      size: 't=\"$(npm pack .)\"; wc -c \"${t}\"; tar tvf \"${t}\"; rm \"${t}\";',
+      size: 't="$(npm pack .)"; wc -c "${t}"; tar tvf "${t}"; rm "${t}";',
     },
   })
 
   return json
 }
 
-function makeUserPackageFile (branchName) {
-  return fs.readJsonAsync(packageJsonSrc)
-  .then((json) => preparePackageForNpmRelease(json, branchName))
-  .then((json) => {
-    return fs.outputJsonAsync(packageJsonDest, json, {
+function makeUserPackageFile (branchName?: string): Promise<any> {
+  return fsAsync.readJsonAsync(packageJsonSrc)
+  .then((json: any) => preparePackageForNpmRelease(json, branchName))
+  .then((json: any) => {
+    return fsAsync.outputJsonAsync(packageJsonDest, json, {
       spaces: 2,
     })
     .return(json) // returning package json object makes it easy to test
   })
 }
 
-module.exports = makeUserPackageFile
+export = makeUserPackageFile
 
 if (!module.parent) {
   makeUserPackageFile(process.env.BRANCH)
-  .catch((err) => {
+  .catch((err: any) => {
     /* eslint-disable no-console */
     console.error('Could not write user package file')
     console.error(err)

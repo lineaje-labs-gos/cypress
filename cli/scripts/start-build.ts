@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { includeTypes } = require('./utils')
-const { join } = require('path')
-const shell = require('shelljs')
+import { includeTypes } from './utils'
+import { join } from 'path'
+import shell from 'shelljs'
 
 shell.set('-v') // verbose
 shell.set('-e') // any error is fatal
@@ -16,8 +16,8 @@ shell.cp('.release.json', 'build/.release.json')
 // copies our typescript definitions
 shell.cp('-R', 'types/*.ts', 'build/types/')
 // copies 3rd party typescript definitions
-includeTypes.forEach((folder) => {
-  const source = join('types', folder)
+includeTypes.forEach((folder: string) => {
+  const source: string = join('types', folder)
 
   shell.cp('-R', source, 'build/types')
 })
