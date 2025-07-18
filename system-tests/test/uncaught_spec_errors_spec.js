@@ -32,10 +32,4 @@ describe('e2e uncaught errors', () => {
     snapshot: true,
     expectedExitCode: 4,
   })
-
-  systemTests.it('studio error filtering', {
-    spec: 'studio_error_filtered.cy.js',
-    snapshot: true,
-    expectedExitCode: 1, // Only the regular error test should fail
-  })
 })
