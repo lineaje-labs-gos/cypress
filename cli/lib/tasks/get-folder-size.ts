@@ -1,6 +1,6 @@
-const fs = require('../fs')
-const { join } = require('path')
-const Bluebird = require('bluebird')
+import fs from '../fs'
+import { join } from 'path'
+import Bluebird from 'bluebird'
 
 /**
  * Get the size of a folder or a file.
@@ -11,13 +11,13 @@ const Bluebird = require('bluebird')
  *
  * @param {string} path path to the file or the folder.
  */
-async function getSize (path) {
+async function getSize (path: string): Promise<number> {
   const stat = await fs.lstat(path)
 
   if (stat.isDirectory()) {
     const list = await fs.readdir(path)
 
-    return Bluebird.resolve(list).reduce(async (prev, curr) => {
+    return Bluebird.resolve(list).reduce(async (prev: number, curr: string) => {
       const currPath = join(path, curr)
 
       const s = await fs.lstat(currPath)
@@ -33,4 +33,4 @@ async function getSize (path) {
   return stat.size
 }
 
-module.exports = getSize
+export default getSize

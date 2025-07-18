@@ -1,17 +1,17 @@
 // Vendored from @cypress/listr-verbose-renderer
-const figures = require('figures')
-const cliCursor = require('cli-cursor')
-const chalk = require('chalk')
-const dayjs = require('dayjs')
+import figures from 'figures'
+import cliCursor from 'cli-cursor'
+import chalk from 'chalk'
+import dayjs from 'dayjs'
 
-const formattedLog = (options, output) => {
+const formattedLog = (options: any, output: string): void => {
   const timestamp = dayjs().format(options.dateFormat)
 
   // eslint-disable-next-line no-console
-  console.log(`${chalk.dim(`[${timestamp}]`) } ${output}`)
+  console.log(`${chalk.dim(`[${timestamp}]`)} ${output}`)
 }
 
-const renderHelper = (task, event, options) => {
+const renderHelper = (task: any, event: any, options: any): void => {
   const log = formattedLog.bind(undefined, options)
 
   if (event.type === 'STATE') {
@@ -27,10 +27,10 @@ const renderHelper = (task, event, options) => {
   }
 }
 
-const render = (tasks, options) => {
+const render = (tasks: any[], options: any): void => {
   for (const task of tasks) {
     task.subscribe(
-      (event) => {
+      (event: any) => {
         if (event.type === 'SUBTASKS') {
           render(task.subtasks, options)
 
@@ -39,7 +39,7 @@ const render = (tasks, options) => {
 
         renderHelper(task, event, options)
       },
-      (err) => {
+      (err: any) => {
         // eslint-disable-next-line no-console
         console.log(err)
       },
@@ -48,25 +48,28 @@ const render = (tasks, options) => {
 }
 
 class VerboseRenderer {
-  constructor (tasks, options) {
+  private _tasks: any[]
+  private _options: any
+
+  constructor (tasks: any[], options: any) {
     this._tasks = tasks
     this._options = Object.assign({
       dateFormat: 'HH:mm:ss',
     }, options)
   }
 
-  static get nonTTY () {
+  static get nonTTY (): boolean {
     return true
   }
 
-  render () {
+  render (): void {
     cliCursor.hide()
     render(this._tasks, this._options)
   }
 
-  end () {
+  end (): void {
     cliCursor.show()
   }
 }
 
-module.exports = VerboseRenderer
+export default VerboseRenderer

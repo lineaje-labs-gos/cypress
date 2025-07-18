@@ -1,55 +1,62 @@
-const _ = require('lodash')
-const arch = require('arch')
-const os = require('os')
-const ospath = require('ospath')
-const hasha = require('hasha')
-const la = require('lazy-ass')
-const is = require('check-more-types')
-const tty = require('tty')
-const path = require('path')
-const isCi = require('ci-info').isCI
-const execa = require('execa')
-const getos = require('getos')
-const chalk = require('chalk')
-const Promise = require('bluebird')
-const cachedir = require('cachedir')
-const logSymbols = require('log-symbols')
-const executable = require('executable')
-const { stripIndent } = require('common-tags')
-const supportsColor = require('supports-color')
-const isInstalledGlobally = require('is-installed-globally')
-const logger = require('./logger')
-const debug = require('debug')('cypress:cli')
-const fs = require('./fs')
+import _ from 'lodash'
+import arch from 'arch'
+import os from 'os'
+import ospath from 'ospath'
+import hasha from 'hasha'
+import la from 'lazy-ass'
+import is from 'check-more-types'
+import tty from 'tty'
+import path from 'path'
+import { isCI as isCi } from 'ci-info'
+import execa from 'execa'
+import getos from 'getos'
+import chalk from 'chalk'
+import Bluebird from 'bluebird'
+import cachedir from 'cachedir'
+import logSymbols from 'log-symbols'
+import executable from 'executable'
+import { stripIndent } from 'common-tags'
+import supportsColor from 'supports-color'
+import isInstalledGlobally from 'is-installed-globally'
+import logger from './logger'
+import Debug from 'debug'
+import fs from './fs'
 
+const debug = Debug('cypress:cli')
+
+// Type helpers as any since they're utility libraries with various checking functions
+const isAny: any = is
+const fsAny: any = fs
+
+// Import package.json dynamically to avoid TypeScript JSON import issues
 const pkg = require(path.join(__dirname, '..', 'package.json'))
 
 const issuesUrl = 'https://github.com/cypress-io/cypress/issues'
 
-const getosAsync = Promise.promisify(getos)
+const getosAsync = Bluebird.promisify(getos)
 
 /**
  * Returns SHA512 of a file
  */
-const getFileChecksum = (filename) => {
-  la(is.unemptyString(filename), 'expected filename', filename)
+const getFileChecksum = (filename: string): any => {
+  la(isAny.unemptyString(filename), 'expected filename', filename)
 
   return hasha.fromFile(filename, { algorithm: 'sha512' })
 }
 
-const getFileSize = (filename) => {
-  la(is.unemptyString(filename), 'expected filename', filename)
+const getFileSize = (filename: string): any => {
+  la(isAny.unemptyString(filename), 'expected filename', filename)
 
-  return fs.statAsync(filename).get('size')
+  return fsAny.statAsync(filename).get('size')
 }
 
 const isBrokenGtkDisplayRe = /Gtk: cannot open display/
 
-const stringify = (val) => {
+const stringify = (val: any): string => {
   return _.isObject(val) ? JSON.stringify(val) : val
 }
 
-function normalizeModuleOptions (options = {}) {
+function normalizeModuleOptions (options: any = {}): any {
   return _.mapValues(options, stringify)
 }
 
@@ -57,7 +64,7 @@ function normalizeModuleOptions (options = {}) {
  * Returns true if the platform is Linux. We do a lot of different
  * stuff on Linux (like Xvfb) and it helps to has readable code
  */
-const isLinux = () => {
+const isLinux = (): boolean => {
   return os.platform() === 'linux'
 }
 
@@ -68,15 +75,15 @@ const isLinux = () => {
   [1005:0509/184205.663837:WARNING:browser_main_loop.cc(258)] Gtk: cannot open display: 99
   ```
    */
-const isBrokenGtkDisplay = (str) => {
+const isBrokenGtkDisplay = (str: string): boolean => {
   return isBrokenGtkDisplayRe.test(str)
 }
 
-const isPossibleLinuxWithIncorrectDisplay = () => {
-  return isLinux() && process.env.DISPLAY
+const isPossibleLinuxWithIncorrectDisplay = (): boolean => {
+  return isLinux() && !!process.env.DISPLAY
 }
 
-const logBrokenGtkDisplayWarning = () => {
+const logBrokenGtkDisplayWarning = (): void => {
   debug('Cypress exited due to a broken gtk display because of a potential invalid DISPLAY env... retrying after starting Xvfb')
 
   // if we get this error, we are on Linux and DISPLAY is set
@@ -94,7 +101,7 @@ const logBrokenGtkDisplayWarning = () => {
   logger.warn()
 }
 
-function stdoutLineMatches (expectedLine, stdout) {
+function stdoutLineMatches (expectedLine: string, stdout: string): boolean {
   const lines = stdout.split('\n').map((val) => val.trim())
 
   return lines.some((line) => line === expectedLine)
@@ -107,7 +114,7 @@ function stdoutLineMatches (expectedLine, stdout) {
  * @param {string} value
  * @example util.isValidCypressInternalEnvValue(process.env.CYPRESS_INTERNAL_ENV)
  */
-function isValidCypressInternalEnvValue (value) {
+function isValidCypressInternalEnvValue (value: string | undefined): boolean {
   if (_.isUndefined(value)) {
     // will get default value
     return true
@@ -126,7 +133,7 @@ function isValidCypressInternalEnvValue (value) {
  * @param {string} value
  * @example util.isNonProductionCypressInternalEnvValue(process.env.CYPRESS_INTERNAL_ENV)
  */
-function isNonProductionCypressInternalEnvValue (value) {
+function isNonProductionCypressInternalEnvValue (value: string | undefined): boolean {
   return !_.isUndefined(value) && value !== 'production'
 }
 
@@ -134,7 +141,7 @@ function isNonProductionCypressInternalEnvValue (value) {
  * Prints NODE_OPTIONS using debug() module, but only
  * if DEBUG=cypress... is set
  */
-function printNodeOptions (log = debug) {
+function printNodeOptions (log: any = debug): void {
   if (!log.enabled) {
     return
   }
@@ -160,8 +167,8 @@ function printNodeOptions (log = debug) {
   // returns string 'foo'
   ```
  */
-const dequote = (str) => {
-  la(is.string(str), 'expected a string to remove double quotes', str)
+const dequote = (str: string): string => {
+  la(isAny.string(str), 'expected a string to remove double quotes', str)
   if (str.length > 1 && str[0] === '"' && str[str.length - 1] === '"') {
     return str.substr(1, str.length - 2)
   }
@@ -169,7 +176,7 @@ const dequote = (str) => {
   return str
 }
 
-const parseOpts = (opts) => {
+const parseOpts = (opts: any): any => {
   opts = _.pick(opts,
     'autoCancelAfterFailures',
     'browser',
@@ -234,7 +241,7 @@ const parseOpts = (opts) => {
  * Copy of packages/server/lib/browsers/utils.ts
  * because we need same functionality in CLI to show the path :(
  */
-const getApplicationDataFolder = (...paths) => {
+const getApplicationDataFolder = (...paths: string[]): string => {
   const { env } = process
 
   // allow overriding the app_data folder
@@ -261,25 +268,25 @@ const util = {
   isNonProductionCypressInternalEnvValue,
   printNodeOptions,
 
-  isCi () {
+  isCi (): boolean {
     return isCi
   },
 
-  getEnvOverrides (options = {}) {
+  getEnvOverrides (options: any = {}): any {
     return _
     .chain({})
     .extend(util.getEnvColors())
     .extend(util.getForceTty())
     .omitBy(_.isUndefined) // remove undefined values
-    .mapValues((value) => { // stringify to 1 or 0
+    .mapValues((value: any) => { // stringify to 1 or 0
       return value ? '1' : '0'
     })
     .extend(util.getOriginalNodeOptions())
     .value()
   },
 
-  getOriginalNodeOptions () {
-    const opts = {}
+  getOriginalNodeOptions (): any {
+    const opts: any = {}
 
     if (process.env.NODE_OPTIONS) {
       opts.ORIGINAL_NODE_OPTIONS = process.env.NODE_OPTIONS
@@ -288,7 +295,7 @@ const util = {
     return opts
   },
 
-  getForceTty () {
+  getForceTty (): any {
     return {
       FORCE_STDIN_TTY: util.isTty(process.stdin.fd),
       FORCE_STDOUT_TTY: util.isTty(process.stdout.fd),
@@ -296,7 +303,7 @@ const util = {
     }
   },
 
-  getEnvColors () {
+  getEnvColors (): any {
     const sc = util.supportsColor()
 
     return {
@@ -306,11 +313,11 @@ const util = {
     }
   },
 
-  isTty (fd) {
+  isTty (fd: number): boolean {
     return tty.isatty(fd)
   },
 
-  supportsColor () {
+  supportsColor (): boolean {
     // if we've been explicitly told not to support
     // color then turn this off
     if (process.env.NO_COLOR) {
@@ -327,23 +334,23 @@ const util = {
     return Boolean(supportsColor.stdout) && Boolean(supportsColor.stderr)
   },
 
-  cwd () {
+  cwd (): string {
     return process.cwd()
   },
 
-  pkgBuildInfo () {
+  pkgBuildInfo (): any {
     return pkg.buildInfo
   },
 
-  pkgVersion () {
+  pkgVersion (): string {
     return pkg.version
   },
 
-  exit (code) {
+  exit (code: number): never {
     process.exit(code)
   },
 
-  logErrorExit1 (err) {
+  logErrorExit1 (err: Error): never {
     logger.error(err.message)
 
     process.exit(1)
@@ -351,7 +358,7 @@ const util = {
 
   dequote,
 
-  titleize (...args) {
+  titleize (...args: any[]): string {
     // prepend first arg with space
     // and pad so that all messages line up
     args[0] = _.padEnd(` ${args[0]}`, 24)
@@ -362,7 +369,7 @@ const util = {
     return chalk.blue(...args)
   },
 
-  calculateEta (percent, elapsed) {
+  calculateEta (percent: number, elapsed: number): number {
     // returns the number of seconds remaining
 
     // if we're at 100% already just return 0
@@ -376,44 +383,44 @@ const util = {
     return elapsed * (1 / (percent / 100)) - elapsed
   },
 
-  convertPercentToPercentage (num) {
+  convertPercentToPercentage (num: number): number {
     // convert a percent with values between 0 and 1
     // with decimals, so that it is between 0 and 100
     // and has no decimal places
     return Math.round(_.isFinite(num) ? (num * 100) : 0)
   },
 
-  secsRemaining (eta) {
+  secsRemaining (eta: number): string {
     // calculate the seconds reminaing with no decimal places
     return (_.isFinite(eta) ? (eta / 1000) : 0).toFixed(0)
   },
 
-  setTaskTitle (task, title, renderer) {
+  setTaskTitle (task: any, title: string, renderer: string): void {
     // only update the renderer title when not running in CI
     if (renderer === 'default' && task.title !== title) {
       task.title = title
     }
   },
 
-  isInstalledGlobally () {
+  isInstalledGlobally (): boolean {
     return isInstalledGlobally
   },
 
-  isSemver (str) {
+  isSemver (str: string): boolean {
     return /^(\d+\.)?(\d+\.)?(\*|\d+)$/.test(str)
   },
 
-  isExecutableAsync (filePath) {
-    return Promise.resolve(executable(filePath))
+  isExecutableAsync (filePath: string): any {
+    return Bluebird.resolve(executable(filePath))
   },
 
   isLinux,
 
-  getOsVersionAsync () {
-    return Promise.try(() => {
+  getOsVersionAsync (): any {
+    return Bluebird.try(() => {
       if (isLinux()) {
         return getosAsync()
-        .then((osInfo) => {
+        .then((osInfo: any) => {
           return [osInfo.dist, osInfo.release].join(' - ')
         })
         .catch(() => {
@@ -425,8 +432,8 @@ const util = {
     })
   },
 
-  async getPlatformInfo () {
-    const [version, osArch] = await Promise.all([
+  async getPlatformInfo (): Promise<string> {
+    const [version, osArch] = await Bluebird.all([
       util.getOsVersionAsync(),
       this.getRealArch(),
     ])
@@ -437,15 +444,15 @@ const util = {
     `
   },
 
-  _cachedArch: undefined,
+  _cachedArch: undefined as string | undefined,
 
   /**
    * Attempt to return the real system arch (not process.arch, which is only the Node binary's arch)
    */
-  async getRealArch () {
+  async getRealArch (): Promise<string> {
     if (this._cachedArch) return this._cachedArch
 
-    async function _getRealArch () {
+    async function _getRealArch (): Promise<string> {
       const osPlatform = os.platform()
       // eslint-disable-next-line no-restricted-syntax
       const osArch = os.arch()
@@ -457,7 +464,7 @@ const util = {
       if (osPlatform === 'darwin') {
         // could possibly be x64 node on arm64 darwin, check if we are being translated by Rosetta
         // https://stackoverflow.com/a/65347893/3474615
-        const { stdout } = await execa('sysctl', ['-n', 'sysctl.proc_translated']).catch(() => '')
+        const { stdout } = await execa('sysctl', ['-n', 'sysctl.proc_translated']).catch(() => ({ stdout: '' }))
 
         debug('rosetta check result: %o', { stdout })
         if (stdout === '1') return 'arm64'
@@ -466,7 +473,7 @@ const util = {
       if (osPlatform === 'linux') {
         // could possibly be x64 node on arm64 linux, check the "machine hardware name"
         // list of names for reference: https://stackoverflow.com/a/45125525/3474615
-        const { stdout } = await execa('uname', ['-m']).catch(() => '')
+        const { stdout } = await execa('uname', ['-m']).catch(() => ({ stdout: '' }))
 
         debug('arm uname -m result: %o ', { stdout })
         if (['aarch64_be', 'aarch64', 'armv8b', 'armv8l'].includes(stdout)) return 'arm64'
@@ -487,7 +494,7 @@ const util = {
   // when passing relative path to NPM post install hook, the current working
   // directory is set to the `node_modules/cypress` folder
   // the user is probably passing relative path with respect to root package folder
-  formAbsolutePath (filename) {
+  formAbsolutePath (filename: string): string {
     if (path.isAbsolute(filename)) {
       return filename
     }
@@ -495,14 +502,14 @@ const util = {
     return path.join(process.cwd(), '..', '..', filename)
   },
 
-  getEnv (varName, trim) {
-    la(is.unemptyString(varName), 'expected environment variable name, not', varName)
+  getEnv (varName: string, trim?: boolean): string | undefined {
+    la(isAny.unemptyString(varName), 'expected environment variable name, not', varName)
 
     const configVarName = `npm_config_${varName}`
     const configVarNameLower = configVarName.toLowerCase()
     const packageConfigVarName = `npm_package_config_${varName}`
 
-    let result
+    let result: string | undefined
 
     if (process.env.hasOwnProperty(varName)) {
       debug(`Using ${varName} from environment variable`)
@@ -531,14 +538,14 @@ const util = {
     // so for sanity sake we should first trim whitespace characters and remove
     // double quotes around environment strings if the caller is expected to
     // use this environment string as a file path
-    return trim ? dequote(_.trim(result)) : result
+    return trim && result ? dequote(_.trim(result)) : result
   },
 
-  getCacheDir () {
+  getCacheDir (): string {
     return cachedir('Cypress')
   },
 
-  isPostInstall () {
+  isPostInstall (): boolean {
     return process.env.npm_lifecycle_event === 'postinstall'
   },
 
@@ -554,8 +561,8 @@ const util = {
 
   isPossibleLinuxWithIncorrectDisplay,
 
-  getGitHubIssueUrl (number) {
-    la(is.positive(number), 'github issue should be a positive number', number)
+  getGitHubIssueUrl (number: number): string {
+    la(isAny.positive(number), 'github issue should be a positive number', number)
     la(_.isInteger(number), 'github issue should be an integer', number)
 
     return `${issuesUrl}/${number}`
@@ -568,4 +575,4 @@ const util = {
   getApplicationDataFolder,
 }
 
-module.exports = util
+export default util

@@ -1,45 +1,45 @@
-const os = require('os')
-const Promise = require('bluebird')
-const Xvfb = require('@cypress/xvfb')
-const { stripIndent } = require('common-tags')
-const Debug = require('debug')
-const { throwFormErrorText, errors } = require('../errors')
-const util = require('../util')
+import os from 'os'
+import Bluebird from 'bluebird'
+import Xvfb from '@cypress/xvfb'
+import { stripIndent } from 'common-tags'
+import Debug from 'debug'
+import { throwFormErrorText, errors } from '../errors'
+import util from '../util'
 
-const debug = Debug('cypress:cli')
-const debugXvfb = Debug('cypress:xvfb')
+const debug: any = Debug('cypress:cli')
+const debugXvfb: any = Debug('cypress:xvfb')
 
 debug.Debug = debugXvfb.Debug = Debug
 
-const xvfbOptions = {
+const xvfbOptions: any = {
   displayNum: process.env.XVFB_DISPLAY_NUM,
   timeout: 30000, // milliseconds
   // need to explicitly define screen otherwise electron will crash
   // https://github.com/cypress-io/cypress/issues/6184
   xvfb_args: ['-screen', '0', '1280x1024x24'],
-  onStderrData (data) {
+  onStderrData (data: any): void {
     if (debugXvfb.enabled) {
       debugXvfb(data.toString())
     }
   },
 }
 
-const xvfb = Promise.promisifyAll(new Xvfb(xvfbOptions))
+const xvfb: any = Bluebird.promisifyAll(new Xvfb(xvfbOptions))
 
-module.exports = {
+const xvfbModule = {
   _debugXvfb: debugXvfb, // expose for testing
 
   _xvfb: xvfb, // expose for testing
 
   _xvfbOptions: xvfbOptions, // expose for testing
 
-  start () {
+  start (): any {
     debug('Starting Xvfb')
 
     return xvfb.startAsync()
     .return(null)
     .catch({ nonZeroExitCode: true }, throwFormErrorText(errors.nonZeroExitCodeXvfb))
-    .catch((err) => {
+    .catch((err: any) => {
       if (err.known) {
         throw err
       }
@@ -48,7 +48,7 @@ module.exports = {
     })
   },
 
-  stop () {
+  stop (): any {
     debug('Stopping Xvfb')
 
     return xvfb.stopAsync()
@@ -58,7 +58,7 @@ module.exports = {
     })
   },
 
-  isNeeded () {
+  isNeeded (): boolean {
     if (process.env.ELECTRON_RUN_AS_NODE) {
       debug('Environment variable ELECTRON_RUN_AS_NODE detected, xvfb is not needed')
 
@@ -95,10 +95,10 @@ module.exports = {
   },
 
   // async method, resolved with Boolean
-  verify () {
+  verify (): any {
     return xvfb.startAsync()
     .return(true)
-    .catch((err) => {
+    .catch((err: any) => {
       debug('Could not verify xvfb: %s', err.message)
 
       return false
@@ -106,3 +106,5 @@ module.exports = {
     .finally(xvfb.stopAsync)
   },
 }
+
+export default xvfbModule

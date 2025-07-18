@@ -1,24 +1,30 @@
-const _ = require('lodash')
-const os = require('os')
-const path = require('path')
-const chalk = require('chalk')
-const debug = require('debug')('cypress:cli')
-const { Listr } = require('listr2')
-const Promise = require('bluebird')
-const logSymbols = require('log-symbols')
-const { stripIndent } = require('common-tags')
-const fs = require('../fs')
-const download = require('./download')
-const util = require('../util')
-const state = require('./state')
-const unzip = require('./unzip')
-const logger = require('../logger')
-const { throwFormErrorText, errors } = require('../errors')
-const verbose = require('../VerboseRenderer')
+import _ from 'lodash'
+import os from 'os'
+import path from 'path'
+import chalk from 'chalk'
+import Debug from 'debug'
+import { Listr } from 'listr2'
+import Bluebird from 'bluebird'
+import logSymbols from 'log-symbols'
+import { stripIndent } from 'common-tags'
+import fs from '../fs'
+import download from './download'
+import util from '../util'
+import state from './state'
+import unzip from './unzip'
+import logger from '../logger'
+import { throwFormErrorText, errors } from '../errors'
+import verbose from '../VerboseRenderer'
 
+const debug = Debug('cypress:cli')
+
+// Import package.json dynamically to avoid TypeScript JSON import issues
 const { buildInfo, version } = require('../../package.json')
 
-function _getBinaryUrlFromBuildInfo (arch, { commitSha, commitBranch }) {
+// Type fs as any since it's a custom wrapper with async methods
+const fsAny: any = fs
+
+function _getBinaryUrlFromBuildInfo (arch: string, { commitSha, commitBranch }: any): string {
   const platform = os.platform()
 
   if ((platform === 'win32') && (arch === 'arm64')) {
@@ -30,7 +36,7 @@ function _getBinaryUrlFromBuildInfo (arch, { commitSha, commitBranch }) {
   return `https://cdn.cypress.io/beta/binary/${version}/${platform}-${arch}/${commitBranch}-${commitSha}/cypress.zip`
 }
 
-const alreadyInstalledMsg = () => {
+const alreadyInstalledMsg = (): void => {
   if (!util.isPostInstall()) {
     logger.log(stripIndent`
       Skipping installation:
@@ -40,7 +46,7 @@ const alreadyInstalledMsg = () => {
   }
 }
 
-const displayCompletionMsg = () => {
+const displayCompletionMsg = (): void => {
   // check here to see if we are globally installed
   if (util.isInstalledGlobally()) {
     // if we are display a warning
@@ -76,7 +82,7 @@ const displayCompletionMsg = () => {
   logger.log()
 }
 
-const downloadAndUnzip = ({ version, installDir, downloadDir }) => {
+const downloadAndUnzip = ({ version, installDir, downloadDir }: any): any => {
   const progress = {
     throttle: 100,
     onProgress: null,
@@ -91,12 +97,12 @@ const downloadAndUnzip = ({ version, installDir, downloadDir }) => {
   const tasks = new Listr([
     {
       options: { title: util.titleize('Downloading Cypress') },
-      task: (ctx, task) => {
+      task: (ctx: any, task: any) => {
         // as our download progresses indicate the status
         progress.onProgress = progessify(task, 'Downloading Cypress')
 
         return download.start({ version, downloadDestination, progress })
-        .then((redirectVersion) => {
+        .then((redirectVersion: any) => {
           if (redirectVersion) version = redirectVersion
 
           debug(`finished downloading file: ${downloadDestination}`)
@@ -119,11 +125,11 @@ const downloadAndUnzip = ({ version, installDir, downloadDir }) => {
     }),
     {
       options: { title: util.titleize('Finishing Installation') },
-      task: (ctx, task) => {
+      task: (ctx: any, task: any) => {
         const cleanup = () => {
           debug('removing zip file %s', downloadDestination)
 
-          return fs.removeAsync(downloadDestination)
+          return fsAny.removeAsync(downloadDestination)
         }
 
         return cleanup()
@@ -141,11 +147,11 @@ const downloadAndUnzip = ({ version, installDir, downloadDir }) => {
   ], { rendererOptions })
 
   // start the tasks!
-  return Promise.resolve(tasks.run())
+  return Bluebird.resolve(tasks.run())
 }
 
-const validateOS = () => {
-  return util.getPlatformInfo().then((platformInfo) => {
+const validateOS = (): any => {
+  return util.getPlatformInfo().then((platformInfo: string) => {
     return platformInfo.match(/(win32-x64|win32-arm64|linux-x64|linux-arm64|darwin-x64|darwin-arm64)/)
   })
 }
@@ -154,7 +160,7 @@ const validateOS = () => {
  * Returns the version to install - either a string like `1.2.3` to be fetched
  * from the download server or a file path or HTTP URL.
  */
-function getVersionOverride ({ arch, envVarVersion, buildInfo }) {
+function getVersionOverride ({ arch, envVarVersion, buildInfo }: any): string | undefined {
   // let this environment variable reset the binary version we need
   if (envVarVersion) {
     return envVarVersion
@@ -180,7 +186,7 @@ function getVersionOverride ({ arch, envVarVersion, buildInfo }) {
   }
 }
 
-function getEnvVarVersion () {
+function getEnvVarVersion (): string | undefined {
   if (!util.getEnv('CYPRESS_INSTALL_BINARY')) return
 
   // because passed file paths are often double quoted
@@ -193,7 +199,7 @@ function getEnvVarVersion () {
   return envVarVersion
 }
 
-const start = async (options = {}) => {
+const start = async (options: any = {}): Promise<any> => {
   debug('installing with options %j', options)
 
   const envVarVersion = getEnvVarVersion()
@@ -244,8 +250,8 @@ const start = async (options = {}) => {
     return throwFormErrorText(errors.invalidOS)()
   }
 
-  await fs.ensureDirAsync(cacheDir)
-  .catch({ code: 'EACCES' }, (err) => {
+  await fsAny.ensureDirAsync(cacheDir)
+  .catch({ code: 'EACCES' }, (err: any) => {
     return throwFormErrorText(errors.invalidCacheDirectory)(stripIndent`
     Failed to access ${chalk.cyan(cacheDir)}:
 
@@ -256,7 +262,7 @@ const start = async (options = {}) => {
   const binaryPkg = await state.getBinaryPkgAsync(binaryDir)
   const binaryVersion = await state.getBinaryPkgVersion(binaryPkg)
 
-  const shouldInstall = () => {
+  const shouldInstall = (): boolean => {
     if (!binaryVersion) {
       debug('no binary installed under cli version')
 
@@ -307,9 +313,9 @@ const start = async (options = {}) => {
     logger.log()
   }
 
-  const getLocalFilePath = async () => {
+  const getLocalFilePath = async (): Promise<string | false> => {
     // see if version supplied is a path to a binary
-    if (await fs.pathExistsAsync(versionToInstall)) {
+    if (await fsAny.pathExistsAsync(versionToInstall)) {
       return path.extname(versionToInstall) === '.zip' ? versionToInstall : false
     }
 
@@ -319,7 +325,7 @@ const start = async (options = {}) => {
 
     // if this exists return the path to it
     // else false
-    if ((await fs.pathExistsAsync(possibleFile)) && path.extname(possibleFile) === '.zip') {
+    if ((await fsAny.pathExistsAsync(possibleFile)) && path.extname(possibleFile) === '.zip') {
       return possibleFile
     }
 
@@ -359,20 +365,15 @@ const start = async (options = {}) => {
   await downloadAndUnzip({ version: versionToInstall, installDir, downloadDir })
 
   // delay 1 sec for UX, unless we are testing
-  await Promise.delay(1000)
+  await Bluebird.delay(1000)
 
   displayCompletionMsg()
 }
 
-module.exports = {
-  start,
-  _getBinaryUrlFromBuildInfo,
-}
-
-const unzipTask = ({ zipFilePath, installDir, progress, rendererOptions }) => {
+const unzipTask = ({ zipFilePath, installDir, progress, rendererOptions }: any): any => {
   return {
     options: { title: util.titleize('Unzipping Cypress') },
-    task: (ctx, task) => {
+    task: (ctx: any, task: any) => {
     // as our unzip progresses indicate the status
       progress.onProgress = progessify(task, 'Unzipping Cypress')
 
@@ -388,17 +389,17 @@ const unzipTask = ({ zipFilePath, installDir, progress, rendererOptions }) => {
   }
 }
 
-const progessify = (task, title) => {
+const progessify = (task: any, title: string): any => {
   // return higher order function
-  return (percentComplete, remaining) => {
-    percentComplete = chalk.white(` ${percentComplete}%`)
+  return (percentComplete: number, remaining: number) => {
+    const percentCompleteStr = chalk.white(` ${percentComplete}%`)
 
     // pluralize seconds remaining
-    remaining = chalk.gray(`${remaining}s`)
+    const remainingStr = chalk.gray(`${remaining}s`)
 
     util.setTaskTitle(
       task,
-      util.titleize(title, percentComplete, remaining),
+      util.titleize(title, percentCompleteStr, remainingStr),
       getRendererOptions().renderer,
     )
   }
@@ -407,7 +408,7 @@ const progessify = (task, title) => {
 // if we are running in CI then use
 // the verbose renderer else use
 // the default
-const getRendererOptions = () => {
+const getRendererOptions = (): any => {
   let renderer = util.isCi() ? verbose : 'default'
 
   if (logger.logLevel() === 'silent') {
@@ -417,4 +418,9 @@ const getRendererOptions = () => {
   return {
     renderer,
   }
+}
+
+export default {
+  start,
+  _getBinaryUrlFromBuildInfo,
 }

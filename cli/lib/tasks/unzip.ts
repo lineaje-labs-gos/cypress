@@ -1,24 +1,28 @@
-const _ = require('lodash')
-const la = require('lazy-ass')
-const is = require('check-more-types')
-const cp = require('child_process')
-const os = require('os')
-const yauzl = require('yauzl')
-const debug = require('debug')('cypress:cli:unzip')
-const extract = require('extract-zip')
-const Promise = require('bluebird')
-const readline = require('readline')
+import _ from 'lodash'
+import la from 'lazy-ass'
+import is from 'check-more-types'
+import cp from 'child_process'
+import os from 'os'
+import yauzl from 'yauzl'
+import Debug from 'debug'
+import extract from 'extract-zip'
+import Bluebird from 'bluebird'
+import readline from 'readline'
+import { throwFormErrorText, errors } from '../errors'
+import fs from '../fs'
+import util from '../util'
 
-const { throwFormErrorText, errors } = require('../errors')
-const fs = require('../fs')
-const util = require('../util')
+const debug = Debug('cypress:cli:unzip')
+
+// Type fs as any since it's a custom wrapper with async methods
+const fsAny: any = fs
 
 const unzipTools = {
   extract,
 }
 
 // expose this function for simple testing
-const unzip = ({ zipFilePath, installDir, progress }) => {
+const unzip = ({ zipFilePath, installDir, progress }: any): any => {
   debug('unzipping from %s', zipFilePath)
   debug('into', installDir)
 
@@ -29,10 +33,10 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
   const startTime = Date.now()
   let yauzlDoneTime = 0
 
-  return fs.ensureDirAsync(installDir)
+  return fsAny.ensureDirAsync(installDir)
   .then(() => {
-    return new Promise((resolve, reject) => {
-      return yauzl.open(zipFilePath, (err, zipFile) => {
+    return new Bluebird((resolve: any, reject: any) => {
+      return yauzl.open(zipFilePath, (err: any, zipFile: any) => {
         yauzlDoneTime = Date.now()
 
         if (err) {
@@ -50,7 +54,7 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
         let percent = 0
         let count = 0
 
-        const notify = (percent) => {
+        const notify = (percent: number): void => {
           const elapsed = +new Date() - +started
 
           const eta = util.calculateEta(percent, elapsed)
@@ -58,16 +62,16 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
           progress.onProgress(percent, util.secsRemaining(eta))
         }
 
-        const tick = () => {
+        const tick = (): any => {
           count += 1
 
           percent = ((count / total) * 100)
           const displayPercent = percent.toFixed(0)
 
-          return notify(displayPercent)
+          return notify(Number(displayPercent))
         }
 
-        const unzipWithNode = () => {
+        const unzipWithNode = (): any => {
           debug('unzipping with node.js (slow)')
 
           const opts = {
@@ -83,7 +87,7 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
 
             return resolve()
           })
-          .catch((err) => {
+          .catch((err: any) => {
             const error = err || new Error('Unknown error with Node extract tool')
 
             debug('error %s', error.message)
@@ -94,19 +98,19 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
 
         const unzipFallback = _.once(unzipWithNode)
 
-        const unzipWithUnzipTool = () => {
+        const unzipWithUnzipTool = (): any => {
           debug('unzipping via `unzip`')
 
           const inflatingRe = /inflating:/
 
           const sp = cp.spawn('unzip', ['-o', zipFilePath, '-d', installDir])
 
-          sp.on('error', (err) => {
+          sp.on('error', (err: any) => {
             debug('unzip tool error: %s', err.message)
             unzipFallback()
           })
 
-          sp.on('close', (code) => {
+          sp.on('close', (code: number) => {
             debug('unzip tool close with code %d', code)
             if (code === 0) {
               percent = 100
@@ -120,13 +124,13 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
             return unzipFallback()
           })
 
-          sp.stdout.on('data', (data) => {
+          sp.stdout.on('data', (data: any) => {
             if (inflatingRe.test(data)) {
               return tick()
             }
           })
 
-          sp.stderr.on('data', (data) => {
+          sp.stderr.on('data', (data: any) => {
             debug('`unzip` stderr %s', data)
           })
         }
@@ -136,7 +140,7 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
         // with corruption, symlinks, or icons causing failures
         // and can handle resource forks
         // http://automatica.com.au/2011/02/unzip-mac-os-x-zip-in-terminal/
-        const unzipWithOsx = () => {
+        const unzipWithOsx = (): any => {
           debug('unzipping via `ditto`')
 
           const copyingFileRe = /^copying file/
@@ -144,12 +148,12 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
           const sp = cp.spawn('ditto', ['-xkV', zipFilePath, installDir])
 
           // f-it just unzip with node
-          sp.on('error', (err) => {
+          sp.on('error', (err: any) => {
             debug(err.message)
             unzipFallback()
           })
 
-          sp.on('close', (code) => {
+          sp.on('close', (code: number) => {
             if (code === 0) {
             // make sure we get to 100% on the progress bar
             // because reading in lines is not really accurate
@@ -167,7 +171,7 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
           return readline.createInterface({
             input: sp.stderr,
           })
-          .on('line', (line) => {
+          .on('line', (line: string) => {
             if (copyingFileRe.test(line)) {
               return tick()
             }
@@ -195,11 +199,11 @@ const unzip = ({ zipFilePath, installDir, progress }) => {
   })
 }
 
-function isMaybeWindowsMaxPathLengthError (err) {
+function isMaybeWindowsMaxPathLengthError (err: any): boolean {
   return os.platform() === 'win32' && err.code === 'ENOENT' && err.syscall === 'realpath'
 }
 
-const start = async ({ zipFilePath, installDir, progress }) => {
+const start = async ({ zipFilePath, installDir, progress }: any): Promise<void> => {
   la(is.unemptyString(installDir), 'missing installDir')
   if (!progress) {
     progress = { onProgress: () => {
@@ -208,12 +212,12 @@ const start = async ({ zipFilePath, installDir, progress }) => {
   }
 
   try {
-    const installDirExists = await fs.pathExists(installDir)
+    const installDirExists = await fsAny.pathExists(installDir)
 
     if (installDirExists) {
       debug('removing existing unzipped binary', installDir)
 
-      await fs.removeAsync(installDir)
+      await fsAny.removeAsync(installDir)
     }
 
     await unzip({ zipFilePath, installDir, progress })
@@ -222,14 +226,16 @@ const start = async ({ zipFilePath, installDir, progress }) => {
       errors.failedUnzipWindowsMaxPathLength
       : errors.failedUnzip
 
-    await throwFormErrorText(errorTemplate)(err)
+    await throwFormErrorText(errorTemplate)(err as string)
   }
 }
 
-module.exports = {
+const unzipModule = {
   start,
   utils: {
     unzip,
     unzipTools,
   },
 }
+
+export default unzipModule

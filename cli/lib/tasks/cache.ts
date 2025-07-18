@@ -1,15 +1,16 @@
-const state = require('./state')
-const logger = require('../logger')
-const fs = require('../fs')
-const util = require('../util')
-const { join } = require('path')
-const Table = require('cli-table3')
-const dayjs = require('dayjs')
-const relativeTime = require('dayjs/plugin/relativeTime')
-const chalk = require('chalk')
-const _ = require('lodash')
-const getFolderSize = require('./get-folder-size')
-const Bluebird = require('bluebird')
+import state from './state'
+import logger from '../logger'
+import fs from '../fs'
+import util from '../util'
+
+// Type fs as any since it's a custom wrapper with async methods
+import { join } from 'path'
+import Table from 'cli-table3'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import chalk from 'chalk'
+import _ from 'lodash'
+import getFolderSize from './get-folder-size'
 
 dayjs.extend(relativeTime)
 
@@ -21,47 +22,52 @@ const colors = {
   size: chalk.gray,
 }
 
-const logCachePath = () => {
+const logCachePath = (): undefined => {
   logger.always(state.getCacheDir())
 
   return undefined
 }
 
-const clear = () => {
+const clear = (): Promise<void> => {
   return fs.removeAsync(state.getCacheDir())
 }
 
-const prune = () => {
+const prune = async (): Promise<void> => {
   const cacheDir = state.getCacheDir()
   const checkedInBinaryVersion = util.pkgVersion()
 
   let deletedBinary = false
 
-  return fs.readdirAsync(cacheDir)
-  .then((versions) => {
-    return Bluebird.all(versions.map((version) => {
+  try {
+    const versions = await fs.readdirAsync(cacheDir)
+
+    for (const version of versions) {
       if (version !== checkedInBinaryVersion) {
         deletedBinary = true
 
         const versionDir = join(cacheDir, version)
 
-        return fs.removeAsync(versionDir)
+        await fs.removeAsync(versionDir)
       }
-    }))
-  })
-  .then(() => {
+    }
+
     if (deletedBinary) {
       logger.always(`Deleted all binary caches except for the ${checkedInBinaryVersion} binary cache.`)
     } else {
       logger.always(`No binary caches found to prune.`)
     }
-  })
-  .catch({ code: 'ENOENT' }, () => {
-    logger.always(`No Cypress cache was found at ${cacheDir}. Nothing to prune.`)
-  })
+  } catch (e: any) {
+    if (e.code === 'ENOENT') {
+      logger.always(`No Cypress cache was found at ${cacheDir}. Nothing to prune.`)
+
+      return
+    }
+
+    throw e
+  }
 }
 
-const fileSizeInMB = (size) => {
+const fileSizeInMB = (size: number): string => {
   return `${(size / 1024 / 1024).toFixed(1)}MB`
 }
 
@@ -69,9 +75,9 @@ const fileSizeInMB = (size) => {
  * Collects all cached versions, finds when each was used
  * and prints a table with results to the terminal
  */
-const list = (showSize) => {
+const list = (showSize: boolean): any => {
   return getCachedVersions(showSize)
-  .then((binaries) => {
+  .then((binaries: any) => {
     const head = [colors.titles('version'), colors.titles('last used')]
 
     if (showSize) {
@@ -82,7 +88,7 @@ const list = (showSize) => {
       head,
     })
 
-    binaries.forEach((binary) => {
+    binaries.forEach((binary: any) => {
       const versionString = colors.values(binary.version)
       const lastUsed = binary.accessed ? colors.dates(binary.accessed) : 'unknown'
       const row = [versionString, lastUsed]
@@ -100,25 +106,25 @@ const list = (showSize) => {
   })
 }
 
-const getCachedVersions = (showSize) => {
+const getCachedVersions = (showSize: boolean): Promise<any> => {
   const cacheDir = state.getCacheDir()
 
   return fs
   .readdirAsync(cacheDir)
   .filter(util.isSemver)
-  .map((version) => {
+  .map((version: any) => {
     return {
       version,
       folderPath: join(cacheDir, version),
     }
   })
-  .mapSeries((binary) => {
+  .mapSeries((binary: any) => {
     // last access time on the folder is different from last access time
     // on the Cypress binary
     const binaryDir = state.getBinaryDir(binary.version)
     const executable = state.getPathToExecutable(binaryDir)
 
-    return fs.statAsync(executable).then((stat) => {
+    return fs.statAsync(executable).then((stat: any) => {
       const lastAccessedTime = _.get(stat, 'atime')
 
       if (!lastAccessedTime) {
@@ -132,16 +138,16 @@ const getCachedVersions = (showSize) => {
       binary.accessed = accessed
 
       return binary
-    }, (e) => {
+    }, (e: any) => {
       // could not find the binary or gets its stats
       return binary
     })
   })
-  .mapSeries((binary) => {
+  .mapSeries((binary: any) => {
     if (showSize) {
       const binaryDir = state.getBinaryDir(binary.version)
 
-      return getFolderSize(binaryDir).then((size) => {
+      return getFolderSize(binaryDir).then((size: number) => {
         return {
           ...binary,
           size,
@@ -153,10 +159,12 @@ const getCachedVersions = (showSize) => {
   })
 }
 
-module.exports = {
+const cacheModule = {
   path: logCachePath,
   clear,
   prune,
   list,
   getCachedVersions,
 }
+
+export default cacheModule

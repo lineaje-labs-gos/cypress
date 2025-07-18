@@ -1,17 +1,29 @@
 // @ts-check
-const _ = require('lodash')
-const commander = require('commander')
-const { stripIndent } = require('common-tags')
-const logSymbols = require('log-symbols')
-const debug = require('debug')('cypress:cli:cli')
-const util = require('./util')
-const logger = require('./logger')
-const errors = require('./errors')
-const cache = require('./tasks/cache')
+import _ from 'lodash'
+import commander from 'commander'
+import { stripIndent } from 'common-tags'
+import logSymbols from 'log-symbols'
+import Debug from 'debug'
+import util from './util'
+import logger from './logger'
+import { exitWithError, errors } from './errors'
+import cache from './tasks/cache'
+
+import openModule from './exec/open'
+import runModule from './exec/run'
+import verifyModule from './tasks/verify'
+import installModule from './tasks/install'
+import versionModule from './exec/versions'
+import infoModule from './exec/info'
+
+const debug = Debug('cypress:cli:cli')
+
+// Type commander as any since it's a complex library
+const commanderAny: any = commander
 
 // patch "commander" method called when a user passed an unknown option
 // we want to print help for the current command and exit with an error
-function unknownOption (flag, type = 'option') {
+function unknownOption (this: any, flag: string, type: string = 'option'): void {
   if (this._allowUnknownOption) return
 
   logger.error()
@@ -20,17 +32,17 @@ function unknownOption (flag, type = 'option') {
   this.outputHelp()
   util.exit(1)
 }
-commander.Command.prototype.unknownOption = unknownOption
+commanderAny.Command.prototype.unknownOption = unknownOption
 
-const coerceFalse = (arg) => {
+const coerceFalse = (arg: string): boolean => {
   return arg !== 'false'
 }
 
-const coerceAnyStringToInt = (arg) => {
+const coerceAnyStringToInt = (arg: any): number => {
   return typeof arg === 'string' ? parseInt(arg) : arg
 }
 
-const spaceDelimitedArgsMsg = (flag, args) => {
+const spaceDelimitedArgsMsg = (flag: string, args: string[]): void => {
   let msg = `
     ${logSymbols.warning} Warning: It looks like you're passing --${flag} a space-separated list of arguments:
 
@@ -55,7 +67,7 @@ const spaceDelimitedArgsMsg = (flag, args) => {
   logger.log()
 }
 
-const parseVariableOpts = (fnArgs, args) => {
+const parseVariableOpts = (fnArgs: any[], args: string[]): any => {
   const [opts, unknownArgs] = fnArgs
 
   if ((unknownArgs && unknownArgs.length) && (opts.spec || opts.tag)) {
@@ -69,9 +81,9 @@ const parseVariableOpts = (fnArgs, args) => {
       opts.tag ? 'tag' : opts.tag,
     ])
 
-    _.forEach(multiArgFlags, (flag) => {
+    _.forEach(multiArgFlags, (flag: string) => {
       const argIndex = _.indexOf(args, `--${flag}`) + 2
-      const nextOptOffset = _.findIndex(_.slice(args, argIndex), (arg) => {
+      const nextOptOffset = _.findIndex(_.slice(args, argIndex), (arg: string) => {
         return _.startsWith(arg, '--')
       })
       const endIndex = nextOptOffset !== -1 ? argIndex + nextOptOffset : args.length
@@ -92,7 +104,7 @@ const parseVariableOpts = (fnArgs, args) => {
   return util.parseOpts(opts)
 }
 
-const descriptions = {
+const descriptions: any = {
   autoCancelAfterFailures: 'overrides the project-level Cloud configuration to set the failed test threshold for auto cancellation or to disable auto cancellation when recording to the Cloud',
   browser: 'runs Cypress in the browser with the given name. if a filesystem path is supplied, Cypress will attempt to use the browser at that path.',
   cacheClear: 'delete all cached binaries',
@@ -144,7 +156,7 @@ const knownCommands = [
   'info',
 ]
 
-const text = (description) => {
+const text = (description: string): string => {
   if (!descriptions[description]) {
     throw new Error(`Could not find description for: ${description}`)
   }
@@ -152,28 +164,28 @@ const text = (description) => {
   return descriptions[description]
 }
 
-function includesVersion (args) {
+function includesVersion (args: string[]): boolean {
   return (
     _.includes(args, '--version') ||
     _.includes(args, '-v')
   )
 }
 
-function showVersions (opts) {
+function showVersions (opts: any): any {
   debug('printing Cypress version')
   debug('additional arguments %o', opts)
 
   debug('parsed version arguments %o', opts)
 
-  const reportAllVersions = (versions) => {
+  const reportAllVersions = (versions: any): void => {
     logger.always('Cypress package version:', versions.package)
     logger.always('Cypress binary version:', versions.binary)
     logger.always('Electron version:', versions.electronVersion)
     logger.always('Bundled Node version:', versions.electronNodeVersion)
   }
 
-  const reportComponentVersion = (componentName, versions) => {
-    const names = {
+  const reportComponentVersion = (componentName: string, versions: any): void => {
+    const names: any = {
       package: 'package',
       binary: 'binary',
       electron: 'electronVersion',
@@ -202,9 +214,9 @@ function showVersions (opts) {
     electronNodeVersion: undefined,
   }
 
-  return require('./exec/versions')
+  return versionModule
   .getVersions()
-  .then((versions = defaultVersions) => {
+  .then((versions: any = defaultVersions) => {
     if (opts?.component) {
       reportComponentVersion(opts.component, versions)
     } else {
@@ -216,8 +228,8 @@ function showVersions (opts) {
   .catch(util.logErrorExit1)
 }
 
-const createProgram = () => {
-  const program = new commander.Command()
+const createProgram = (): any => {
+  const program = new commanderAny.Command()
 
   // bug in commander not printing name
   // in usage help docs
@@ -228,7 +240,7 @@ const createProgram = () => {
   return program
 }
 
-const addCypressRunCommand = (program) => {
+const addCypressRunCommand = (program: any): any => {
   return program
   .command('run')
   .usage('[options]')
@@ -241,7 +253,7 @@ const addCypressRunCommand = (program) => {
   .option('-C, --config-file <config-file>', text('configFile'))
   .option('--e2e', text('e2e'))
   .option('-e, --env <env>', text('env'))
-  .option('--group <name>', text('group'))
+  .option('--group <n>', text('group'))
   .option('-k, --key <record-key>', text('key'))
   .option('--headed', text('headed'))
   .option('--headless', text('headless'))
@@ -260,7 +272,7 @@ const addCypressRunCommand = (program) => {
   .option('--dev', text('dev'), coerceFalse)
 }
 
-const addCypressOpenCommand = (program) => {
+const addCypressOpenCommand = (program: any): any => {
   return program
   .command('open')
   .usage('[options]')
@@ -278,7 +290,7 @@ const addCypressOpenCommand = (program) => {
   .option('--dev', text('dev'), coerceFalse)
 }
 
-const maybeAddInspectFlags = (program) => {
+const maybeAddInspectFlags = (program: any): any => {
   if (process.argv.includes('--dev')) {
     return program
     .option('--inspect', 'Node option')
@@ -295,7 +307,7 @@ const maybeAddInspectFlags = (program) => {
  *
  * Returns a clone of the original object.
  */
-const castCypressOptions = (opts) => {
+const castCypressOptions = (opts: any): any => {
   // only properties that have type "string | false" in our TS definition
   // require special handling, because CLI parsing takes care of purely
   // boolean arguments
@@ -308,7 +320,7 @@ const castCypressOptions = (opts) => {
   return castOpts
 }
 
-module.exports = {
+const cliModule = {
   /**
    * Parses `cypress run` command line option array into an object
    * with options that you can feed into a `cypress.run()` module API call.
@@ -316,7 +328,7 @@ module.exports = {
    *  const options = parseRunCommand(['cypress', 'run', '--browser', 'chrome'])
    *  // options is {browser: 'chrome'}
    */
-  parseRunCommand (args) {
+  parseRunCommand (args: string[]): Promise<any> {
     return new Promise((resolve, reject) => {
       if (!Array.isArray(args)) {
         return reject(new Error('Expected array of arguments'))
@@ -327,13 +339,13 @@ module.exports = {
       // also remove "cypress" keyword at the start if present
       const cliArgs = args[0] === 'cypress' ? [...args.slice(1)] : [...args]
 
-      cliArgs.unshift(null, null)
+      cliArgs.unshift(null as any, null as any)
 
       debug('creating program parser')
       const program = createProgram()
 
       maybeAddInspectFlags(addCypressRunCommand(program))
-      .action((...fnArgs) => {
+      .action((...fnArgs: any[]) => {
         debug('parsed Cypress run %o', fnArgs)
         const options = parseVariableOpts(fnArgs, cliArgs)
 
@@ -357,7 +369,7 @@ module.exports = {
    *  const options = parseOpenCommand(['cypress', 'open', '--browser', 'chrome'])
    *  // options is {browser: 'chrome'}
    */
-  parseOpenCommand (args) {
+  parseOpenCommand (args: string[]): Promise<any> {
     return new Promise((resolve, reject) => {
       if (!Array.isArray(args)) {
         return reject(new Error('Expected array of arguments'))
@@ -368,13 +380,13 @@ module.exports = {
       // also remove "cypress" keyword at the start if present
       const cliArgs = args[0] === 'cypress' ? [...args.slice(1)] : [...args]
 
-      cliArgs.unshift(null, null)
+      cliArgs.unshift(null as any, null as any)
 
       debug('creating program parser')
       const program = createProgram()
 
       maybeAddInspectFlags(addCypressOpenCommand(program))
-      .action((...fnArgs) => {
+      .action((...fnArgs: any[]) => {
         debug('parsed Cypress open %o', fnArgs)
         const options = parseVariableOpts(fnArgs, cliArgs)
 
@@ -394,7 +406,7 @@ module.exports = {
   /**
    * Parses the command line and kicks off Cypress process.
    */
-  init (args) {
+  init (args?: string[]): any {
     if (!args) {
       args = process.argv
     }
@@ -418,7 +430,7 @@ module.exports = {
     if (!util.isValidCypressInternalEnvValue(CYPRESS_INTERNAL_ENV)) {
       debug('invalid CYPRESS_INTERNAL_ENV value', CYPRESS_INTERNAL_ENV)
 
-      return errors.exitWithError(errors.errors.invalidCypressEnv)(
+      return exitWithError(errors.invalidCypressEnv)(
         `CYPRESS_INTERNAL_ENV=${CYPRESS_INTERNAL_ENV}`,
       )
     }
@@ -448,10 +460,10 @@ module.exports = {
       program.help()
     })
 
-    const handleVersion = (cmd) => {
+    const handleVersion = (cmd: any): any => {
       return cmd
       .option('--component <package|binary|electron|node>', 'component to report version for')
-      .action((opts, ...other) => {
+      .action((opts: any, ...other: any[]) => {
         showVersions(util.parseOpts(opts))
       })
     }
@@ -463,19 +475,19 @@ module.exports = {
     .description(text('version')))
 
     maybeAddInspectFlags(addCypressOpenCommand(program))
-    .action((opts) => {
+    .action((opts: any) => {
       debug('opening Cypress')
-      require('./exec/open')
-      .start(util.parseOpts(opts))
+
+      openModule.start(util.parseOpts(opts))
       .then(util.exit)
       .catch(util.logErrorExit1)
     })
 
     maybeAddInspectFlags(addCypressRunCommand(program))
-    .action((...fnArgs) => {
+    .action((...fnArgs: any[]) => {
       debug('running Cypress with args %o', fnArgs)
-      require('./exec/run')
-      .start(parseVariableOpts(fnArgs, args))
+
+      runModule.start(parseVariableOpts(fnArgs, args as string[]))
       .then(util.exit)
       .catch(util.logErrorExit1)
     })
@@ -487,8 +499,8 @@ module.exports = {
       'Installs the Cypress executable matching this package\'s version',
     )
     .option('-f, --force', text('forceInstall'))
-    .action((opts) => {
-      require('./tasks/install')
+    .action((opts: any) => {
+      installModule
       .start(util.parseOpts(opts))
       .catch(util.logErrorExit1)
     })
@@ -500,12 +512,12 @@ module.exports = {
       'Verifies that Cypress is installed correctly and executable',
     )
     .option('--dev', text('dev'), coerceFalse)
-    .action((opts) => {
+    .action((opts: any) => {
       const defaultOpts = { force: true, welcomeMessage: false }
       const parsedOpts = util.parseOpts(opts)
       const options = _.extend(parsedOpts, defaultOpts)
 
-      require('./tasks/verify')
+      verifyModule
       .start(options)
       .catch(util.logErrorExit1)
     })
@@ -519,7 +531,7 @@ module.exports = {
     .option('clear', text('cacheClear'))
     .option('prune', text('cachePrune'))
     .option('--size', text('cacheSize'))
-    .action(function (opts, args) {
+    .action(function (this: any, opts: any, args: string[]) {
       if (!args || !args.length) {
         this.outputHelp()
         util.exit(1)
@@ -542,7 +554,7 @@ module.exports = {
           logger.always('No cached binary versions were found.')
           process.exit(0)
         })
-        .catch((e) => {
+        .catch((e: Error) => {
           debug('cache list command failed with "%s"', e.message)
 
           util.logErrorExit1(e)
@@ -557,8 +569,8 @@ module.exports = {
     .usage('[command]')
     .description('Prints Cypress and system information')
     .option('--dev', text('dev'), coerceFalse)
-    .action((opts) => {
-      require('./exec/info')
+    .action((opts: any) => {
+      infoModule
       .start(opts)
       .then(util.exit)
       .catch(util.logErrorExit1)
@@ -597,6 +609,8 @@ module.exports = {
     return program.parse(args)
   },
 }
+
+export default cliModule
 
 // @ts-ignore
 if (!module.parent) {

@@ -1,9 +1,11 @@
-const debug = require('debug')('cypress:cli')
-const util = require('../util')
-const spawn = require('./spawn')
-const verify = require('../tasks/verify')
-const { processTestingType, checkConfigFile } = require('./shared')
-const { exitWithError } = require('../errors')
+import Debug from 'debug'
+import util from '../util'
+import spawn from './spawn'
+import verifyModule from '../tasks/verify'
+import { processTestingType, checkConfigFile } from './shared'
+import { exitWithError } from '../errors'
+
+const debug = Debug('cypress:cli')
 
 /**
  * Maps options collected by the CLI
@@ -14,7 +16,7 @@ const { exitWithError } = require('../errors')
  *
  * @returns {string[]} list of CLI arguments
  */
-const processOpenOptions = (options = {}) => {
+export const processOpenOptions = (options: any = {}): string[] => {
   // In addition to setting the project directory, setting the project option
   // here ultimately decides whether cypress is run in global mode or not.
   // It's first based off whether it's installed globally by npm/yarn (-g).
@@ -25,7 +27,7 @@ const processOpenOptions = (options = {}) => {
     options.project = process.cwd()
   }
 
-  const args = []
+  const args: string[] = []
 
   if (options.config) {
     args.push('--config', options.config)
@@ -72,31 +74,32 @@ const processOpenOptions = (options = {}) => {
   return args
 }
 
-module.exports = {
-  processOpenOptions,
-  start (options = {}) {
-    function open () {
-      try {
-        const args = processOpenOptions(options)
+export const start = (options: any = {}): any => {
+  function open (): any {
+    try {
+      const args = processOpenOptions(options)
 
-        return spawn.start(args, {
-          dev: options.dev,
-          detached: Boolean(options.detached),
-        })
-      } catch (err) {
-        if (err.details) {
-          return exitWithError(err.details)()
-        }
-
-        throw err
+      return spawn.start(args, {
+        dev: options.dev,
+        detached: Boolean(options.detached),
+      })
+    } catch (err: any) {
+      if (err.details) {
+        return exitWithError(err.details)()
       }
-    }
 
-    if (options.dev) {
-      return open()
+      throw err
     }
+  }
 
-    return verify.start()
-    .then(open)
-  },
+  if (options.dev) {
+    return open()
+  }
+
+  return verifyModule.start()
+  .then(open)
+}
+
+export default {
+  start,
 }

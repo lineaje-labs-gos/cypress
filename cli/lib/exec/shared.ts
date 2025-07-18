@@ -1,18 +1,18 @@
-const { errors } = require('../errors')
+import { errors } from '../errors'
 
 /**
  * Throws an error with "details" property from
  * "errors" object.
  * @param {Object} details - Error details
  */
-const throwInvalidOptionError = (details) => {
+const throwInvalidOptionError = (details?: any): never => {
   if (!details) {
     details = errors.unknownError
   }
 
   // throw this error synchronously, it will be caught later on and
   // the details will be propagated to the promise chain
-  const err = new Error()
+  const err: any = new Error()
 
   err.details = details
   throw err
@@ -23,7 +23,7 @@ const throwInvalidOptionError = (details) => {
  * @param {string} testingType The type of tests being executed
  * @returns {string[]} The array of new exec arguments
  */
-const processTestingType = (options) => {
+const processTestingType = (options: any): string[] => {
   if (options.e2e && options.component) {
     return throwInvalidOptionError(errors.incompatibleTestTypeFlags)
   }
@@ -51,14 +51,14 @@ const processTestingType = (options) => {
  * Throws an error if configFile is string 'false' or boolean false
  * @param {*} options
  */
-const checkConfigFile = (options) => {
+const checkConfigFile = (options: any): void => {
   // CLI will parse as string, module API can pass in boolean
   if (options.configFile === 'false' || options.configFile === false) {
     throwInvalidOptionError(errors.invalidConfigFile)
   }
 }
 
-module.exports = {
+export {
   throwInvalidOptionError,
   processTestingType,
   checkConfigFile,

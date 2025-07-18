@@ -1,32 +1,35 @@
 // https://github.com/cypress-io/cypress/issues/316
 
-const Promise = require('bluebird')
-const tmp = Promise.promisifyAll(require('tmp'))
+import Bluebird from 'bluebird'
+import tmpModule from 'tmp'
+import fs from './fs'
+import openModule from './exec/open'
+import runModule from './exec/run'
+import util from './util'
+import cli from './cli'
 
-const fs = require('./fs')
-const open = require('./exec/open')
-const run = require('./exec/run')
-const util = require('./util')
-const cli = require('./cli')
+// Type fs as any since it's a custom wrapper with async methods
+const fsAny: any = fs
+const tmp = Bluebird.promisifyAll(tmpModule) as any
 
 const cypressModuleApi = {
   /**
    * Opens Cypress GUI
    * @see https://on.cypress.io/module-api#cypress-open
    */
-  open (options = {}) {
+  open (options: any = {}): any {
     options = util.normalizeModuleOptions(options)
 
-    return open.start(options)
+    return openModule.start(options)
   },
 
   /**
    * Runs Cypress tests in the current project
    * @see https://on.cypress.io/module-api#cypress-run
    */
-  run (options = {}) {
-    if (!run.isValidProject(options.project)) {
-      return Promise.reject(new Error(`Invalid project path parameter: ${options.project}`))
+  run (options: any = {}): any {
+    if (!runModule.isValidProject(options.project)) {
+      return Bluebird.reject(new Error(`Invalid project path parameter: ${options.project}`))
     }
 
     options = util.normalizeModuleOptions(options)
@@ -34,13 +37,13 @@ const cypressModuleApi = {
     tmp.setGracefulCleanup()
 
     return tmp.fileAsync()
-    .then((outputPath) => {
+    .then((outputPath: string) => {
       options.outputPath = outputPath
 
-      return run.start(options)
-      .then((failedTests) => {
-        return fs.readJsonAsync(outputPath, { throws: false })
-        .then((output) => {
+      return runModule.start(options)
+      .then((failedTests: any) => {
+        return fsAny.readJsonAsync(outputPath, { throws: false })
+        .then((output: any) => {
           if (!output) {
             return {
               status: 'failed',
@@ -66,7 +69,7 @@ const cypressModuleApi = {
      *  await cypress.run(options)
      * @see https://on.cypress.io/module-api
      */
-    parseRunArguments (args) {
+    parseRunArguments (args: string[]): any {
       return cli.parseRunCommand(args)
     },
   },
@@ -84,7 +87,7 @@ const cypressModuleApi = {
    * @param {Cypress.ConfigOptions} config
    * @returns {Cypress.ConfigOptions} the configuration passed in parameter
    */
-  defineConfig (config) {
+  defineConfig (config: any): any {
     return config
   },
 
@@ -102,9 +105,9 @@ const cypressModuleApi = {
    * @param {Cypress.ThirdPartyComponentFrameworkDefinition} config
    * @returns {Cypress.ThirdPartyComponentFrameworkDefinition} the configuration passed in parameter
    */
-  defineComponentFramework (config) {
+  defineComponentFramework (config: any): any {
     return config
   },
 }
 
-module.exports = cypressModuleApi
+export default cypressModuleApi

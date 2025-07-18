@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
-const spawn = require('./spawn')
-const util = require('../util')
-const state = require('../tasks/state')
-const os = require('os')
-const chalk = require('chalk')
-const prettyBytes = require('pretty-bytes')
-const _ = require('lodash')
+import spawn from './spawn'
+import util from '../util'
+import state from '../tasks/state'
+import os from 'os'
+import chalk from 'chalk'
+import prettyBytes from 'pretty-bytes'
+import _ from 'lodash'
 
 // color for numbers and show values
 const g = chalk.green
@@ -16,13 +16,13 @@ const red = chalk.red
 const link = chalk.blue.underline
 
 // to be exported
-const methods = {}
+const methods: any = {}
 
-methods.findProxyEnvironmentVariables = () => {
+methods.findProxyEnvironmentVariables = (): any => {
   return _.pick(process.env, ['HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY'])
 }
 
-const maskSensitiveVariables = (obj) => {
+const maskSensitiveVariables = (obj: any): any => {
   const masked = { ...obj }
 
   if (masked.CYPRESS_RECORD_KEY) {
@@ -32,19 +32,19 @@ const maskSensitiveVariables = (obj) => {
   return masked
 }
 
-methods.findCypressEnvironmentVariables = () => {
-  const isCyVariable = (val, key) => key.startsWith('CYPRESS_')
+methods.findCypressEnvironmentVariables = (): any => {
+  const isCyVariable = (val: any, key: string): boolean => key.startsWith('CYPRESS_')
 
   return _.pickBy(process.env, isCyVariable)
 }
 
-const formatCypressVariables = () => {
+const formatCypressVariables = (): any => {
   const vars = methods.findCypressEnvironmentVariables()
 
   return maskSensitiveVariables(vars)
 }
 
-methods.start = async (options = {}) => {
+methods.start = async (options: any = {}): Promise<void> => {
   const args = ['--mode=info']
 
   await spawn.start(args, {
@@ -58,7 +58,7 @@ methods.start = async (options = {}) => {
     console.log('Proxy Settings: none detected')
   } else {
     console.log('Proxy Settings:')
-    _.forEach(proxyVars, (value, key) => {
+    _.forEach(proxyVars, (value: any, key: string) => {
       console.log('%s: %s', key, g(value))
     })
 
@@ -73,7 +73,7 @@ methods.start = async (options = {}) => {
     console.log('Environment Variables: none detected')
   } else {
     console.log('Environment Variables:')
-    _.forEach(cyVars, (value, key) => {
+    _.forEach(cyVars, (value: any, key: string) => {
       console.log('%s: %s', key, g(value))
     })
   }
@@ -106,4 +106,4 @@ methods.start = async (options = {}) => {
   }
 }
 
-module.exports = methods
+export default methods

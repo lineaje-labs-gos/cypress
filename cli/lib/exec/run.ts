@@ -1,11 +1,12 @@
-const _ = require('lodash')
-const debug = require('debug')('cypress:cli:run')
+import _ from 'lodash'
+import Debug from 'debug'
+import util from '../util'
+import spawn from './spawn'
+import verifyModule from '../tasks/verify'
+import { exitWithError, errors } from '../errors'
+import { processTestingType, throwInvalidOptionError, checkConfigFile } from './shared'
 
-const util = require('../util')
-const spawn = require('./spawn')
-const verify = require('../tasks/verify')
-const { exitWithError, errors } = require('../errors')
-const { processTestingType, throwInvalidOptionError, checkConfigFile } = require('./shared')
+const debug = Debug('cypress:cli:run')
 
 /**
  * Typically a user passes a string path to the project.
@@ -13,7 +14,7 @@ const { processTestingType, throwInvalidOptionError, checkConfigFile } = require
  * and the user can accidentally execute `cypress run --project false`
  * which should be invalid.
  */
-const isValidProject = (v) => {
+const isValidProject = (v: any): boolean => {
   if (typeof v === 'boolean') {
     return false
   }
@@ -34,7 +35,7 @@ const isValidProject = (v) => {
  *
  * @returns {string[]} list of CLI arguments
  */
-const processRunOptions = (options = {}) => {
+const processRunOptions = (options: any = {}): string[] => {
   debug('processing run options %o', options)
 
   if (!isValidProject(options.project)) {
@@ -43,7 +44,7 @@ const processRunOptions = (options = {}) => {
     return throwInvalidOptionError(errors.invalidRunProjectPath)
   }
 
-  const args = ['--run-project', options.project]
+  const args: string[] = ['--run-project', options.project]
 
   if (options.autoCancelAfterFailures || options.autoCancelAfterFailures === 0 || options.autoCancelAfterFailures === false) {
     args.push('--auto-cancel-after-failures', options.autoCancelAfterFailures)
@@ -87,7 +88,7 @@ const processRunOptions = (options = {}) => {
       return throwInvalidOptionError(errors.incompatibleHeadlessFlags)
     }
 
-    args.push('--headed', !options.headless)
+    args.push('--headed', String(!options.headless))
   }
 
   // if key is set use that - else attempt to find it by environment variable
@@ -159,11 +160,11 @@ const processRunOptions = (options = {}) => {
   return args
 }
 
-module.exports = {
+const runModule = {
   processRunOptions,
   isValidProject,
   // resolves with the number of failed tests
-  start (options = {}) {
+  start (options: any = {}): any {
     _.defaults(options, {
       key: null,
       spec: null,
@@ -172,7 +173,7 @@ module.exports = {
       project: process.cwd(),
     })
 
-    function run () {
+    function run (): any {
       try {
         const args = processRunOptions(options)
 
@@ -181,7 +182,7 @@ module.exports = {
         return spawn.start(args, {
           dev: options.dev,
         })
-      } catch (err) {
+      } catch (err: any) {
         if (err.details) {
           return exitWithError(err.details)()
         }
@@ -194,7 +195,9 @@ module.exports = {
       return run()
     }
 
-    return verify.start()
+    return verifyModule.start()
     .then(run)
   },
 }
+
+export default runModule

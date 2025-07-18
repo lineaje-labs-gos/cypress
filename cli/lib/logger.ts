@@ -1,38 +1,38 @@
-const chalk = require('chalk')
+import chalk from 'chalk'
 
-let logs = []
+let logs: string[] = []
 
-const logLevel = () => {
+const logLevel = (): string => {
   return (process.env.npm_config_loglevel || 'notice')
 }
 
-const error = (...messages) => {
+const error = (...messages: any[]): void => {
   logs.push(messages.join(' '))
   console.log(chalk.red(...messages)) // eslint-disable-line no-console
 }
 
-const warn = (...messages) => {
+const warn = (...messages: any[]): void => {
   if (logLevel() === 'silent') return
 
   logs.push(messages.join(' '))
   console.log(chalk.yellow(...messages)) // eslint-disable-line no-console
 }
 
-const log = (...messages) => {
+const log = (...messages: any[]): void => {
   if (logLevel() === 'silent' || logLevel() === 'warn') return
 
   logs.push(messages.join(' '))
   console.log(...messages) // eslint-disable-line no-console
 }
 
-const always = (...messages) => {
+const always = (...messages: any[]): void => {
   logs.push(messages.join(' '))
   console.log(...messages) // eslint-disable-line no-console
 }
 
 // splits long text into lines and calls log()
 // on each one to allow easy unit testing for specific message
-const logLines = (text) => {
+const logLines = (text: string): void => {
   const lines = text.split('\n')
 
   for (const line of lines) {
@@ -40,15 +40,15 @@ const logLines = (text) => {
   }
 }
 
-const print = () => {
+const print = (): string => {
   return logs.join('\n')
 }
 
-const reset = () => {
+const reset = (): void => {
   logs = []
 }
 
-module.exports = {
+const loggerModule = {
   log,
   warn,
   error,
@@ -58,3 +58,5 @@ module.exports = {
   reset,
   logLevel,
 }
+
+export default loggerModule

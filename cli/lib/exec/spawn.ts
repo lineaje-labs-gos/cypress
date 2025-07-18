@@ -1,17 +1,18 @@
-const _ = require('lodash')
-const os = require('os')
-const cp = require('child_process')
-const path = require('path')
-const Promise = require('bluebird')
-const debug = require('debug')('cypress:cli')
-const debugVerbose = require('debug')('cypress-verbose:cli')
+import _ from 'lodash'
+import os from 'os'
+import cp from 'child_process'
+import path from 'path'
+import Bluebird from 'bluebird'
+import Debug from 'debug'
+import util from '../util'
+import state from '../tasks/state'
+import xvfb from './xvfb'
+import verifyModule from '../tasks/verify'
+import { throwFormErrorText, getError, errors } from '../errors'
+import readline from 'readline'
 
-const util = require('../util')
-const state = require('../tasks/state')
-const xvfb = require('./xvfb')
-const verify = require('../tasks/verify')
-const errors = require('../errors')
-const readline = require('readline')
+const debug = Debug('cypress:cli')
+const debugVerbose = Debug('cypress-verbose:cli')
 
 const isXlibOrLibudevRe = /^(?:Xlib|libudev)/
 const isHighSierraWarningRe = /\*\*\* WARNING/
@@ -118,17 +119,17 @@ const GARBAGE_WARNINGS = [
   isGlxDriverError,
 ]
 
-const isGarbageLineWarning = (str) => {
+const isGarbageLineWarning = (str: string): boolean => {
   return _.some(GARBAGE_WARNINGS, (re) => {
     return re.test(str)
   })
 }
 
-function isPlatform (platform) {
+function isPlatform (platform: string): boolean {
   return os.platform() === platform
 }
 
-function needsStderrPiped (needsXvfb) {
+function needsStderrPiped (needsXvfb: boolean): boolean {
   return _.some([
     isPlatform('darwin'),
 
@@ -138,11 +139,11 @@ function needsStderrPiped (needsXvfb) {
   ])
 }
 
-function needsEverythingPipedDirectly () {
+function needsEverythingPipedDirectly (): boolean {
   return isPlatform('win32')
 }
 
-function getStdio (needsXvfb) {
+function getStdio (needsXvfb: boolean): any {
   if (needsEverythingPipedDirectly()) {
     return 'pipe'
   }
@@ -160,15 +161,15 @@ function getStdio (needsXvfb) {
   return 'inherit'
 }
 
-module.exports = {
+const spawnModule = {
   isGarbageLineWarning,
 
-  start (args, options = {}) {
+  start (args: any, options: any = {}): any {
     const needsXvfb = xvfb.isNeeded()
     let executable = state.getPathToExecutable(state.getBinaryDir())
 
     if (util.getEnv('CYPRESS_RUN_BINARY')) {
-      executable = path.resolve(util.getEnv('CYPRESS_RUN_BINARY'))
+      executable = path.resolve(util.getEnv('CYPRESS_RUN_BINARY') as string)
     }
 
     debug('needs to start own Xvfb?', needsXvfb)
@@ -190,29 +191,29 @@ module.exports = {
       stdio: getStdio(needsXvfb),
     })
 
-    const spawn = (overrides = {}) => {
-      return new Promise((resolve, reject) => {
+    const spawn = (overrides: any = {}): any => {
+      return new Bluebird((resolve: any, reject: any) => {
         _.defaults(overrides, {
           onStderrData: false,
         })
 
         const { onStderrData } = overrides
         const envOverrides = util.getEnvOverrides(options)
-        const electronArgs = []
+        const electronArgs: string[] = []
         const node11WindowsFix = isPlatform('win32')
 
-        let startScriptPath
+        let startScriptPath: string | undefined
 
         if (options.dev) {
           executable = 'node'
           // if we're in dev then reset
           // the launch cmd to be 'npm run dev'
-          startScriptPath = path.resolve(__dirname, '..', '..', '..', 'scripts', 'start.js'),
+          startScriptPath = path.resolve(__dirname, '..', '..', '..', 'scripts', 'start.js')
 
           debug('in dev mode the args became %o', args)
         }
 
-        if (!options.dev && verify.needsSandbox()) {
+        if (!options.dev && verifyModule.needsSandbox()) {
           electronArgs.push('--no-sandbox')
         }
 
@@ -220,7 +221,7 @@ module.exports = {
         /**
          * @type {import('child_process').ForkOptions}
          */
-        let stdioOptions = _.pick(options, 'env', 'detached', 'stdio')
+        let stdioOptions: any = _.pick(options, 'env', 'detached', 'stdio')
 
         // figure out if we're going to be force enabling or disabling colors.
         // also figure out whether we should force stdout and stderr into thinking
@@ -261,14 +262,14 @@ module.exports = {
 
         const child = cp.spawn(executable, args, stdioOptions)
 
-        function resolveOn (event) {
-          return function (code, signal) {
+        function resolveOn (event: any): any {
+          return function (code: any, signal: any): any {
             debug('child event fired %o', { event, code, signal })
 
             if (code === null) {
-              const errorObject = errors.errors.childProcessKilled(event, signal)
+              const errorObject = errors.childProcessKilled(event, signal)
 
-              return errors.getError(errorObject).then(reject)
+              return getError(errorObject).then(reject)
             }
 
             resolve(code)
@@ -287,10 +288,10 @@ module.exports = {
 
           // on windows, SIGINT does not propagate to the child process when ctrl+c is pressed
           // this makes sure all nested processes are closed(ex: firefox inside the server)
-          rl.on('SIGINT', function () {
-            let kill = require('tree-kill')
+          rl.on('SIGINT', async function () {
+            const kill = (await import('tree-kill')).default
 
-            kill(child.pid, 'SIGINT')
+            kill(child.pid as number, 'SIGINT')
           })
         }
 
@@ -313,7 +314,7 @@ module.exports = {
         // to filter out the garbage
         if (child.stderr) {
           debug('piping child STDERR to process STDERR')
-          child.stderr.on('data', (data) => {
+          child.stderr.on('data', (data: any) => {
             const str = data.toString()
 
             // bail if this is warning line garbage
@@ -341,7 +342,7 @@ module.exports = {
         // into the child process. unpiping does not seem
         // to have any effect. so we're just catching the
         // error here and not doing anything.
-        process.stdin.on('error', (err) => {
+        process.stdin.on('error', (err: any) => {
           if (['EPIPE', 'ENOTCONN'].includes(err.code)) {
             return
           }
@@ -355,24 +356,24 @@ module.exports = {
       })
     }
 
-    const spawnInXvfb = () => {
+    const spawnInXvfb = (): any => {
       return xvfb
       .start()
       .then(userFriendlySpawn)
       .finally(xvfb.stop)
     }
 
-    const userFriendlySpawn = (linuxWithDisplayEnv) => {
+    const userFriendlySpawn = (linuxWithDisplayEnv: any): any => {
       debug('spawning, should retry on display problem?', Boolean(linuxWithDisplayEnv))
 
-      let brokenGtkDisplay
+      let brokenGtkDisplay: boolean
 
-      const overrides = {}
+      const overrides: any = {}
 
       if (linuxWithDisplayEnv) {
         _.extend(overrides, {
           electronLogging: true,
-          onStderrData (str) {
+          onStderrData (str: string): any {
             // if we receive a broken pipe anywhere
             // then we know that's why cypress exited early
             if (util.isBrokenGtkDisplay(str)) {
@@ -383,7 +384,7 @@ module.exports = {
       }
 
       return spawn(overrides)
-      .then((code) => {
+      .then((code: any) => {
         if (code !== 0 && brokenGtkDisplay) {
           util.logBrokenGtkDisplayWarning()
 
@@ -394,7 +395,7 @@ module.exports = {
       })
       // we can format and handle an error message from the code above
       // prevent wrapping error again by using "known: undefined" filter
-      .catch({ known: undefined }, errors.throwFormErrorText(errors.errors.unexpected))
+      .catch({ known: undefined }, throwFormErrorText(errors.unexpected))
     }
 
     if (needsXvfb) {
@@ -409,3 +410,5 @@ module.exports = {
     return userFriendlySpawn(linuxWithDisplayEnv)
   },
 }
+
+export default spawnModule

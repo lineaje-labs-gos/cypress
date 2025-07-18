@@ -1,13 +1,17 @@
-const _ = require('lodash')
-const os = require('os')
-const path = require('path')
-const untildify = require('untildify')
-const debug = require('debug')('cypress:cli')
+import _ from 'lodash'
+import os from 'os'
+import path from 'path'
+import untildify from 'untildify'
+import Debug from 'debug'
+import fs from '../fs'
+import util from '../util'
 
-const fs = require('../fs')
-const util = require('../util')
+const debug = Debug('cypress:cli')
 
-const getPlatformExecutable = () => {
+// Type fs as any since it's a custom wrapper with async methods
+const fsAny: any = fs
+
+const getPlatformExecutable = (): string => {
   const platform = os.platform()
 
   switch (platform) {
@@ -19,7 +23,7 @@ const getPlatformExecutable = () => {
   }
 }
 
-const getPlatFormBinaryFolder = () => {
+const getPlatFormBinaryFolder = (): string => {
   const platform = os.platform()
 
   switch (platform) {
@@ -31,7 +35,7 @@ const getPlatFormBinaryFolder = () => {
   }
 }
 
-const getBinaryPkgPath = (binaryDir) => {
+const getBinaryPkgPath = (binaryDir: string): string => {
   const platform = os.platform()
 
   switch (platform) {
@@ -46,11 +50,11 @@ const getBinaryPkgPath = (binaryDir) => {
 /**
  * Get path to binary directory
 */
-const getBinaryDir = (version = util.pkgVersion()) => {
+const getBinaryDir = (version: string = util.pkgVersion()): string => {
   return path.join(getVersionDir(version), getPlatFormBinaryFolder())
 }
 
-const getVersionDir = (version = util.pkgVersion(), buildInfo = util.pkgBuildInfo()) => {
+const getVersionDir = (version: string = util.pkgVersion(), buildInfo: any = util.pkgBuildInfo()): string => {
   if (buildInfo && !buildInfo.stable) {
     version = ['beta', version, buildInfo.commitBranch, buildInfo.commitSha.slice(0, 8)].join('-')
   }
@@ -62,7 +66,7 @@ const getVersionDir = (version = util.pkgVersion(), buildInfo = util.pkgBuildInf
  * When executing "npm postinstall" hook, the working directory is set to
  * "<current folder>/node_modules/cypress", which can be surprising when using relative paths.
  */
-const isInstallingFromPostinstallHook = () => {
+const isInstallingFromPostinstallHook = (): boolean => {
   // individual folders
   const cwdFolders = process.cwd().split(path.sep)
   const length = cwdFolders.length
@@ -70,11 +74,11 @@ const isInstallingFromPostinstallHook = () => {
   return cwdFolders[length - 2] === 'node_modules' && cwdFolders[length - 1] === 'cypress'
 }
 
-const getCacheDir = () => {
+const getCacheDir = (): string => {
   let cache_directory = util.getCacheDir()
 
   if (util.getEnv('CYPRESS_CACHE_FOLDER')) {
-    const envVarCacheDir = untildify(util.getEnv('CYPRESS_CACHE_FOLDER'))
+    const envVarCacheDir = untildify(util.getEnv('CYPRESS_CACHE_FOLDER') as string)
 
     debug('using environment variable CYPRESS_CACHE_FOLDER %s', envVarCacheDir)
 
@@ -92,9 +96,9 @@ const getCacheDir = () => {
   return cache_directory
 }
 
-const parseRealPlatformBinaryFolderAsync = (binaryPath) => {
-  return fs.realpathAsync(binaryPath)
-  .then((realPath) => {
+const parseRealPlatformBinaryFolderAsync = (binaryPath: string): any => {
+  return fsAny.realpathAsync(binaryPath)
+  .then((realPath: any) => {
     debug('CYPRESS_RUN_BINARY has realpath:', realPath)
     if (!realPath.toString().endsWith(getPlatformExecutable())) {
       return false
@@ -108,7 +112,7 @@ const parseRealPlatformBinaryFolderAsync = (binaryPath) => {
   })
 }
 
-const getDistDir = () => {
+const getDistDir = (): string => {
   return path.join(__dirname, '..', '..', 'dist')
 }
 
@@ -117,14 +121,14 @@ const getDistDir = () => {
  * Note: the binary state file will be stored one level up from the given binary folder.
  * @param {string} binaryDir - full path to the folder holding the binary.
  */
-const getBinaryStatePath = (binaryDir) => {
+const getBinaryStatePath = (binaryDir: string): string => {
   return path.join(binaryDir, '..', 'binary_state.json')
 }
 
-const getBinaryStateContentsAsync = (binaryDir) => {
+const getBinaryStateContentsAsync = (binaryDir: string): any => {
   const fullPath = getBinaryStatePath(binaryDir)
 
-  return fs.readJsonAsync(fullPath)
+  return fsAny.readJsonAsync(fullPath)
   .catch({ code: 'ENOENT' }, SyntaxError, () => {
     debug('could not read binary_state.json file at "%s"', fullPath)
 
@@ -132,14 +136,14 @@ const getBinaryStateContentsAsync = (binaryDir) => {
   })
 }
 
-const getBinaryVerifiedAsync = (binaryDir) => {
+const getBinaryVerifiedAsync = (binaryDir: string): any => {
   return getBinaryStateContentsAsync(binaryDir)
   .tap(debug)
   .get('verified')
 }
 
-const clearBinaryStateAsync = (binaryDir) => {
-  return fs.removeAsync(getBinaryStatePath(binaryDir))
+const clearBinaryStateAsync = (binaryDir: string): any => {
+  return fsAny.removeAsync(getBinaryStatePath(binaryDir))
 }
 
 /**
@@ -148,10 +152,10 @@ const clearBinaryStateAsync = (binaryDir) => {
  * @param {string} binaryDir Folder holding the binary
  * @returns {Promise<void>} returns a promise
  */
-const writeBinaryVerifiedAsync = (verified, binaryDir) => {
+const writeBinaryVerifiedAsync = (verified: boolean, binaryDir: string): any => {
   return getBinaryStateContentsAsync(binaryDir)
-  .then((contents) => {
-    return fs.outputJsonAsync(
+  .then((contents: any) => {
+    return fsAny.outputJsonAsync(
       getBinaryStatePath(binaryDir),
       _.extend(contents, { verified }),
       { spaces: 2 },
@@ -159,7 +163,7 @@ const writeBinaryVerifiedAsync = (verified, binaryDir) => {
   })
 }
 
-const getPathToExecutable = (binaryDir) => {
+const getPathToExecutable = (binaryDir: string): string => {
   return path.join(binaryDir, getPlatformExecutable())
 }
 
@@ -167,26 +171,26 @@ const getPathToExecutable = (binaryDir) => {
  * Resolves with an object read from the binary app package.json file.
  * If the file does not exist resolves with null
  */
-const getBinaryPkgAsync = (binaryDir) => {
+const getBinaryPkgAsync = (binaryDir: string): any => {
   const pathToPackageJson = getBinaryPkgPath(binaryDir)
 
   debug('Reading binary package.json from:', pathToPackageJson)
 
-  return fs.pathExistsAsync(pathToPackageJson)
-  .then((exists) => {
+  return fsAny.pathExistsAsync(pathToPackageJson)
+  .then((exists: boolean) => {
     if (!exists) {
       return null
     }
 
-    return fs.readJsonAsync(pathToPackageJson)
+    return fsAny.readJsonAsync(pathToPackageJson)
   })
 }
 
-const getBinaryPkgVersion = (o) => _.get(o, 'version', null)
-const getBinaryElectronVersion = (o) => _.get(o, 'electronVersion', null)
-const getBinaryElectronNodeVersion = (o) => _.get(o, 'electronNodeVersion', null)
+const getBinaryPkgVersion = (o: any): any => _.get(o, 'version', null)
+const getBinaryElectronVersion = (o: any): any => _.get(o, 'electronVersion', null)
+const getBinaryElectronNodeVersion = (o: any): any => _.get(o, 'electronNodeVersion', null)
 
-module.exports = {
+const stateModule = {
   getPathToExecutable,
   getPlatformExecutable,
   // those names start to sound like Java
@@ -204,3 +208,5 @@ module.exports = {
   getDistDir,
   getVersionDir,
 }
+
+export default stateModule

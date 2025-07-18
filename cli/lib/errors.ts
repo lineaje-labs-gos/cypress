@@ -1,10 +1,12 @@
-const chalk = require('chalk')
-const { stripIndent, stripIndents } = require('common-tags')
-const la = require('lazy-ass')
-const is = require('check-more-types')
+import chalk from 'chalk'
+import { stripIndent, stripIndents } from 'common-tags'
+import la from 'lazy-ass'
+import is from 'check-more-types'
+import util from './util'
+import state from './tasks/state'
 
-const util = require('./util')
-const state = require('./tasks/state')
+// Type is as any since it's a helper library with various checking functions
+const isAny: any = is
 
 const docsUrl = 'https://on.cypress.io'
 const requiredDependenciesUrl = `${docsUrl}/required-dependencies`
@@ -13,7 +15,7 @@ const runDocumentationUrl = `${docsUrl}/cypress-run`
 // TODO it would be nice if all error objects could be enforced via types
 // to only have description + solution properties
 
-const hr = '----------'
+export const hr = '----------'
 
 const genericErrorSolution = stripIndent`
   Search for an existing issue or open a GitHub issue at
@@ -65,7 +67,7 @@ const failedUnzipWindowsMaxPathLength = {
   Read here for solutions to this problem: https://on.cypress.io/win-max-path-length-error`,
 }
 
-const missingApp = (binaryDir) => {
+const missingApp = (binaryDir: string): any => {
   return {
     description: `No version of Cypress is installed in: ${chalk.cyan(
       binaryDir,
@@ -76,7 +78,7 @@ const missingApp = (binaryDir) => {
   }
 }
 
-const binaryNotExecutable = (executable) => {
+const binaryNotExecutable = (executable: string): any => {
   return {
     description: `Cypress cannot run because this binary file does not have executable permissions here:\n\n${executable}`,
     solution: stripIndent`\n
@@ -92,7 +94,7 @@ const binaryNotExecutable = (executable) => {
   }
 }
 
-const notInstalledCI = (executable) => {
+const notInstalledCI = (executable: string): any => {
   return {
     description:
       'The cypress npm package is installed, but the Cypress binary is missing.',
@@ -135,7 +137,7 @@ const missingXvfb = {
     `,
 }
 
-const smokeTestFailure = (smokeTestCommand, timedOut) => {
+const smokeTestFailure = (smokeTestCommand: string, timedOut: boolean): any => {
   return {
     description: `Cypress verification ${timedOut ? 'timed out' : 'failed'}.`,
     solution: stripIndent`
@@ -150,7 +152,7 @@ const smokeTestFailure = (smokeTestCommand, timedOut) => {
 const invalidSmokeTestDisplayError = {
   code: 'INVALID_SMOKE_TEST_DISPLAY_ERROR',
   description: 'Cypress verification failed.',
-  solution (msg) {
+  solution (msg: string): string {
     return stripIndent`
       Cypress failed to start after spawning a new Xvfb server.
 
@@ -249,7 +251,7 @@ const invalidConfigFile = {
  * @param {'close'|'event'} eventName Child close event name
  * @param {string} signal Signal that closed the child process, like "SIGBUS"
 */
-const childProcessKilled = (eventName, signal) => {
+const childProcessKilled = (eventName: string, signal: string): any => {
   return {
     description: `The Test Runner unexpectedly exited via a ${chalk.cyan(eventName)} event with signal ${chalk.cyan(signal)}`,
     solution: solutionUnknown,
@@ -257,7 +259,7 @@ const childProcessKilled = (eventName, signal) => {
 }
 
 const CYPRESS_RUN_BINARY = {
-  notValid: (value) => {
+  notValid: (value: string): any => {
     const properFormat = `**/${state.getPlatformExecutable()}`
 
     return {
@@ -267,8 +269,8 @@ const CYPRESS_RUN_BINARY = {
   },
 }
 
-function addPlatformInformation (info) {
-  return util.getPlatformInfo().then((platform) => {
+function addPlatformInformation (info: any): any {
+  return util.getPlatformInfo().then((platform: string) => {
     return { ...info, platform }
   })
 }
@@ -277,7 +279,7 @@ function addPlatformInformation (info) {
  * Given an error object (see the errors above), forms error message text with details,
  * then resolves with Error instance you can throw or reject with.
  * @param {object} errorObject
- * @returns {Promise<Error>} resolves with an Error
+ * @returns {Promise<e>} resolves with an Error
  * @example
   ```js
   // inside a Promise with "resolve" and "reject"
@@ -285,9 +287,9 @@ function addPlatformInformation (info) {
   return getError(errorObject).then(reject)
   ```
  */
-function getError (errorObject) {
-  return formErrorText(errorObject).then((errorMessage) => {
-    const err = new Error(errorMessage)
+export function getError (errorObject: any): any {
+  return formErrorText(errorObject).then((errorMessage: string) => {
+    const err: any = new Error(errorMessage)
 
     err.known = true
 
@@ -299,26 +301,26 @@ function getError (errorObject) {
  * Forms nice error message with error and platform information,
  * and if possible a way to solve it. Resolves with a string.
  */
-function formErrorText (info, msg, prevMessage) {
-  return addPlatformInformation(info).then((obj) => {
-    const formatted = []
+export function formErrorText (info: any, msg?: string, prevMessage?: string): any {
+  return addPlatformInformation(info).then((obj: any) => {
+    const formatted: string[] = []
 
-    function add (msg) {
+    function add (msg: string): void {
       formatted.push(stripIndents(msg))
     }
 
     la(
-      is.unemptyString(obj.description),
+      isAny.unemptyString(obj.description),
       'expected error description to be text',
       obj.description,
     )
 
     // assuming that if there the solution is a function it will handle
     // error message and (optional previous error message)
-    if (is.fn(obj.solution)) {
+    if (isAny.fn(obj.solution)) {
       const text = obj.solution(msg, prevMessage)
 
-      la(is.unemptyString(text), 'expected solution to be text', text)
+      la(isAny.unemptyString(text), 'expected solution to be text', text)
 
       add(`
         ${obj.description}
@@ -328,7 +330,7 @@ function formErrorText (info, msg, prevMessage) {
       `)
     } else {
       la(
-        is.unemptyString(obj.solution),
+        isAny.unemptyString(obj.solution),
         'expected error solution to be text',
         obj.solution,
       )
@@ -369,9 +371,9 @@ function formErrorText (info, msg, prevMessage) {
   })
 }
 
-const raise = (info) => {
-  return (text) => {
-    const err = new Error(text)
+export const raise = (info: any) => {
+  return (text: string) => {
+    const err: any = new Error(text)
 
     if (info.code) {
       err.code = info.code
@@ -382,8 +384,8 @@ const raise = (info) => {
   }
 }
 
-const throwFormErrorText = (info) => {
-  return (msg, prevMessage) => {
+export const throwFormErrorText = (info: any) => {
+  return (msg?: string, prevMessage?: string) => {
     return formErrorText(info, msg, prevMessage).then(raise(info))
   }
 }
@@ -394,9 +396,9 @@ const throwFormErrorText = (info) => {
  * @param {ErrorInformation} info Error information {description, solution}
  * @example return exitWithError(errors.invalidCypressEnv)('foo')
  */
-const exitWithError = (info) => {
-  return (msg) => {
-    return formErrorText(info, msg).then((text) => {
+export const exitWithError = (info: any) => {
+  return (msg?: string) => {
+    return formErrorText(info, msg).then((text: string) => {
       // eslint-disable-next-line no-console
       console.error(text)
       process.exit(info.exitCode || 1)
@@ -404,39 +406,30 @@ const exitWithError = (info) => {
   }
 }
 
-module.exports = {
-  raise,
-  exitWithError,
-  // formError,
-  formErrorText,
-  throwFormErrorText,
-  getError,
-  hr,
-  errors: {
-    unknownError,
-    nonZeroExitCodeXvfb,
-    missingXvfb,
-    missingApp,
-    notInstalledCI,
-    missingDependency,
-    invalidOS,
-    invalidSmokeTestDisplayError,
-    versionMismatch,
-    binaryNotExecutable,
-    unexpected,
-    failedDownload,
-    failedUnzip,
-    failedUnzipWindowsMaxPathLength,
-    invalidCypressEnv,
-    invalidCacheDirectory,
-    CYPRESS_RUN_BINARY,
-    smokeTestFailure,
-    childProcessKilled,
-    incompatibleHeadlessFlags,
-    invalidRunProjectPath,
-    invalidTestingType,
-    incompatibleTestTypeFlags,
-    incompatibleTestingTypeAndFlag,
-    invalidConfigFile,
-  },
+export const errors = {
+  unknownError,
+  nonZeroExitCodeXvfb,
+  missingXvfb,
+  missingApp,
+  notInstalledCI,
+  missingDependency,
+  invalidOS,
+  invalidSmokeTestDisplayError,
+  versionMismatch,
+  binaryNotExecutable,
+  unexpected,
+  failedDownload,
+  failedUnzip,
+  failedUnzipWindowsMaxPathLength,
+  invalidCypressEnv,
+  invalidCacheDirectory,
+  CYPRESS_RUN_BINARY,
+  smokeTestFailure,
+  childProcessKilled,
+  incompatibleHeadlessFlags,
+  invalidRunProjectPath,
+  invalidTestingType,
+  incompatibleTestTypeFlags,
+  incompatibleTestingTypeAndFlag,
+  invalidConfigFile,
 }
