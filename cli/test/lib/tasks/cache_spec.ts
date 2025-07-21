@@ -193,6 +193,7 @@ describe('lib/tasks/cache', () => {
       // unknown access times
       sinon.stub(state, 'getPathToExecutable').returns('/.cache/Cypress/1.2.3/app/cypress')
 
+      // @ts-expect-error
       await cache.list()
 
       defaultSnapshot()
@@ -206,6 +207,7 @@ describe('lib/tasks/cache', () => {
       // unknown access times
       sinon.stub(state, 'getPathToExecutable').returns('/.cache/Cypress/1.2.3/app/cypress')
 
+      // @ts-expect-error
       await cache.list()
       // log output snapshot should have a grid of versions
       defaultSnapshot('cache list with silent log level')
@@ -219,6 +221,7 @@ describe('lib/tasks/cache', () => {
       // unknown access times
       sinon.stub(state, 'getPathToExecutable').returns('/.cache/Cypress/1.2.3/app/cypress')
 
+      // @ts-expect-error
       await cache.list()
 
       // log output snapshot should have a grid of versions
@@ -238,6 +241,7 @@ describe('lib/tasks/cache', () => {
         atime: dayjs().subtract(5, 'day').valueOf(),
       })
 
+      // @ts-expect-error
       await cache.list()
       await snapshotWithHtml('list-of-versions.html')
     })
@@ -254,6 +258,7 @@ describe('lib/tasks/cache', () => {
       // the second binary has never been accessed
       statAsync.onSecondCall().resolves()
 
+      // @ts-expect-error
       await cache.list()
       await snapshotWithHtml('second-binary-never-used.html')
     })

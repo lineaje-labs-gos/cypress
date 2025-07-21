@@ -59,6 +59,7 @@ describe('cypress', function () {
     it('resolves with error object', function () {
       const outputPath = path.join(os.tmpdir(), 'cypress/monorepo/cypress_spec/output.json')
 
+      // @ts-expect-error
       sinon.stub(tmp, 'fileAsync').resolves(outputPath)
       sinon.stub(run, 'start').resolves(2)
       sinon.stub(fs, 'readJsonAsync').withArgs(outputPath).resolves()
@@ -78,6 +79,7 @@ describe('cypress', function () {
 
     beforeEach(function () {
       outputPath = path.join(os.tmpdir(), 'cypress/monorepo/cypress_spec/output.json')
+      // @ts-expect-error
       sinon.stub(tmp, 'fileAsync').resolves(outputPath)
       sinon.stub(run, 'start').resolves()
 

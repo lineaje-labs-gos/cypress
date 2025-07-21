@@ -111,9 +111,11 @@ describe('cli', () => {
 
     const sanitizePlatform = (text: any): any => {
       return text
+      // @ts-expect-error
       .split(os.eol)
       .map(replacePlatform)
       .map(replaceCypressVersion)
+      // @ts-expect-error
       .join(os.eol)
     }
 
@@ -328,10 +330,12 @@ describe('cli', () => {
     })
 
     it('calls run.start with options + exits with code', function (done) {
+      // @ts-expect-error
       run.start.resolves(10)
 
       ;(this as any).exec('run')
 
+      // @ts-expect-error
       util.exit.callsFake((code: number) => {
         expect(code).to.eq(10)
         done()
@@ -341,10 +345,12 @@ describe('cli', () => {
     it('run.start with options + catches errors', function (done) {
       const err = new Error('foo')
 
+      // @ts-expect-error
       run.start.rejects(err)
 
       ;(this as any).exec('run')
 
+      // @ts-expect-error
       util.logErrorExit1.callsFake((e: Error) => {
         expect(e).to.eq(err)
         done()
@@ -550,10 +556,12 @@ describe('cli', () => {
     it('calls open.start + catches errors', function (done) {
       const err = new Error('foo')
 
+      // @ts-expect-error
       open.start.rejects(err)
 
       ;(this as any).exec('open --port 7878')
 
+      // @ts-expect-error
       util.logErrorExit1.callsFake((e: Error) => {
         expect(e).to.eq(err)
         done()
@@ -583,6 +591,7 @@ describe('cli', () => {
 
       ;(this as any).exec('install')
 
+      // @ts-expect-error
       util.logErrorExit1.callsFake((e: Error) => {
         expect(e).to.eq(err)
         done()
@@ -608,6 +617,7 @@ describe('cli', () => {
 
       ;(this as any).exec('verify')
 
+      // @ts-expect-error
       util.logErrorExit1.callsFake((e: Error) => {
         expect(e).to.eq(err)
         done()
@@ -650,6 +660,7 @@ describe('cli', () => {
 
       ;(this as any).exec('cache list')
 
+      // @ts-expect-error
       util.logErrorExit1.callsFake((e: Error) => {
         expect(e).to.eq(err)
         done()
@@ -664,13 +675,17 @@ describe('cli', () => {
 
     it('spawns server with correct args for component-testing', function (): void {
       (this as any).exec('open --component --dev')
+      // @ts-expect-error
       expect(spawn.start.firstCall.args[0]).to.include('--testing-type')
+      // @ts-expect-error
       expect(spawn.start.firstCall.args[0]).to.include('component')
     })
 
     it('runs server with correct args for component-testing', function (): void {
       (this as any).exec('run --component --dev')
+      // @ts-expect-error
       expect(spawn.start.firstCall.args[0]).to.include('--testing-type')
+      // @ts-expect-error
       expect(spawn.start.firstCall.args[0]).to.include('component')
     })
   })

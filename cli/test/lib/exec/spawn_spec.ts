@@ -375,6 +375,7 @@ describe('lib/exec/spawn', function () {
     it('does not unref by default', function () {
       (this as any).spawnedProcess.on.withArgs('close').yieldsAsync(0)
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         expect((this as any).spawnedProcess.unref).not.to.be.called
@@ -386,6 +387,7 @@ describe('lib/exec/spawn', function () {
 
       process.env.FOO = 'bar'
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         expect((cp.spawn as any).firstCall.args[2].env.FOO).to.eq('bar')
@@ -466,6 +468,7 @@ describe('lib/exec/spawn', function () {
 
       ;(xvfb.isNeeded as any).returns(false)
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         expect((cp.spawn as any).firstCall.args[2].stdio).to.deep.eq('pipe')
@@ -482,6 +485,7 @@ describe('lib/exec/spawn', function () {
 
       ;(xvfb.isNeeded as any).returns(false)
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         expect((cp.spawn as any).firstCall.args[2].stdio).to.deep.eq('inherit')
@@ -495,6 +499,7 @@ describe('lib/exec/spawn', function () {
 
       ;(os.platform as any).returns('linux')
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         expect((cp.spawn as any).firstCall.args[2].stdio).to.deep.eq([
@@ -510,6 +515,7 @@ describe('lib/exec/spawn', function () {
 
       ;(os.platform as any).returns('darwin')
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         expect((cp.spawn as any).firstCall.args[2].stdio).to.deep.eq([
@@ -535,6 +541,7 @@ describe('lib/exec/spawn', function () {
 
       ;(os.platform as any).returns('win32')
 
+      // @ts-expect-error
       return spawn.start()
     })
 
@@ -560,6 +567,7 @@ describe('lib/exec/spawn', function () {
 
       ;(xvfb.isNeeded as any).returns(true)
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         expect(process.stderr.write).not.to.be.calledWith(buf1)
@@ -584,6 +592,7 @@ describe('lib/exec/spawn', function () {
 
       ;(os.platform as any).returns('darwin')
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         expect(process.stderr.write).not.to.be.calledWith(buf1)
@@ -596,6 +605,7 @@ describe('lib/exec/spawn', function () {
       it(`catches process.stdin errors and returns when code=${errCode}`, function () {
         (this as any).spawnedProcess.on.withArgs('close').yieldsAsync(0)
 
+        // @ts-expect-error
         return spawn.start()
         .then(() => {
           let called = false
@@ -618,6 +628,7 @@ describe('lib/exec/spawn', function () {
     it('throws process.stdin errors code!=EPIPE', function () {
       (this as any).spawnedProcess.on.withArgs('close').yieldsAsync(0)
 
+      // @ts-expect-error
       return spawn.start()
       .then(() => {
         const fn = () => {
