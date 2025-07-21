@@ -102,4 +102,5 @@ export const start = (options: any = {}): any => {
 
 export default {
   start,
+  processOpenOptions,
 }
