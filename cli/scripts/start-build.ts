@@ -22,10 +22,17 @@ includeTypes.forEach((folder: string) => {
   shell.cp('-R', source, 'build/types')
 })
 
-// TODO: Add a typescript or rollup build step
-// The only reason start-build.js exists
-// is because the cli package does not have an actual
-// build process to compile index.js and lib
-shell.exec('babel lib -d build/lib')
-shell.exec('babel index.js -o build/index.js')
+// build the project and copy the build files over to the build directory
+shell.exec('tsc')
+
+shell.cp('index.js', 'build/index.js')
 shell.cp('index.mjs', 'build/index.mjs')
+
+shell.mkdir('-p', 'build/lib')
+shell.cp('lib/*.js', 'build/lib/')
+
+shell.mkdir('-p', 'build/lib/exec')
+shell.cp('lib/exec/*.js', 'build/lib/exec')
+
+shell.mkdir('-p', 'build/lib/tasks')
+shell.cp('lib/tasks/*.js', 'build/lib/tasks')
