@@ -42,3 +42,11 @@ if (args.exec) {
 }
 
 export default CLI
+
+export const defineConfig = CLI.defineConfig
+
+export const defineComponentFramework = CLI.defineComponentFramework
+
+export const run = CLI.run
+
+export const open = CLI.open
