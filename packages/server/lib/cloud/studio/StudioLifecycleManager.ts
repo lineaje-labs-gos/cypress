@@ -261,8 +261,8 @@ export class StudioLifecycleManager {
 
     telemetryManager.mark(BUNDLE_LIFECYCLE_MARK_NAMES.STUDIO_MANAGER_SETUP_END)
 
-    if (studioManager.status === 'ENABLED') {
-      debug('Cloud studio is enabled - setting up protocol')
+    if (studioManager.status === 'ENABLED' && this.studioAiAvailable) {
+      debug('Cloud studio is enabled with AI - setting up protocol')
       const protocolManager = new ProtocolManager()
 
       telemetryManager.mark(BUNDLE_LIFECYCLE_MARK_NAMES.STUDIO_PROTOCOL_GET_START)
@@ -290,7 +290,7 @@ export class StudioLifecycleManager {
 
       studioManager.protocolManager = protocolManager
     } else {
-      debug('Cloud studio is not enabled - skipping protocol setup')
+      debug('Cloud studio is not enabled with AI - skipping protocol setup')
     }
 
     debug('Studio is ready')

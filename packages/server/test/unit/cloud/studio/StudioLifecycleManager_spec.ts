@@ -262,7 +262,9 @@ describe('StudioLifecycleManager', () => {
       })
     })
 
-    it('initializes the studio manager and registers it in the data context and sets up protocol when studio is enabled', async () => {
+    it('initializes the studio manager and registers it in the data context and sets up protocol when studio is enabled with AI', async () => {
+      process.env.CYPRESS_ENABLE_CLOUD_STUDIO_AI = 'true'
+
       studioManagerSetupStub.callsFake((args) => {
         mockStudioManager.status = 'ENABLED'
 
@@ -364,7 +366,99 @@ describe('StudioLifecycleManager', () => {
       })
     })
 
+    it('skips setting up protocol when AI is not enabled', async () => {
+      process.env.CYPRESS_ENABLE_CLOUD_STUDIO_AI = 'false'
+
+      studioManagerSetupStub.callsFake((args) => {
+        mockStudioManager.status = 'ENABLED'
+
+        return Promise.resolve()
+      })
+
+      studioLifecycleManager.initializeStudioManager({
+        projectId: 'test-project-id',
+        cloudDataSource: mockCloudDataSource,
+        ctx: mockCtx,
+        cfg: mockCfg,
+        debugData: {},
+      })
+
+      const studioReadyPromise = new Promise((resolve) => {
+        studioLifecycleManager?.registerStudioReadyListener((studioManager) => {
+          resolve(studioManager)
+        })
+      })
+
+      const mockManifest = {
+        'server/index.js': 'e1ed3dc8ba9eb8ece23914004b99ad97bba37e80a25d8b47c009e1e4948a6159',
+      }
+
+      ensureStudioBundleStub.resolves(mockManifest)
+
+      await studioReadyPromise
+
+      expect(mockCtx.update).to.be.calledOnce
+      expect(ensureStudioBundleStub).to.be.calledWith({
+        studioPath: path.join(os.tmpdir(), 'cypress', 'studio', 'abc'),
+        studioUrl: 'https://cloud.cypress.io/studio/bundle/abc.tgz',
+        projectId: 'test-project-id',
+      })
+
+      expect(studioManagerSetupStub).to.be.calledWith({
+        script: 'console.log("studio script")',
+        studioPath: path.join(os.tmpdir(), 'cypress', 'studio', 'abc'),
+        studioHash: 'abc',
+        projectSlug: 'test-project-id',
+        cloudApi: {
+          cloudUrl: 'https://cloud.cypress.io',
+          cloudHeaders: { 'Authorization': 'Bearer test-token' },
+          CloudRequest,
+          isRetryableError,
+          asyncRetry,
+        },
+        shouldEnableStudio: true,
+        manifest: mockManifest,
+      })
+
+      expect(postStudioSessionStub).to.be.calledWith({
+        projectId: 'test-project-id',
+      })
+
+      expect(readFileStub).to.be.calledWith(path.join(os.tmpdir(), 'cypress', 'studio', 'abc', 'server', 'index.js'), 'utf8')
+
+      expect(getCaptureProtocolScriptStub).not.to.be.called
+      expect(prepareProtocolStub).not.to.be.called
+
+      expect(initializeTelemetryReporterStub).to.be.calledWith({
+        projectSlug: 'test-project-id',
+        cloudDataSource: mockCloudDataSource,
+      })
+
+      expect(initializeTelemetryReporterStub).to.be.calledWith({
+        projectSlug: 'test-project-id',
+        cloudDataSource: mockCloudDataSource,
+      })
+
+      expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.BUNDLE_LIFECYCLE_START)
+      expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.BUNDLE_LIFECYCLE_END)
+      expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.POST_STUDIO_SESSION_START)
+      expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.POST_STUDIO_SESSION_END)
+      expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.ENSURE_STUDIO_BUNDLE_START)
+      expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.ENSURE_STUDIO_BUNDLE_END)
+      expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.STUDIO_MANAGER_SETUP_START)
+      expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.STUDIO_MANAGER_SETUP_END)
+      expect(markStub).not.to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.STUDIO_PROTOCOL_GET_START)
+      expect(markStub).not.to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.STUDIO_PROTOCOL_GET_END)
+      expect(markStub).not.to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.STUDIO_PROTOCOL_PREPARE_START)
+      expect(markStub).not.to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.STUDIO_PROTOCOL_PREPARE_END)
+
+      expect(reportTelemetryStub).to.be.calledWith(BUNDLE_LIFECYCLE_TELEMETRY_GROUP_NAMES.COMPLETE_BUNDLE_LIFECYCLE, {
+        success: true,
+      })
+    })
+
     it('initializes the studio manager in watch mode when CYPRESS_LOCAL_STUDIO_PATH is set', async () => {
+      process.env.CYPRESS_ENABLE_CLOUD_STUDIO_AI = 'true'
       process.env.CYPRESS_LOCAL_STUDIO_PATH = '/path/to/studio'
 
       studioManagerSetupStub.callsFake((args) => {
