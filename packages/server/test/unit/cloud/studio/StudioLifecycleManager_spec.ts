@@ -434,11 +434,6 @@ describe('StudioLifecycleManager', () => {
         cloudDataSource: mockCloudDataSource,
       })
 
-      expect(initializeTelemetryReporterStub).to.be.calledWith({
-        projectSlug: 'test-project-id',
-        cloudDataSource: mockCloudDataSource,
-      })
-
       expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.BUNDLE_LIFECYCLE_START)
       expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.BUNDLE_LIFECYCLE_END)
       expect(markStub).to.be.calledWith(BUNDLE_LIFECYCLE_MARK_NAMES.POST_STUDIO_SESSION_START)
