@@ -108,14 +108,14 @@ context('lib/tasks/verify', () => {
     const proxyquire = await import('proxyquire')
     const newVerifyInstance = proxyquire.default(`../../../lib/tasks/verify`, {}).default
 
-    return newVerifyInstance.start().then((result: any) => {
+    return newVerifyInstance.start({ listrRenderer: 'silent' }).then((result: any) => {
       expect(result).to.eq(undefined)
     })
   })
 
   it('logs error and exits when no version of Cypress is installed', () => {
     return verify
-    .start()
+    .start({ listrRenderer: 'silent' })
     .then(() => {
       throw new Error('should have caught error')
     })
@@ -144,7 +144,7 @@ context('lib/tasks/verify', () => {
       stderr: '',
     })
 
-    return verify.start()
+    return verify.start({ listrRenderer: 'silent' })
     .then(() => {
       expect(util.exec).to.be.calledWith(executablePath, ['--no-sandbox', '--smoke-test', '--ping=222'])
     })
@@ -165,7 +165,7 @@ context('lib/tasks/verify', () => {
       stderr: '',
     })
 
-    return verify.start()
+    return verify.start({ listrRenderer: 'silent' })
     .then(() => {
       expect(util.exec).to.be.calledWith(executablePath, ['--no-sandbox', '--smoke-test', '--ping=222'])
     })
@@ -179,7 +179,7 @@ context('lib/tasks/verify', () => {
       packageVersion,
     })
 
-    return verify.start().then(() => {
+    return verify.start({ listrRenderer: 'silent' }).then(() => {
       // nothing should have been logged to stdout
       // since no verification took place
       expect(stdout.toString()).to.be.empty
@@ -196,7 +196,7 @@ context('lib/tasks/verify', () => {
     })
 
     return verify
-    .start()
+    .start({ listrRenderer: 'silent' })
     .then(() => {
       throw new Error('should have caught error')
     })
@@ -210,7 +210,7 @@ context('lib/tasks/verify', () => {
 
   it('logs error and exits when executable cannot be found', () => {
     return verify
-    .start()
+    .start({ listrRenderer: 'silent' })
     .then(() => {
       throw new Error('should have caught error')
     })
@@ -238,12 +238,12 @@ context('lib/tasks/verify', () => {
     util.exec.restore()
 
     return verify
-    .start({ smokeTestTimeout: 1 })
+    .start({ smokeTestTimeout: 1, listrRenderer: 'silent' })
     .catch((err: any) => {
       logger.error(err)
     })
     .then(() => {
-      snapshot(normalize(slice(stdout.toString())))
+      snapshot(normalize(stdout.toString()))
     })
   })
 
@@ -265,12 +265,12 @@ context('lib/tasks/verify', () => {
     util.exec.restore()
 
     return verify
-    .start()
+    .start({ listrRenderer: 'silent' })
     .catch((err: any) => {
       logger.error(err)
     })
     .then(() => {
-      snapshot(normalize(slice(stdout.toString())))
+      snapshot(normalize(stdout.toString()))
     })
   })
 
@@ -291,12 +291,12 @@ context('lib/tasks/verify', () => {
     util.exec.restore()
 
     return verify
-    .start()
+    .start({ listrRenderer: 'silent' })
     .catch((err: any) => {
       logger.error(err)
     })
     .then(() => {
-      snapshot(normalize(slice(stdout.toString())))
+      snapshot(normalize(stdout.toString()))
     })
   })
 
@@ -327,7 +327,7 @@ context('lib/tasks/verify', () => {
         stderr: '',
       })
 
-      return verify.start()
+      return verify.start({ listrRenderer: 'silent' })
       .then(() => {
         expect(util.exec).to.be.calledWith(executablePath, ['--no-sandbox', '--smoke-test', '--ping=222'],
           sinon.match({
@@ -349,7 +349,7 @@ context('lib/tasks/verify', () => {
     })
 
     it('shows full path to executable when verifying', () => {
-      return verify.start({ force: true }).then(() => {
+      return verify.start({ force: true, listrRenderer: 'silent' }).then(() => {
         snapshot('verification with executable 1', normalize(stdout.toString()))
       })
     })
@@ -366,7 +366,7 @@ context('lib/tasks/verify', () => {
       })
 
       return verify
-      .start({ force: true })
+      .start({ force: true, listrRenderer: 'silent' })
       .then(() => {
         throw new Error('Should have thrown')
       })
@@ -382,7 +382,7 @@ context('lib/tasks/verify', () => {
       .then(() => {
         return snapshot(
           'fails verifying Cypress 1',
-          normalize(slice(stdout.toString())),
+          normalize(stdout.toString()),
         )
       })
     })
@@ -410,7 +410,7 @@ context('lib/tasks/verify', () => {
     })
 
     it('finds ping value in the verbose output', () => {
-      return verify.start().then(() => {
+      return verify.start({ listrRenderer: 'silent' }).then(() => {
         snapshot('verbose stdout output 1', normalize(stdout.toString()))
       })
     })
@@ -467,7 +467,7 @@ context('lib/tasks/verify', () => {
         return BluebirdPromise.reject(firstSpawnError)
       })
 
-      return verify.start().then(() => {
+      return verify.start({ listrRenderer: 'silent' }).then(() => {
         expect(util.exec).to.have.been.calledTwice
         // user should have been warned
         expect(logger.warn).to.have.been.calledWithMatch(
@@ -513,7 +513,7 @@ context('lib/tasks/verify', () => {
         return BluebirdPromise.reject(firstSpawnError)
       })
 
-      return verify.start().then(() => {
+      return verify.start({ listrRenderer: 'silent' }).then(() => {
         throw new Error('Should have failed')
       })
       .catch((e: any) => {
@@ -538,7 +538,7 @@ context('lib/tasks/verify', () => {
     })
 
     return verify
-    .start()
+    .start({ listrRenderer: 'silent' })
     .then(() => {
       throw new Error('Should have thrown')
     })
@@ -559,7 +559,7 @@ context('lib/tasks/verify', () => {
     })
 
     return verify
-    .start()
+    .start({ listrRenderer: 'silent' })
     .then(() => {
       throw new Error('Should have thrown')
     })
@@ -581,7 +581,7 @@ context('lib/tasks/verify', () => {
       packageVersion,
     })
 
-    return verify.start().then(() => {
+    return verify.start({ listrRenderer: 'silent' }).then(() => {
       return snapshot(
         'current version has not been verified 1',
         normalize(stdout.toString()),
@@ -596,7 +596,7 @@ context('lib/tasks/verify', () => {
       packageVersion: '7.8.9',
     })
 
-    return verify.start().then(() => {
+    return verify.start({ listrRenderer: 'silent' }).then(() => {
       return snapshot(
         'different version installed 1',
         normalize(stdout.toString()),
@@ -613,7 +613,7 @@ context('lib/tasks/verify', () => {
 
     process.env.npm_config_loglevel = 'silent'
 
-    return verify.start().then(() => {
+    return verify.start({ listrRenderer: 'silent' }).then(() => {
       return snapshot(
         'silent verify 1',
         normalize(`[no output]${stdout.toString()}`),
@@ -653,7 +653,7 @@ context('lib/tasks/verify', () => {
     })
 
     return verify
-    .start()
+    .start({ listrRenderer: 'silent' })
     .then(() => {
       throw new Error('Should have thrown')
     })
@@ -678,13 +678,13 @@ context('lib/tasks/verify', () => {
     })
 
     it('starts xvfb', () => {
-      return verify.start().then(() => {
+      return verify.start({ listrRenderer: 'silent' }).then(() => {
         expect(xvfb.start).to.be.called
       })
     })
 
     it('stops xvfb on spawned process close', () => {
-      return verify.start().then(() => {
+      return verify.start({ listrRenderer: 'silent' }).then(() => {
         expect(xvfb.stop).to.be.called
       })
     })
@@ -699,7 +699,7 @@ context('lib/tasks/verify', () => {
       err.stack = 'xvfb? no dice'
       sinon.stub(xvfb._xvfb, 'startAsync').rejects(err)
 
-      return verify.start()
+      return verify.start({ listrRenderer: 'silent' })
       .then(() => {
         throw new Error('should have thrown')
       })
@@ -708,7 +708,7 @@ context('lib/tasks/verify', () => {
 
         logger.error(err)
 
-        snapshot('xvfb fails 1', normalize(slice(stdout.toString())))
+        snapshot('xvfb fails 1', normalize(stdout.toString()))
       })
     })
   })
@@ -726,7 +726,7 @@ context('lib/tasks/verify', () => {
     })
 
     it('uses verbose renderer', () => {
-      return verify.start().then(() => {
+      return verify.start({ listrRenderer: 'silent' }).then(() => {
         snapshot('verifying in ci 1', normalize(stdout.toString()))
       })
     })
@@ -735,7 +735,7 @@ context('lib/tasks/verify', () => {
       mockfs({})
 
       return verify
-      .start()
+      .start({ listrRenderer: 'silent' })
       .then(() => {
         throw new Error('Should have thrown')
       })
@@ -764,7 +764,7 @@ context('lib/tasks/verify', () => {
       .withArgs(realEnvBinaryPath, ['--no-sandbox', '--smoke-test', '--ping=222'])
       .resolves(spawnedProcess)
 
-      return verify.start().then(() => {
+      return verify.start({ listrRenderer: 'silent' }).then(() => {
         // @ts-expect-error
         expect(util.exec.firstCall.args[0]).to.equal(realEnvBinaryPath)
         snapshot('valid CYPRESS_RUN_BINARY 1', normalize(stdout.toString()))
@@ -778,7 +778,7 @@ context('lib/tasks/verify', () => {
         ;(os.platform as any).returns(platform)
 
         return verify
-        .start()
+        .start({ listrRenderer: 'silent' })
         .then(() => {
           throw new Error('Should have thrown')
         })
@@ -866,21 +866,4 @@ function createfs ({ alreadyVerified, executable, packageVersion, customDir }: a
   }
 
   return mockfs(mockFiles)
-}
-
-function slice (str: string) {
-  // strip answer and split by new lines
-  let strArray = str.split('\n')
-
-  // find the line about verifying cypress can run
-  const index = _.findIndex(strArray, (line) => {
-    return line.includes('Verifying Cypress can run')
-  })
-
-  // get rid of whatever the next line is because
-  // i cannot figure out why this line fails in CI
-  // its likely due to some UTF code
-  strArray.splice(index + 1, 1, 'STRIPPED')
-
-  return strArray.join('\n')
 }

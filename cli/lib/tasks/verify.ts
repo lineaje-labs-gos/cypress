@@ -190,7 +190,8 @@ function testBinary (version: string, binaryDir: string, options: any): any {
   // the default
   let renderer = util.isCi() ? verbose : 'default'
 
-  if (logger.logLevel() === 'silent') renderer = 'silent'
+  // NOTE: under test we set the listr renderer to 'silent' in order to get deterministic snapshots
+  if (logger.logLevel() === 'silent' || options.listrRenderer) renderer = 'silent'
 
   const rendererOptions = {
     renderer,
