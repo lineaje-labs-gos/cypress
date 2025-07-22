@@ -38,7 +38,9 @@ export const baseConfig = <InfiniteDepthConfigWithExtends[]>[
     languageOptions: {
       parserOptions: {
         parser: tsParser,
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['eslint.config.ts'],
+        },
         extraFileExtensions: ['.vue'],
         ecmaFeatures: {
           jsx: true,
