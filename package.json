@@ -45,7 +45,7 @@
     "gulp:debug": "node --inspect-brk ./node_modules/.bin/gulp",
     "postinstall": "node ./scripts/run-postInstall.js",
     "lint": "lerna run lint --no-bail --concurrency 2",
-    "lint:fix": "lerna run lint --no-bail --concurrency 2 --scope=@cypress/grep -- --fix",
+    "lint:fix": "lerna run lint --no-bail --concurrency 2 --scope=@cypress/{grep,mount-utils,cypress-schematic,puppeteer} -- --fix",
     "npm-release": "node scripts/npm-release.js",
     "prepare": "husky install",
     "prepare-release-artifacts": "node ./scripts/prepare-release-artifacts.js",
@@ -265,7 +265,7 @@
     ]
   },
   "lint-staged": {
-    "npm/grep/**/*.{js,jsx,ts,tsx}": "yarn lint:fix",
+    "npm/{grep,mount-utils,cypress-schematic,puppeteer}/**/*.{js,jsx,ts,tsx}": "yarn lint:fix",
     "*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
     "cli/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
     "packages/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
@@ -273,10 +273,7 @@
     "system-tests/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
     "tooling/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
     "npm/angular/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
-    "npm/cypress-schematic/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
     "npm/eslint-plugin-dev/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
-    "npm/mount-utils/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
-    "npm/puppeteer/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
     "npm/react/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
     "npm/svelte/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
     "npm/vite-dev-server/**/*.{js,jsx,ts,tsx,json,eslintrc,vue}": "eslint --fix",
