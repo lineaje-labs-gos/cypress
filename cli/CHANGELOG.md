@@ -9,6 +9,10 @@ _Released 7/30/2025 (PENDING)_
 - Fixed an issue where TypeScript ESM projects using `.js` and `.mjs` extensions where not resolving correctly within `@cypress/webpack-batteries-included-preprocessor`. Addressed in [#31994](https://github.com/cypress-io/cypress/pull/31994).
 - Fixed an issue in `@cypress/angular` where component instance fields were not reference safe and were being overwritten. Addresses [#31238](https://github.com/cypress-io/cypress/issues/31238) and [#31983](https://github.com/cypress-io/cypress/issues/31983).
 
+**Dependency Updates:**
+
+- Pinned `form-data` to `4.0.4` to address a security vulnerability. Addresses [#32066](https://github.com/cypress-io/cypress/issues/32066).
+
 ## 14.5.2
 
 _Released 7/15/2025_
