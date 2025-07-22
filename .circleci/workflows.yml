@@ -52,7 +52,7 @@ macWorkflowFilters: &darwin-workflow-filters
       - equal:
           [
             'update-chrome-stable-from-136.0.7103.113-beta-from-137.0.7151.40',
-            'dep/fix-form-data-4.0.04',
+            'dep/fix-form-data-4.0.4',
             << pipeline.git.branch >>
           ]
       - matches:
@@ -68,7 +68,7 @@ linuxArm64WorkflowFilters: &linux-arm64-workflow-filters
       - equal:
           [
             'update-chrome-stable-from-136.0.7103.113-beta-from-137.0.7151.40',
-            'dep/fix-form-data-4.0.04',
+            'dep/fix-form-data-4.0.4',
             << pipeline.git.branch >>
           ]
       - matches:
@@ -96,7 +96,7 @@ windowsWorkflowFilters: &windows-workflow-filters
       - equal:
           [
             'update-chrome-stable-from-136.0.7103.113-beta-from-137.0.7151.40',
-            'dep/fix-form-data-4.0.04',
+            'dep/fix-form-data-4.0.4',
             << pipeline.git.branch >>
           ]
       - matches:
