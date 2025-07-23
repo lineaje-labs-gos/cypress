@@ -11,7 +11,7 @@ _Released 7/30/2025 (PENDING)_
 
 **Dependency Updates:**
 
-- Pinned `form-data` to `4.0.4` to address a security vulnerability. Addresses [#32066](https://github.com/cypress-io/cypress/issues/32066).
+- Pinned `form-data` to `4.0.4`. This removes the [SNYK-JS-FORMDATA-10841150](https://security.snyk.io/vuln/SNYK-JS-FORMDATA-10841150) vulnerability being reported in security scans. Addresses [#32066](https://github.com/cypress-io/cypress/issues/32066).
 
 ## 14.5.2
 
