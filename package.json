@@ -279,7 +279,6 @@
     "@types/react": "18.3.12",
     "browserify-sign": "4.2.2",
     "devtools-protocol": "0.0.1459876",
-    "form-data": "4.0.4",
     "sharp": "0.29.3",
     "vue-template-compiler": "2.6.12"
   },
