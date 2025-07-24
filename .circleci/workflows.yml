@@ -49,6 +49,7 @@ macWorkflowFilters: &darwin-workflow-filters
       - equal: [ develop, << pipeline.git.branch >> ]
       # use the following branch as well to ensure that v8 snapshot cache updates are fully tested
       - equal: [ 'update-v8-snapshot-cache-on-develop', << pipeline.git.branch >> ]
+      - equal: [ 'test-cypress-request-update', << pipeline.git.branch >> ]
       - equal:
           [
             'update-chrome-stable-from-136.0.7103.113-beta-from-137.0.7151.40',
@@ -64,6 +65,7 @@ linuxArm64WorkflowFilters: &linux-arm64-workflow-filters
       - equal: [ develop, << pipeline.git.branch >> ]
       # use the following branch as well to ensure that v8 snapshot cache updates are fully tested
       - equal: [ 'update-v8-snapshot-cache-on-develop', << pipeline.git.branch >> ]
+      - equal: [ 'test-cypress-request-update', << pipeline.git.branch >> ]
       - equal:
           [
             'update-chrome-stable-from-136.0.7103.113-beta-from-137.0.7151.40',
@@ -96,6 +98,7 @@ windowsWorkflowFilters: &windows-workflow-filters
             'update-chrome-stable-from-136.0.7103.113-beta-from-137.0.7151.40',
             << pipeline.git.branch >>
           ]
+      - equal: [ 'test-cypress-request-update', << pipeline.git.branch >> ]
       - matches:
           pattern: /^release\/\d+\.\d+\.\d+$/
           value: << pipeline.git.branch >>
