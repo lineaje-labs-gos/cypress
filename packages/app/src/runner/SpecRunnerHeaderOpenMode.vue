@@ -18,7 +18,7 @@
       </button>
       <div
         data-cy="aut-url"
-        class="border rounded flex bg-gray-950 grow border-gray-800 h-[32px] align-middle"
+        class="aut-url-container border rounded flex bg-gray-950 grow border-gray-800 h-[32px] align-middle"
       >
         <SpecRunnerDropdown
           v-if="selectedBrowser?.displayName"
@@ -252,23 +252,22 @@ function openExternally () {
   text-decoration: none;
 }
 
-.aut-url-input:focus {
-  outline: 2px solid #6366f1;
-  outline-offset: -2px;
-  background-color: #0f172a;
-  color: #f8fafc;
-  border-radius: 4px;
-}
-
+.aut-url-input:focus,
 .aut-url-input:active {
-  background-color: #1e293b;
-  color: #f8fafc;
+  outline: none;
+  background-color: transparent;
+  color: #9aa2fc;
 }
 
-/* Enhanced container styling when input is focused */
-.aut-url-input:focus-within,
-[data-cy="aut-url"]:focus-within {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 1px #6366f1;
+.aut-url-container {
+  border: 3px solid transparent;
+}
+
+/* Style container when input is focused */
+.aut-url-container:focus-within {
+  border: 3px solid rgba(154, 162, 252, 0.35);
+  border-radius: 7px;
+  box-shadow: 0 0 0 1px #9aa2fc;
+  background-color: #25283c;
 }
 </style>

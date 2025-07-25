@@ -1,7 +1,7 @@
 <template>
   <Popover
     :key="`${props.disabled}`"
-    class="rounded-[50px] h-[30px] mx-[6px] py-[2px] relative"
+    class="rounded-[50px] h-[26px] mx-[6px] py-[2px] relative"
     #="{ open, close }"
   >
     <PopoverButton
