@@ -251,4 +251,24 @@ function openExternally () {
 .aut-url-input:disabled:hover {
   text-decoration: none;
 }
+
+.aut-url-input:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: -2px;
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-radius: 4px;
+}
+
+.aut-url-input:active {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+/* Enhanced container styling when input is focused */
+.aut-url-input:focus-within,
+[data-cy="aut-url"]:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px #6366f1;
+}
 </style>
