@@ -44,6 +44,7 @@
         <input
           ref="autUrlInputRef"
           data-cy="aut-url-input"
+          :readonly="!studioStore.needsUrl && !!inputValue"
           :disabled="urlDisabled"
           :value="inputValue"
           :placeholder="inputPlaceholder"
@@ -229,7 +230,7 @@ function visitUrl () {
 }
 
 function openExternally () {
-  if (!autStore.url || studioStore.isActive) {
+  if (!autStore.url || studioStore.needsUrl) {
     return
   }
 

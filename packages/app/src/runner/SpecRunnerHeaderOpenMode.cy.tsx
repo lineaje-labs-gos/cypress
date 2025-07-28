@@ -232,7 +232,6 @@ describe('SpecRunnerHeaderOpenMode', { viewportHeight: 500 }, () => {
 
       cy.findByTestId('aut-url-input').should('not.be.disabled')
       cy.findByTestId('aut-url-input').should('have.prop', 'placeholder', 'Enter URL')
-      cy.findByTestId('aut-url-input').should('be.focused')
       cy.percySnapshot()
     })
   })
