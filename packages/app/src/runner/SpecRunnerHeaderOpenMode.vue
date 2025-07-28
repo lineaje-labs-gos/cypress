@@ -44,8 +44,7 @@
         <input
           ref="autUrlInputRef"
           data-cy="aut-url-input"
-          :readonly="!studioStore.needsUrl && !!inputValue"
-          :disabled="urlDisabled"
+          :readonly="urlReadOnly"
           :value="inputValue"
           :placeholder="inputPlaceholder"
           aria-label="url of the application under test"
@@ -195,7 +194,7 @@ const activeSpecPath = specStore.activeSpec?.absolute
 
 const isDisabled = computed(() => autStore.isRunning || autStore.isLoading)
 
-const urlDisabled = computed(() => !studioStore.needsUrl || props.gql.currentTestingType === 'component')
+const urlReadOnly = computed(() => !studioStore.needsUrl || props.gql.currentTestingType === 'component')
 
 const inputPlaceholder = computed(() => {
   if (props.gql.currentTestingType === 'component') {

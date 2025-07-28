@@ -122,7 +122,7 @@ describe('SpecRunnerHeaderOpenMode', { viewportHeight: 500 }, () => {
       cy.get('[data-cy="aut-url"]').should('exist')
       cy.findByTestId('aut-url-input').should('be.visible').should('have.value', autUrl)
       // no reason to type in the url input
-      cy.findByTestId('aut-url-input').should('be.disabled')
+      cy.findByTestId('aut-url-input').should('have.prop', 'readOnly', true)
       cy.findByTestId('viewport-size').should('be.visible').contains('500x500')
     })
 
@@ -212,7 +212,7 @@ describe('SpecRunnerHeaderOpenMode', { viewportHeight: 500 }, () => {
       })
 
       cy.findByTestId('playground-activator').should('be.visible')
-      cy.findByTestId('aut-url-input').should('be.disabled')
+      cy.findByTestId('aut-url-input').should('have.prop', 'readOnly', true)
       cy.findByTestId('aut-url-input').should('have.prop', 'placeholder', 'URL navigation disabled in component testing')
       cy.findByTestId('viewport-size').should('be.visible').contains('500x500')
     })
@@ -230,7 +230,7 @@ describe('SpecRunnerHeaderOpenMode', { viewportHeight: 500 }, () => {
         },
       })
 
-      cy.findByTestId('aut-url-input').should('not.be.disabled')
+      cy.findByTestId('aut-url-input').should('have.prop', 'readOnly', false)
       cy.findByTestId('aut-url-input').should('have.prop', 'placeholder', 'Enter URL')
       cy.percySnapshot()
     })
