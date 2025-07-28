@@ -3,10 +3,10 @@
 ## Migration Checklist
 
 ### Batch 1: Small npm utilities
-- [x] npm/grep
-- [x] npm/puppeteer
-- [x] npm/mount-utils
-- [ ] npm/cypress-schematic
+- [x] npm/grep ✅ **COMPLETED** 
+- [x] npm/puppeteer ✅ **COMPLETED** 
+- [x] npm/mount-utils ✅ **COMPLETED** 
+- [x] npm/cypress-schematic ✅ **COMPLETED** 
 
 ### Batch 2: Framework adapters
 - [ ] npm/react
