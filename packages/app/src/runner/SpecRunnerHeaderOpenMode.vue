@@ -48,7 +48,7 @@
           :value="inputValue"
           :placeholder="inputPlaceholder"
           aria-label="url of the application under test"
-          class="aut-url-input bg-gray-950 flex grow mr-[12px] leading-normal max-w-full text-gray-300 self-center hocus-link-default truncate w-full"
+          class="aut-url-input bg-transparent text-gray-300 outline-none text-base font-normal leading-6 flex grow mr-[12px] max-w-full self-center truncate w-full placeholder:text-gray-400 placeholder:text-base placeholder:font-normal placeholder:leading-6 focus:text-indigo-300 active:text-indigo-300 focus-visible:outline-none"
           :style="{ zIndex: inputZIndex }"
           @input="setStudioUrl"
           @click="openExternally"
@@ -212,7 +212,17 @@ const isDisabled = computed(() => autStore.isRunning || autStore.isLoading)
 
 const urlDisabled = computed(() => props.gql.currentTestingType === 'component')
 
-const inputPlaceholder = computed(() => props.gql.currentTestingType === 'e2e' ? '' : 'URL navigation disabled in component testing')
+const inputPlaceholder = computed(() => {
+  if (props.gql.currentTestingType === 'component') {
+    return 'URL navigation disabled in component testing'
+  }
+
+  if (studioStore.needsUrl) {
+    return 'Enter URL'
+  }
+
+  return ''
+})
 
 const inputValue = computed(() => {
   if (props.gql.currentTestingType === 'component') {
@@ -244,32 +254,25 @@ function openExternally () {
 </script>
 
 <style scoped>
-.aut-url-input:disabled {
-  background-color: transparent;
-}
-
-.aut-url-input:disabled:hover {
-  text-decoration: none;
-}
-
-.aut-url-input:focus,
-.aut-url-input:active {
-  outline: none;
-  background-color: transparent;
-  color: #9aa2fc;
-}
-
 .aut-url-container {
   border: 1px solid #434861;
-  margin: 2px;
+  padding: 1px;
+  background-color: #25283c;
+  border-radius: 4px;
 }
 
-/* Style container when input is focused */
-.aut-url-container:focus-within {
-  margin: 0px;
-  border: 3px solid rgba(154, 162, 252, 0.35);
-  border-radius: 7px;
-  box-shadow: 0 0 0 1px #9aa2fc;
+.aut-url-container:hover {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.aut-url-container:focus-within,
+.aut-url-container:focus-visible,
+.aut-url-container:focus {
+  border: 2px solid #9aa2fc;
+  padding: 0;
+  box-shadow: 0 0 0 1px rgba(154, 162, 252, 0.35);
   background-color: #25283c;
 }
 
