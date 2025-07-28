@@ -2743,10 +2743,10 @@
   dependencies:
     "@cypress-design/constants-tabs" "^1.2.1"
 
-"@cypress-design/vue-tag@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@cypress-design/vue-tag/-/vue-tag-1.0.1.tgz#dd4c820c635d614ab64097bfe2bb77742037508a"
-  integrity sha512-+Ampbv/NBnwLOBRx/jiyyfMKYeKcWYs+0IMk85HgSyjhPVlMiwZRiLIQLfJGKMf7elNNiqna37RZEsgJJfJX8Q==
+"@cypress-design/vue-tag@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@cypress-design/vue-tag/-/vue-tag-1.1.0.tgz#7f156f906b904c6e0e7d63853ca086be1d277d21"
+  integrity sha512-kGTLpS8mZ5Pi9Calyr1b5YviJZlQ7xsVHsPytLvlFOAnBAKSW6KA/bin+SuwPUgVyI9oPrd9RpQ3JkD+lrRO6g==
 
 "@cypress/commit-info@2.2.0":
   version "2.2.0"

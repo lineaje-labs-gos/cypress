@@ -65,9 +65,9 @@
         <Tag
           data-cy="viewport-size"
           size="20"
-          color="gray"
-          :dark="true"
-          class="self-center rounded-[10px] mr-[5px] pr-[6px] pl-[6px]"
+          color="gray-dark"
+          :outline="true"
+          class="self-center mr-[5px] pr-[6px] pl-[6px] viewport-tag"
         >
           <span class="whitespace-nowrap text-[12px]">{{ autStore.viewportWidth }}x{{
             autStore.viewportHeight
@@ -77,9 +77,9 @@
           v-if="displayScale"
           data-cy="viewport-scale"
           size="20"
-          color="gray"
-          :dark="true"
-          class="self-center rounded-[10px] mr-[5px] pr-[6px] pl-[6px]"
+          color="gray-dark"
+          :outline="true"
+          class="self-center mr-[5px] pr-[6px] pl-[6px] viewport-tag"
         >
           <span class="text-[12px]">
             {{ displayScale }}
@@ -260,14 +260,21 @@ function openExternally () {
 }
 
 .aut-url-container {
-  border: 3px solid transparent;
+  border: 1px solid #434861;
+  margin: 2px;
 }
 
 /* Style container when input is focused */
 .aut-url-container:focus-within {
+  margin: 0px;
   border: 3px solid rgba(154, 162, 252, 0.35);
   border-radius: 7px;
   box-shadow: 0 0 0 1px #9aa2fc;
   background-color: #25283c;
+}
+
+/* Override Tag component border-radius with higher specificity */
+.viewport-tag {
+  border-radius: 12px !important;
 }
 </style>
