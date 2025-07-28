@@ -48,7 +48,7 @@
           :value="inputValue"
           :placeholder="inputPlaceholder"
           aria-label="url of the application under test"
-          class="aut-url-input bg-transparent text-gray-300 outline-none text-base font-normal leading-6 flex grow mr-[12px] max-w-full self-center truncate w-full placeholder:text-gray-400 placeholder:text-base placeholder:font-normal placeholder:leading-6 focus:text-indigo-300 active:text-indigo-300 focus-visible:outline-none"
+          class="aut-url-input bg-transparent text-gray-300 outline-none text-base font-normal leading-6 flex grow mr-[12px] max-w-full self-center truncate w-full placeholder:text-gray-400 placeholder:text-base placeholder:font-normal placeholder:leading-6 focus:text-indigo-300 focus-visible:outline-none"
           :style="{ zIndex: inputZIndex }"
           @input="setStudioUrl"
           @click="openExternally"
@@ -203,7 +203,7 @@ const activeSpecPath = specStore.activeSpec?.absolute
 
 const isDisabled = computed(() => autStore.isRunning || autStore.isLoading)
 
-const urlDisabled = computed(() => props.gql.currentTestingType === 'component')
+const urlDisabled = computed(() => !studioStore.needsUrl || props.gql.currentTestingType === 'component')
 
 const inputPlaceholder = computed(() => {
   if (props.gql.currentTestingType === 'component') {
