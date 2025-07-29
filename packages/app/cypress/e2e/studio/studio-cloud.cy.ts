@@ -17,7 +17,7 @@ describe('Studio Cloud', () => {
     cy.withCtx(async (ctx) => {
       await ctx.actions.file.writeFileInProject('cypress/e2e/spec-with-only.cy.js', `
 describe('spec with .only tests', () => {
-  it.only('should be the only test to run normally', () => {
+  it['only']('should be the only test to run normally', () => {
     cy.visit('cypress/e2e/index.html')
     cy.get('h1').should('contain', 'Hello World')
   })
