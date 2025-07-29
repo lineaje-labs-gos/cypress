@@ -11,6 +11,51 @@ describe('Studio Cloud', () => {
     })
   })
 
+  it('creates and runs new tests in studio mode when there is a .only test in the spec file', () => {
+    loadProjectAndRunSpec({ specName: 'spec.cy.js' })
+
+    cy.withCtx(async (ctx) => {
+      await ctx.actions.file.writeFileInProject('cypress/e2e/spec-with-only.cy.js', `
+describe('spec with .only tests', () => {
+  it.only('should be the only test to run normally', () => {
+    cy.visit('cypress/e2e/index.html')
+    cy.get('h1').should('contain', 'Hello World')
+  })
+
+  it('should be skipped in normal mode', () => {
+    cy.visit('cypress/e2e/index.html')
+    cy.get('p').should('contain', 'Count is 0')
+  })
+
+  it('another test that should be skipped', () => {
+    cy.visit('cypress/e2e/index.html')
+    cy.get('#increment').click()
+  })
+})`)
+    })
+
+    cy.visitApp()
+    cy.specsPageIsVisible()
+
+    // open the spec with .only tests
+    cy.get('[data-cy-row="spec-with-only.cy.js"]').click()
+    cy.waitForSpecToFinish()
+
+    cy.get('.test').should('have.length', 1)
+    cy.get('.test').contains('should be the only test to run normally').should('be.visible')
+
+    // launch studio and create a new test
+    cy.findByTestId('studio-button').click()
+    cy.findByTestId('studio-panel').should('be.visible').within(() => {
+      cy.contains('button', 'New test').click()
+      cy.get('[data-cy="test-name-input"]').type('new test{enter}')
+    })
+
+    cy.get('.spec-name').should('have.text', 'spec-with-only')
+    // our new test runs in studio mode even though it doesn't have a .only
+    cy.get('[data-cy="studio-single-test-title"]').should('have.text', 'new test')
+  })
+
   it('immediately loads the studio panel from existing test', () => {
     const deferred = pDefer()
 

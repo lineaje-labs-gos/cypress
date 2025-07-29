@@ -31,6 +31,21 @@ const RUNNABLE_PROPS = [
 const debug = debugFn('cypress:driver:runner')
 const debugErrors = debugFn('cypress:driver:errors')
 
+// detect studio mode from URL parameters
+const isStudioMode = () => {
+  try {
+    if (typeof window === 'undefined') return false
+
+    const url = new URL(window.location.href)
+    const hashParams = new URLSearchParams(url.hash.slice(1))
+
+    // studio mode is active if there's a 'studio' parameter
+    return hashParams.has('studio')
+  } catch (err) {
+    return false
+  }
+}
+
 const RUNNER_EVENTS = [
   TEST_BEFORE_RUN_ASYNC_EVENT,
   TEST_BEFORE_RUN_EVENT,
@@ -771,7 +786,7 @@ const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, setO
     setOnlyTestId(runnable.id)
   }
 
-  if ((runnable.type !== 'suite') || !hasOnly(runnable)) {
+  if ((runnable.type !== 'suite') || !hasOnly(runnable) || isStudioMode()) {
     if (runnable.type === 'test' && (!getOnlyTestId() || runnable.id === getOnlyTestId())) {
       push(runnable)
     }
