@@ -240,7 +240,7 @@ export const useStudioStore = defineStore('studioRecorder', {
         this._wasStudioCreatedTest = true
       } else if (this.testId) {
         if (this._wasStudioCreatedTest) {
-          // This test was created just createdby studio, so we need to set the test id
+          // This test was just created by studio, so we need to set the test id
           getCypress().runner.setOnlyTestId(this.testId)
           getCypress().runner.setIsStudioCreatedTest(true)
         } else {
@@ -254,9 +254,11 @@ export const useStudioStore = defineStore('studioRecorder', {
     interceptTest (test) {
       // if this test is the one we created, we can just set the test id
       if (this.newTestLineNumber && test.invocationDetails?.line === this.newTestLineNumber) {
+        this._wasStudioCreatedTest = true
         this.setTestId(test.id)
         getCypress().runner.setIsStudioCreatedTest(true)
       } else if (this.suiteId) {
+        this._wasStudioCreatedTest = true
         this.setTestId(test.id)
         getCypress().runner.setIsStudioCreatedTest(true)
       }
