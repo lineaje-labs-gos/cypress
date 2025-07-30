@@ -1,6 +1,6 @@
 {
   "name": "cypress",
-  "version": "12.17.4",
+  "version": "12.17.4-lineaje-01",
   "description": "Cypress is a next generation front end testing tool built for the modern web",
   "private": true,
   "scripts": {
@@ -216,9 +216,15 @@
   },
   "productName": "Cypress",
   "license": "MIT",
+  "contributors": [
+    {
+      "name": "Lineaje DepFixer",
+      "email": "221268890+Lineaje-DepFixer@users.noreply.github.com"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/cypress-io/cypress.git"
+    "url": "https://github.com/lineaje-labs-gos/cypress"
   },
   "homepage": "https://github.com/cypress-io/cypress",
   "bugs": {
