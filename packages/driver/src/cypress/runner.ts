@@ -651,7 +651,7 @@ const pruneEmptySuites = (rootSuite, testFilter: NonNullable<TestFilter>) => {
   return totalUnfilteredTests
 }
 
-const normalizeAll = (suite, initialTests = {}, testFilter, setTestsById, setTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber) => {
+const normalizeAll = (suite, initialTests = {}, testFilter, setTestsById, setTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber, getIsStudioCreatedTest) => {
   let totalUnfilteredTests = 0
 
   // Empty suites don't have any impact in run mode so let's avoid this extra work.
@@ -677,7 +677,7 @@ const normalizeAll = (suite, initialTests = {}, testFilter, setTestsById, setTes
   // traversing through it multiple times
   const tests: Record<string, any> = {}
 
-  const normalizedSuite = normalize(suite, tests, initialTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber)
+  const normalizedSuite = normalize(suite, tests, initialTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber, getIsStudioCreatedTest)
 
   if (setTestsById) {
     // use callback here to hand back
@@ -717,7 +717,7 @@ const normalizeAll = (suite, initialTests = {}, testFilter, setTestsById, setTes
   return normalizedSuite
 }
 
-const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber) => {
+const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber, getIsStudioCreatedTest) => {
   const normalizeRunnable = (runnable) => {
     if (!runnable.id) {
       runnable.id = getRunnableId()
@@ -786,7 +786,9 @@ const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, setO
     setOnlyTestId(runnable.id)
   }
 
-  if ((runnable.type !== 'suite') || !hasOnly(runnable) || isStudioMode()) {
+  const shouldBypassOnly = (isStudioMode() && getIsStudioCreatedTest())
+
+  if ((runnable.type !== 'suite') || !hasOnly(runnable) || shouldBypassOnly) {
     if (runnable.type === 'test' && (!getOnlyTestId() || runnable.id === getOnlyTestId())) {
       push(runnable)
     }
@@ -807,7 +809,7 @@ const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, setO
     _.each({ tests: runnableTests, suites: runnableSuites }, (_runnables, type) => {
       if (runnable[type]) {
         return normalizedRunnable[type] = _.compact(_.map(_runnables, (childRunnable) => {
-          const normalizedChild = normalize(childRunnable, tests, initialTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber)
+          const normalizedChild = normalize(childRunnable, tests, initialTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber, getIsStudioCreatedTest)
 
           if (type === 'tests' && onlyIdMode()) {
             if (normalizedChild.id === getOnlyTestId()) {
@@ -896,7 +898,7 @@ const normalize = (runnable, tests, initialTests, getRunnableId, getHookId, setO
       suite.suites = []
 
       normalizedSuite.suites = _.compact(_.map(suiteSuites, (childSuite) => {
-        const normalizedChildSuite = normalize(childSuite, tests, initialTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber)
+        const normalizedChildSuite = normalize(childSuite, tests, initialTests, getRunnableId, getHookId, setOnlyTestId, getOnlyTestId, getNewTestLineNumber, getIsStudioCreatedTest)
 
         if ((suite._onlySuites.indexOf(childSuite) !== -1) || filterOnly(normalizedChildSuite, childSuite)) {
           if (onlyIdMode()) {
@@ -1329,6 +1331,7 @@ export default {
     let _startTime: string | null = null
     let _onlyTestId = null
     let _newTestLineNumber = null
+    let _isStudioCreatedTest = false
 
     const getRunnableId = () => {
       return `r${++_runnableId}`
@@ -1392,6 +1395,12 @@ export default {
     }
 
     const getNewTestLineNumber = () => _newTestLineNumber
+
+    const setIsStudioCreatedTest = (isCreated) => {
+      _isStudioCreatedTest = isCreated
+    }
+
+    const getIsStudioCreatedTest = () => _isStudioCreatedTest
 
     const abort = () => {
       // abort the run
@@ -1577,6 +1586,8 @@ export default {
       setOnlyTestId,
       setNewTestLineNumber,
       getNewTestLineNumber,
+      setIsStudioCreatedTest,
+      getIsStudioCreatedTest,
       normalizeAll (tests, skipCollectingLogs, testFilter) {
         _skipCollectingLogs = skipCollectingLogs
         // if we have an uncaught error then slice out
@@ -1605,6 +1616,7 @@ export default {
           setOnlyTestId,
           getOnlyTestId,
           getNewTestLineNumber,
+          getIsStudioCreatedTest,
         )
       },
 

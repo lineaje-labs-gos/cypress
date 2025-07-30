@@ -11,35 +11,26 @@ describe('Studio Cloud', () => {
     })
   })
 
+  it('allows .only tests to be edited in studio', () => {
+    loadProjectAndRunSpec({ specName: 'spec-with-only.cy.js' })
+
+    // verify the test is the only one that runs
+    cy.get('.test').should('have.length', 1)
+    cy.get('.test').contains('should be the only test to run normally').should('be.visible')
+
+    // open edit in studio
+    cy.contains('should be the only test to run normally')
+    .closest('.runnable-wrapper')
+    .findByTestId('launch-studio')
+    .click()
+
+    cy.findByTestId('studio-panel').should('be.visible')
+
+    cy.findByTestId('studio-single-test-title').should('have.text', 'should be the only test to run normally')
+  })
+
   it('creates and runs new tests in studio mode when there is a .only test in the spec file', () => {
-    loadProjectAndRunSpec({ specName: 'spec.cy.js' })
-
-    cy.withCtx(async (ctx) => {
-      await ctx.actions.file.writeFileInProject('cypress/e2e/spec-with-only.cy.js', `
-describe('spec with .only tests', () => {
-  it['only']('should be the only test to run normally', () => {
-    cy.visit('cypress/e2e/index.html')
-    cy.get('h1').should('contain', 'Hello World')
-  })
-
-  it('should be skipped in normal mode', () => {
-    cy.visit('cypress/e2e/index.html')
-    cy.get('p').should('contain', 'Count is 0')
-  })
-
-  it('another test that should be skipped', () => {
-    cy.visit('cypress/e2e/index.html')
-    cy.get('#increment').click()
-  })
-})`)
-    })
-
-    cy.visitApp()
-    cy.specsPageIsVisible()
-
-    // open the spec with .only tests
-    cy.get('[data-cy-row="spec-with-only.cy.js"]').click()
-    cy.waitForSpecToFinish()
+    loadProjectAndRunSpec({ specName: 'spec-with-only.cy.js' })
 
     cy.get('.test').should('have.length', 1)
     cy.get('.test').contains('should be the only test to run normally').should('be.visible')
