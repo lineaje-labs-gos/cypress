@@ -304,6 +304,7 @@ export const useStudioStore = defineStore('studioRecorder', {
       this._currentId = 1
       this.isFailed = false
       this.showUrlPrompt = true
+      this._wasStudioCreatedTest = false
 
       this._maybeResetRunnables()
     },
