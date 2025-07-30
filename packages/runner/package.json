@@ -43,9 +43,6 @@
   "files": [
     "dist"
   ],
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
-  },
   "nx": {
     "implicitDependencies": [
       "@packages/driver",

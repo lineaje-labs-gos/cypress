@@ -41,9 +41,6 @@
     "src/v8-snapshot.ts"
   ],
   "types": "src/v8-snapshot.ts",
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
-  },
   "optionalDependencies": {
     "@cypress/snapbuild-android-arm64": "1.0.4",
     "@cypress/snapbuild-darwin-64": "1.0.4",

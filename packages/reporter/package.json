@@ -42,8 +42,5 @@
     "webpack-cli": "^5.1.4"
   },
   "files": [],
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
-  },
   "nx": {}
 }

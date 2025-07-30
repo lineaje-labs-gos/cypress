@@ -27,9 +27,6 @@
     "lib"
   ],
   "types": "index.d.ts",
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
-  },
   "nx": {
     "targets": {
       "build": {

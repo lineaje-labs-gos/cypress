@@ -71,9 +71,6 @@
     }
   ],
   "module": "dist/cypress-vue.esm-bundler.js",
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,vue}": "eslint --fix"
-  },
   "peerDependenciesMeta": {
     "@cypress/webpack-dev-server": {
       "optional": true

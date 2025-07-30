@@ -51,8 +51,5 @@
     "src"
   ],
   "types": "src/index.ts",
-  "lint-staged": {
-    "*.{js,ts,json}": "eslint --fix"
-  },
   "nx": {}
 }

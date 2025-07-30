@@ -61,9 +61,6 @@
     }
   ],
   "module": "dist/index.js",
-  "lint-staged": {
-    "*.{js,ts,json}": "eslint --fix"
-  },
   "publishConfig": {
     "access": "public"
   },

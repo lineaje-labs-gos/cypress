@@ -30,8 +30,5 @@
     "src/require.ts"
   ],
   "types": "src/require.ts",
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
-  },
   "nx": {}
 }

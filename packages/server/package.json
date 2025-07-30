@@ -233,9 +233,6 @@
       "webdriver"
     ]
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
-  },
   "optionalDependencies": {
     "fsevents": "^2",
     "registry-js": "1.15.0"

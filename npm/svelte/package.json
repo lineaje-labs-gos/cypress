@@ -37,9 +37,6 @@
     "component testing"
   ],
   "module": "dist/cypress-svelte.esm-bundler.js",
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
-  },
   "publishConfig": {
     "access": "public"
   },
