@@ -238,14 +238,9 @@ export const useStudioStore = defineStore('studioRecorder', {
         // Creating a new test - need to bypass .only filtering
         getCypress().runner.setIsStudioCreatedTest(true)
         this._wasStudioCreatedTest = true
-      } else if (this.suiteId) {
-        getCypress().runner.setOnlySuiteId(this.suiteId)
-        // Creating a new test in a suite - need to bypass .only filtering
-        getCypress().runner.setIsStudioCreatedTest(true)
-        this._wasStudioCreatedTest = true
       } else if (this.testId) {
         if (this._wasStudioCreatedTest) {
-          // This test was created by studio, so we need to set the test id
+          // This test was created just createdby studio, so we need to set the test id
           getCypress().runner.setOnlyTestId(this.testId)
           getCypress().runner.setIsStudioCreatedTest(true)
         } else {
