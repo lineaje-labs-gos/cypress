@@ -9,7 +9,6 @@
     "check-ts": "tsc --noEmit",
     "clean": "rimraf dist",
     "clean-deps": "rimraf node_modules",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "test": "yarn test-integration",
     "test-integration": "mocha --config ./test/.mocharc.js",
     "watch": "tsc --watch"
