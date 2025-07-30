@@ -9,6 +9,7 @@
     "check-ts": "tsc --noEmit",
     "clean": "rimraf dist",
     "clean-deps": "rimraf node_modules",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "test": "yarn test-unit",
     "test-integration": "mocha test/integration/**/*.spec.ts --config ./test/.mocharc.js",
     "test-unit": "mocha test/unit/**/*.spec.ts --config ./test/.mocharc.js",
@@ -40,6 +41,9 @@
     "src/v8-snapshot.ts"
   ],
   "types": "src/v8-snapshot.ts",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
+  },
   "optionalDependencies": {
     "@cypress/snapbuild-android-arm64": "1.0.4",
     "@cypress/snapbuild-darwin-64": "1.0.4",

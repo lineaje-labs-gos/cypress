@@ -9,6 +9,7 @@
     "check-ts": "tsc --noEmit",
     "clean": "rimraf dist",
     "clean-deps": "rimraf node_modules",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "test": "yarn test-unit",
     "test-integration": "mocha test/integration/**/*.spec.ts --config ./test/.mocharc.js",
     "test-unit": "mocha test/unit/**/*.spec.ts --config ./test/.mocharc.js",
@@ -30,5 +31,8 @@
   "files": [
     "dist"
   ],
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
+  },
   "nx": {}
 }

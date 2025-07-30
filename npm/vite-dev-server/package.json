@@ -50,6 +50,9 @@
   "homepage": "https://github.com/cypress-io/cypress/tree/develop/npm/vite-dev-server#readme",
   "bugs": "https://github.com/cypress-io/cypress/issues/new?template=1-bug-report.md",
   "module": "dist/index.js",
+  "lint-staged": {
+    "*.{js,ts,json}": "eslint --fix"
+  },
   "publishConfig": {
     "access": "public"
   },

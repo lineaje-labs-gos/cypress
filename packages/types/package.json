@@ -31,5 +31,8 @@
       "devtools-protocol"
     ]
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
+  },
   "nx": {}
 }

@@ -9,6 +9,7 @@
     "predeploy": "yarn build",
     "deploy": "gh-pages -d build -b gh-pages",
     "postinstall": "echo '@packages/example needs: yarn build'",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "test": "yarn test-unit",
     "test-e2e": "cypress run",
     "test-unit": "echo 'no unit tests'"
@@ -26,6 +27,9 @@
     "lib"
   ],
   "types": "index.d.ts",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
+  },
   "nx": {
     "targets": {
       "build": {

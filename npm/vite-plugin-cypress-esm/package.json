@@ -39,6 +39,9 @@
   "homepage": "https://github.com/cypress-io/cypress/tree/develop/npm/vite-plugin-cypress-esm#readme",
   "bugs": "https://github.com/cypress-io/cypress/issues/new?labels=npm:%20@cypress/vite-plugin-cypress-esm",
   "module": "dist/index.js",
+  "lint-staged": {
+    "*.{js,ts,json}": "eslint --fix"
+  },
   "publishConfig": {
     "access": "public"
   },

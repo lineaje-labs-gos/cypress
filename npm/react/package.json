@@ -80,6 +80,9 @@
   ],
   "unpkg": "dist/cypress-react.browser.js",
   "module": "dist/cypress-react.esm-bundler.js",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
+  },
   "peerDependenciesMeta": {
     "@types/react": {
       "optional": true

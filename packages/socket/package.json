@@ -53,5 +53,8 @@
       "socket.io-client/socket.io-parser"
     ]
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
+  },
   "nx": {}
 }

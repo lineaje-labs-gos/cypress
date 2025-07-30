@@ -9,6 +9,7 @@
     "build": "tsc",
     "check-ts": "tsc --noEmit && yarn -s tslint",
     "clean": "rimraf dist",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "test": "yarn test-unit",
     "test-unit": "mocha --config ./test/.mocharc.js",
     "tslint": "tslint --config ../ts/tslint.json --project .",
@@ -34,5 +35,8 @@
     "src"
   ],
   "types": "src/node.ts",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
+  },
   "nx": {}
 }

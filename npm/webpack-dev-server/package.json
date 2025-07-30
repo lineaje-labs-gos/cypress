@@ -59,6 +59,9 @@
   },
   "homepage": "https://github.com/cypress-io/cypress/tree/develop/npm/webpack-dev-server#readme",
   "bugs": "https://github.com/cypress-io/cypress/issues/new?template=1-bug-report.md",
+  "lint-staged": {
+    "*.{js,ts,json}": "eslint --fix"
+  },
   "publishConfig": {
     "access": "public"
   },

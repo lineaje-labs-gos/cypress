@@ -116,6 +116,9 @@
       "patch-package"
     ]
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,vue}": "eslint --fix"
+  },
   "nx": {
     "targets": {
       "build": {

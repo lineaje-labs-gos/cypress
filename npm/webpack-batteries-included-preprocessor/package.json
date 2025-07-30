@@ -79,6 +79,9 @@
     "cypress-preprocessor",
     "webpack"
   ],
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "eslint --fix"
+  },
   "publishConfig": {
     "access": "public"
   },

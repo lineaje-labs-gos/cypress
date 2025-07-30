@@ -32,5 +32,8 @@
   "files": [
     "lib"
   ],
+  "lint-staged": {
+    "*.{js,ts,json}": "eslint --fix"
+  },
   "nx": {}
 }
